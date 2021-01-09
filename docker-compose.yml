@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  web:
+    build:
+      context: .
+    image: dobon_web
+    container_name: dobon_web
+    volumes:
+      - ./src:/src
+      - /src/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081

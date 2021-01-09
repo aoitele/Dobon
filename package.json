@@ -1,0 +1,13 @@
+{
+  "name": "dobon",
+  "version": "1.0.0",
+  "description": "extreme trump game -dobon-",
+  "author": "Takuto Eto",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.16.1"
+  }
+}
