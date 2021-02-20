@@ -4,7 +4,7 @@ const { VueLoaderPlugin } = require("vue-loader");
 const outputPath = path.resolve(__dirname, "dist");
 
 module.exports = {
-  entry: "./src/main.js",
+  entry: "./src/index.js",
   output: {
     path: path.resolve(__dirname, "./dist"),
     publicPath: "/dist/",
@@ -67,7 +67,7 @@ module.exports = {
     historyApiFallback: true,
     noInfo: true,
     overlay: true,
-    contentBase: outputPath,
+    contentBase: path.resolve(__dirname, "./src"),
     port: 3000,
   },
   performance: {

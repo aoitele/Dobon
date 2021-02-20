@@ -1,5 +1,7 @@
 <template>
-  <p>pages index.vue</p>
+  <div id="app">
+    <p>pages index.vue</p>
+  </div>
 </template>
 
 <script>
