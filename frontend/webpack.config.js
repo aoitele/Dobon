@@ -2,15 +2,18 @@ var path = require("path");
 var webpack = require("webpack");
 const { VueLoaderPlugin } = require("vue-loader");
 const outputPath = path.resolve(__dirname, "dist");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
+const ASSET_PATH = process.env.ASSET_PATH || "/";
 
 module.exports = {
   entry: "./src/index.js",
   output: {
-    path: path.resolve(__dirname, "./dist"),
-    publicPath: "/dist/",
-    filename: "build.js",
+    path: path.resolve(__dirname, outputPath),
+    publicPath: ASSET_PATH,
+    filename: "bundle.js",
   },
-  plugins: [new VueLoaderPlugin()],
   module: {
     rules: [
       {
@@ -19,7 +22,13 @@ module.exports = {
       },
       {
         test: /\.scss$/,
-        use: ["vue-style-loader", "css-loader", "sass-loader"],
+        use: [
+          MiniCssExtractPlugin.loader,
+          //"vue-style-loader",
+          "css-loader",
+          "postcss-loader",
+          "sass-loader",
+        ],
       },
       {
         test: /\.sass$/,
@@ -49,14 +58,35 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(png|jpg|gif|svg)$/,
-        loader: "file-loader",
-        options: {
-          name: "[name].[ext]?[hash]",
-        },
+        test: /\.(jpe?g|gif|png|svg)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              // name: "[name].[contenthash].[ext]", //出力するファイル名 extは拡張子
+              name: "[name].[ext]", //出力するファイル名 extは拡張子
+              outputPath: "images", //output path (dist)からの相対パスを指定
+              publicPath: "images", //出力されるCSSからの画像パスを指定
+            },
+          },
+          "image-webpack-loader", //出力される画像を圧縮するためのローダー
+        ],
       },
     ],
   },
+  plugins: [
+    new VueLoaderPlugin(),
+    new HtmlWebpackPlugin({
+      template: "index.html",
+      chunks: ["app"],
+    }),
+    new MiniCssExtractPlugin({
+      filename: "./css/[name].css", //nameにはエントリーポイント名が入る
+    }),
+    new CopyPlugin({
+      patterns: [{ from: "static" }],
+    }),
+  ],
   resolve: {
     alias: {
       vue$: "vue/dist/vue.esm.js",
@@ -64,11 +94,10 @@ module.exports = {
     extensions: ["*", ".js", ".vue", ".json"],
   },
   devServer: {
-    historyApiFallback: true,
-    noInfo: true,
-    overlay: true,
-    contentBase: path.resolve(__dirname, "./src"),
+    contentBase: path.resolve(__dirname, "dist"),
+    watchContentBase: true,
     port: 3000,
+    overlay: { warnings: true, errors: true },
   },
   performance: {
     hints: false,
@@ -86,7 +115,7 @@ if (process.env.NODE_ENV === "production") {
       },
     }),
     new webpack.LoaderOptionsPlugin({
-      minimize: true,
+      minimize: false,
     }),
   ]);
 }
