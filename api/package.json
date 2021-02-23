@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development node ./server/server.js",
+    "dev-api": "nodemon --config nodemon.json",
     "start": "NODE_ENV=production node ./server/server.js"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "eslint": "^7.17.0",
     "eslint-config-prettier": "^7.1.0",
     "node-notifier": "^9.0.0",
+    "nodemon": "^2.0.7",
     "prettier": "^2.2.1",
     "typescript": "^4.1.3"
   },

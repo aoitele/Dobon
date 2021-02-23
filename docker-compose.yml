@@ -7,13 +7,14 @@ services:
       dockerfile: ./api/Dockerfile
     image: dobon_api
     container_name: dobon_api
-    command: "npm start"
     volumes:
-      - ./api:/api
+      - ./api:/usr/src/api
       - ./api/node_modules:/usr/src/api/node_modules
     ports:
       - "8080:8080"
     tty: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
   web:
     build:
       context: .
