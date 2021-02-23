@@ -8,6 +8,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 const ASSET_PATH = process.env.ASSET_PATH || "/";
 
 module.exports = {
+  mode: 'development',
   entry: "./src/index.js",
   output: {
     path: path.resolve(__dirname, outputPath),
@@ -94,10 +95,18 @@ module.exports = {
     extensions: ["*", ".js", ".vue", ".json"],
   },
   devServer: {
-    contentBase: path.resolve(__dirname, "dist"),
+    contentBase: path.resolve(__dirname, "src"),
     watchContentBase: true,
+    inline: true,
+    open: true,
     port: 3000,
+    host: '0.0.0.0',
     overlay: { warnings: true, errors: true },
+  },
+  watch: true,
+  watchOptions: {
+    aggregateTimeout: 200, // 最初の変更からここで設定した期間に行われた変更は1度の変更の中で処理が行われる
+    poll: 1000 // ポーリングの間隔
   },
   performance: {
     hints: false,

@@ -14,4 +14,6 @@ RUN npm install
 
 # アプリケーションを実行するコマンド定義
 EXPOSE 3000
+
+RUN npm rebuild node-sass --force
 CMD npm run start

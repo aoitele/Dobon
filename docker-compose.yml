@@ -22,7 +22,7 @@ services:
     image: dobon_web
     container_name: dobon_web
     volumes:
-      - ./frontend:/frontend
+      - ./frontend:/usr/src/frontend
       - ./frontend/node_modules:/usr/src/frontend/node_modules
     ports:
       - "3000:3000"
