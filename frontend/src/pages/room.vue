@@ -9,6 +9,7 @@ export default {
     return {
       msg: null
     };
-  }
+  },
+
 };
 </script>

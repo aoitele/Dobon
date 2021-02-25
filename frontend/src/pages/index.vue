@@ -1,8 +1,30 @@
 <template>
   <div>
-    <div class="index-wrap">
-      <h1 class="title">Dobon</h1>
-      <img src="image/numa_hamaru_woman.png" class="mv" />
+    <div class='index-wrap'>
+      <h1 class='title'>Dobon</h1>
+      logging: {{ logging }}
+      <img src='image/numa_hamaru_woman.png' class='mv' />
+      <div>
+        <form id='app'>
+          <input
+            type='text'
+            v-model='invitationCode'
+            placeholder='enter your invitation code'
+            class='invitaionForm'
+          />
+           <p v-if="errors.length">
+            <ul>
+              <li 
+              v-for="error in errors" 
+              :key="error">
+              {{ error }}
+              </li>
+            </ul>
+            </p>
+            <button @click="submit">参加する</button>
+        </form>
+      </div>
+      <router-link to='/room'>ルームを選んで参加する</router-link>
     </div>
   </div>
 </template>
@@ -10,8 +32,35 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      logging: false, 
+      invitationCode: null,
+      errors: []
+    };
   },
+  methods: {
+    async submit() {
+      this.logging = true;
+      try {
+        const res = await this.$axios.get('/api/login', { params:{ invitationcode: this.invitationCode }})
+        console.log(res.data, 'res')
+      } catch(e) {
+        console.log(e, 'e')
+      }
+      this.logging = false;
+    },
+    checkForm: function (e) {
+      if (this.invitationCode) {
+        return true;
+      }
+
+      this.errors = [];
+      if (!this.invitationCode) {
+        this.errors.push('code required');
+      }
+      e.preventDefault();
+    }
+  }
 };
 </script>
 

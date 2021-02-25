@@ -6,7 +6,13 @@ router.get("/", (req, res) => {
   res.send("Hello Router");
 });
 
-router.get("/login", (req, res) => {});
+router.get("/login", (req, res) => {
+  const result = {
+    success: true,
+    userId: 1
+  };
+  res.json(result);
+});
 router.get("/logout", (req, res) => {});
 router.get("/create", (req, res) => {});
 router.get("/room", (req, res) => {
@@ -21,7 +27,7 @@ router.get("/room", (req, res) => {
       id: 2,
       name: "テスト部屋F",
       participantUserId: [4, 5, 6]
-    },
+    }
   ];
   res.json(roomInfo);
 });
