@@ -28,10 +28,16 @@ services:
       - "3000:3000"
     tty: true
     depends_on:
-      - mongo
-  mongo:
-    image: mongo
-  mongo-express:
-    image: mongo-express
+      - db
+  db:
+    image: postgres:13-alpine
+    container_name: dobon_db
+    volumes:
+      - ./database/initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
     ports:
-      - 8081:8081
+      - "15432:5432"
+    tty: true
