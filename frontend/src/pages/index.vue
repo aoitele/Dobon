@@ -21,7 +21,7 @@
               </li>
             </ul>
             </p>
-            <button @click="submit">参加する</button>
+            <input type="button" @click="submit" value="参加する">
         </form>
       </div>
       <router-link to='/room'>ルームを選んで参加する</router-link>

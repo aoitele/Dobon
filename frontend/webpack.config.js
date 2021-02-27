@@ -104,7 +104,11 @@ module.exports = {
     overlay: { warnings: true, errors: true },
     proxy: {
       "/api": {
-        target: "http://dobon_api:8080",
+        target: {
+          host: "dobon_api",
+          protocol: "http",
+          port: 8080,
+        },
         pathRewrite: { "^/api": "/" },
       },
     },
