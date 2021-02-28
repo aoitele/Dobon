@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:14.16.0-buster-slim
 
 # アプリケーションソースをバンドル
 COPY ./api ./usr/src/api

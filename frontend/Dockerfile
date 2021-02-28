@@ -1,19 +1,13 @@
 # ビルド環境
-FROM node:12
-# アプリケーションディレクトリを作成
-WORKDIR /usr/src
-
-# 依存関係をインストール (package.json, packeage-lock.json)
-COPY ./frontend/package*.json ./
+FROM node:14.16.0-buster-slim
 
 # アプリケーションソースをバンドル
-COPY ./frontend ./frontend
+COPY ./frontend ./usr/src/frontend
 
 WORKDIR /usr/src/frontend
-RUN npm install
+RUN npm cache verify --force && npm install && npm rebuild node-sass --force
 
 # アプリケーションを実行するコマンド定義
 EXPOSE 3000
 
-RUN npm rebuild node-sass --force
 CMD npm run start
