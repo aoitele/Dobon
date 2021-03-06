@@ -13,10 +13,11 @@ services:
       - ./api:/usr/src/api
       - ./api/node_modules:/usr/src/api/node_modules
     ports:
-      - $PORT_API:$PORT_API
+      - "8080:8080"
     tty: true
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=development
   web:
     env_file: .env
     build:
@@ -25,11 +26,13 @@ services:
     image: dobon_web
     container_name: dobon_web
     command: npm run dev
+    environment:
+      NODE_ENV: development
     volumes:
       - ./frontend:/usr/src/frontend
       - ./frontend/node_modules:/usr/src/frontend/node_modules
     ports:
-      - $PORT_WEB:$PORT_WEB
+      - "3000:3000"
     tty: true
     depends_on:
       - db
@@ -43,5 +46,5 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_DB
     ports:
-      - "15432:5432"
+      - "5432:5432"
     tty: true
