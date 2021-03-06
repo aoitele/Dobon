@@ -9,9 +9,7 @@
     "dev": "NODE_ENV=development webpack-dev-server --Host 0.0.0.0",
     "build": "NODE_ENV=production webpack --progress --hide-modules",
     "watch": "webpack --watch",
-    "start": "NODE_ENV=production node ./server/server.js",
-    "dev-build": "webpack --progress --mode development",
-    "prod-build": "webpack --progress --hide-modules --mode production"
+    "start": "NODE_ENV=production node ./server/server.js"
   },
   "dependencies": {
     "axios": "^0.21.1",
