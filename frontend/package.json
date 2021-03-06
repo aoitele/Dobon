@@ -6,9 +6,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "NODE_ENV=development webpack-dev-server --Host 0.0.0.0",
-    "build": "NODE_ENV=production webpack --progress --hide-modules",
-    "watch": "webpack --watch",
+    "dev": "NODE_ENV=development webpack-dev-server --config webpack.dev.js --Host 0.0.0.0",
+    "build": "NODE_ENV=production webpack --config webpack.prod.js",
+    "watch": "webpack --watch --config webpack.dev.js",
     "start": "NODE_ENV=production node ./server/server.js"
   },
   "dependencies": {
