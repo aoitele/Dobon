@@ -5,10 +5,10 @@ build:
   docker:
     api: Dockerfile.api
     web: Dockerfile.web
-release:
-  image: web
-  command:
-    - npm run build
+#release:
+#  image: web
+#  command:
+#    - npm run build
 run:
   api: npm run start
-  web: npm run start
+  web: npm run build && npm run start
