@@ -2,30 +2,34 @@ version: "3"
 
 services:
   api:
+    env_file: .env
     build:
       context: .
-      dockerfile: ./api/Dockerfile
+      dockerfile: Dockerfile.api
     image: dobon_api
     container_name: dobon_api
+    command: npm run dev-api
     volumes:
       - ./api:/usr/src/api
       - ./api/node_modules:/usr/src/api/node_modules
     ports:
-      - "8080:8080"
+      - $PORT_API:$PORT_API
     tty: true
     environment:
       - CHOKIDAR_USEPOLLING=true
   web:
+    env_file: .env
     build:
       context: .
-      dockerfile: ./frontend/Dockerfile
+      dockerfile: Dockerfile.web
     image: dobon_web
     container_name: dobon_web
+    command: npm run dev
     volumes:
       - ./frontend:/usr/src/frontend
       - ./frontend/node_modules:/usr/src/frontend/node_modules
     ports:
-      - "3000:3000"
+      - $PORT_WEB:$PORT_WEB
     tty: true
     depends_on:
       - db

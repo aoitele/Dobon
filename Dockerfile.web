@@ -9,5 +9,3 @@ RUN npm cache verify --force && npm install && npm rebuild node-sass --force
 
 # アプリケーションを実行するコマンド定義
 EXPOSE 3000
-
-CMD npm run dev
