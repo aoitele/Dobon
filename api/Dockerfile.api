@@ -7,3 +7,5 @@ COPY /api /usr/src/api
 WORKDIR /usr/src/api
 
 RUN npm install
+
+CMD [ "npm", "start" ]
