@@ -4,7 +4,7 @@ services:
   api:
     env_file: .env
     build:
-      context: .
+      context: ./api
       dockerfile: Dockerfile.api
     image: dobon_api
     container_name: dobon_api
@@ -21,7 +21,7 @@ services:
   web:
     env_file: .env
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile.web
     image: dobon_web
     container_name: dobon_web
