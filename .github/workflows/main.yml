@@ -1,0 +1,30 @@
+# This is a basic workflow to help you get started with Actions
+
+name: DOBON-DEPLOY-CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build, Push and Deploy to Heroku #set the whatever name you want to this step
+        id: heroku
+        uses: snithyanantham/docker-compose-multiple-apps-heroku-deploy@v1.0  # use the latest version of the action
+        with:
+          email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
+          api_key: ${{ secrets.HEROKU_API_KEY }} # your  heroku api key
+          docker_compose_file: './src/docker-compose.heroku.yml' # set the path to the folder where the docker-compose file is located
+          heroku_apps: '[{"imagename":"web","appname":"dobon-web","apptype":"web"},{"imagename":"api","appname":"dobon-api","apptype":"web"}]' # List of Docker Image name, Heroku app and Heroku app type
