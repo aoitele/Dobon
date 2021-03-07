@@ -13,7 +13,7 @@ app.use(function (req, res, next) {
 });
 
 const PORT = process.env.PORT || 8080;
-const HOST = (process.env.NODE_ENV === 'production') ? 'https://ymltest.herokuapp.com': 'http://localhost';
+const HOST = (process.env.NODE_ENV === 'production') ? 'https://dobon-game.herokuapp.com': 'http://localhost';
 
 app.listen(PORT);
-console.log(`running on http://${HOST}:${PORT}`);
+console.log(`running on ${HOST}:${PORT}`);

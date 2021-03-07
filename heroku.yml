@@ -3,8 +3,8 @@ setup:
     - plan: heroku-postgresql
 build:
   docker:
-    api: Dockerfile.api
+    web.api: Dockerfile.api
     web: Dockerfile.web
 run:
-  api: npm run start
+  web.api: npm run start
   web: npm run build && npm run start
