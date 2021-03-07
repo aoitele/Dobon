@@ -27,4 +27,4 @@ jobs:
           email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
           api_key: ${{ secrets.HEROKU_API_KEY }} # your  heroku api key
           docker_compose_file: 'docker-compose.yml' # set the path to the folder where the docker-compose file is located
-          heroku_apps: '[{"imagename":"web","appname":"dobon-web","apptype":"web"},{"imagename":"api","appname":"dobon-api","apptype":"web"}]' # List of Docker Image name, Heroku app and Heroku app type
+          heroku_apps: '[{"imagename":"dobon_web","appname":"dobon_game","apptype":"web"}]' # List of Docker Image name, Heroku app and Heroku app type
