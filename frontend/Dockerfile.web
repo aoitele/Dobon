@@ -10,4 +10,6 @@ RUN apt-get update && apt-get install -y \
 COPY /frontend /usr/src/frontend
 
 WORKDIR /usr/src/frontend
-RUN npm cache verify --force && npm install && npm rebuild node-sass --force
+RUN npm cache verify --force && npm install && npm rebuild node-sass --force && npm run build
+
+CMD [ "npm", "start" ]
