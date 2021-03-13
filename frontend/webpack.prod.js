@@ -1,4 +1,5 @@
 var path = require("path");
+const dotenv = require('dotenv-webpack');
 const { VueLoaderPlugin } = require("vue-loader");
 const outputPath = path.resolve(__dirname, "dist");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -86,6 +87,9 @@ module.exports = {
     new CopyPlugin({
       patterns: [{ from: "static" }],
     }),
+    new dotenv({
+      systemvars: true, // 本番環境で環境変数を取得するため
+    })
   ],
   resolve: {
     alias: {

@@ -1,6 +1,6 @@
 var path = require("path");
 var webpack = require("webpack");
-const dotenv = require('dotenv');
+const dotenv = require('dotenv-webpack');
 const { VueLoaderPlugin } = require("vue-loader");
 const outputPath = path.resolve(__dirname, "dist");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -88,9 +88,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [{ from: "static" }],
     }),
-    new webpack.DefinePlugin({
-      'process.env': JSON.stringify(dotenv.config().parsed)
-    })
+    new dotenv()
 ],
   resolve: {
     alias: {
