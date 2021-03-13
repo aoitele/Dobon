@@ -4,7 +4,7 @@ import Top from "./pages/index.vue";
 import Room from "./pages/room.vue";
 
 Vue.use(Router);
-console.log(process.env.BASE_URL, "process.env.BASE_URL");
+
 export default new Router({
   base: "/",
   mode: "history",
