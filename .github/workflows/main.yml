@@ -16,6 +16,8 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
+    env:
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
