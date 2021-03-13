@@ -15,7 +15,7 @@ services:
     tty: true
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - NODE_ENV=development
+      - NODE_ENV=production
   web:
     build:
       context: .
@@ -23,25 +23,10 @@ services:
     image: dobon_web
     container_name: dobon_web
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
     volumes:
       - ./frontend:/usr/src/frontend
       - ./frontend/node_modules:/usr/src/frontend/node_modules
     ports:
       - "3000:3000"
-    tty: true
-    depends_on:
-      - db
-  db:
-    image: postgres:13-alpine
-    container_name: dobon_db
-    volumes:
-      - ./database/initdb.d:/docker-entrypoint-initdb.d
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    ports:
-      - "5432:5432"
     tty: true
