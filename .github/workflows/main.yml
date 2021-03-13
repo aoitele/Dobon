@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setenv
-            run: echo "api_base_url=https://dobon-api.herokuapp.com" >> $API_BASE_URL
+        run: echo "api_base_url=https://dobon-api.herokuapp.com" >> $API_BASE_URL
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build, Push and Deploy to Heroku #set the whatever name you want to this step
