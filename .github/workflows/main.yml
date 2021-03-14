@@ -15,7 +15,6 @@ on:
 
 env:
   API_BASE_URL: https://dobon-api.herokuapp.com
-  API_BASE_URL_TEST: https://dobon-api.herokuapp.com
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:

@@ -43,10 +43,12 @@ export default {
       this.logging = true;
       try {
         //const res = await this.$axios.get('/api/login', { params:{ invitationcode: this.invitationCode }})
-        console.log(process.env.API_BASE_URL, 'API_BASE_URL')
-        console.log(process.env.API_BASE_URL_TEST, 'API_BASE_URL_TEST')
-        const res = await this.$axios.get('https://dobon-api.herokuapp.com/room');
-        console.log(res, 'res')
+        console.log(process.env.API_BASE_URL, 'API_BASE_URL');
+        const res1 = await this.$axios.get('/room');
+        console.log(res1, 'res1');
+
+        const res2 = await this.$axios.get(process.env.API_BASE_URL + '/room');
+        console.log(res2, 'res2');
       } catch(e) {
         console.log(e, 'e')
       }
