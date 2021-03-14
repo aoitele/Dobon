@@ -92,7 +92,11 @@ module.exports = {
       systemvars: true, // 本番環境で環境変数を取得するため
     }),
     new webpack.DefinePlugin({
-      'process.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL),
+      'process.env': {
+        API_BASE_URL: JSON.stringify(process.env.API_BASE_URL),
+        API_BASE_URL_TEST: JSON.stringify('https://dobon-api.herokuapp.com'),
+        DEBUG: JSON.stringify(true)
+      }
     })
 ],
   resolve: {
