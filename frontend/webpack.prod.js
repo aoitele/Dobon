@@ -93,8 +93,7 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env': {
-        API_BASE_URL: JSON.stringify(process.env.API_BASE_URL),
-        API_BASE_URL_TEST: JSON.stringify('https://dobon-api.herokuapp.com'),
+        API_BASE_URL: JSON.stringify('https://dobon-api.herokuapp.com'),
         DEBUG: JSON.stringify(true)
       }
     })
