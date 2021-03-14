@@ -1,4 +1,5 @@
 var path = require("path");
+var webpack = require("webpack");
 const dotenv = require('dotenv-webpack');
 const { VueLoaderPlugin } = require("vue-loader");
 const outputPath = path.resolve(__dirname, "dist");
@@ -89,8 +90,11 @@ module.exports = {
     }),
     new dotenv({
       systemvars: true, // 本番環境で環境変数を取得するため
+    }),
+    new webpack.DefinePlugin({
+      'process.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL),
     })
-  ],
+],
   resolve: {
     alias: {
       vue$: "vue/dist/vue.esm.js",
