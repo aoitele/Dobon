@@ -1,21 +1,21 @@
 const express = require("express");
-const router = express.Router();
+const index = express.Router();
 const wrap = fn => (...args) => fn(...args).catch(args[2]);
 
-router.get("/", (req, res) => {
+index.get("/", (req, res) => {
   res.send("Hello Router");
 });
 
-router.get("/login", (req, res) => {
+index.get("/login", (req, res) => {
   const result = {
     success: true,
     userId: 1
   };
   res.json(result);
 });
-router.get("/logout", (req, res) => {});
-router.get("/create", (req, res) => {});
-router.get("/room", (req, res) => {
+index.get("/logout", (req, res) => {});
+index.get("/create", (req, res) => {});
+index.get("/room", (req, res) => {
   // 開催中のルーム一覧を返す
   const roomInfo = [
     {
@@ -31,8 +31,8 @@ router.get("/room", (req, res) => {
   ];
   res.json(roomInfo);
 });
-router.get("/room/:id", (req, res) => {
+index.get("/room/:id", (req, res) => {
   res.send("this room number is" + req.params.id);
 });
 
-module.exports = router;
+module.exports = index;
