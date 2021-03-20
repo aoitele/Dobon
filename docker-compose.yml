@@ -45,7 +45,27 @@ services:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
-      - POSTGRES_HOST_AUTH_METHOD=trust
     ports:
       - "5432:5432"
     tty: true
+  prisma:
+    image: prismagraphql/prisma:1.34
+    container_name: dobon_prisma
+    restart: always
+    ports:
+      - "4466:4466"
+    tty: true
+    environment:
+      PRISMA_CONFIG: |
+        port: 4466
+        databases:
+          default:
+            connector: postgres
+            database: ${POSTGRES_DB}
+            host: ${DB_HOST}
+            port: ${DB_PORT}
+            user: ${POSTGRES_USER}
+            password: ${POSTGRES_PASSWORD}
+            migrations: true
+volumes:
+  db:
