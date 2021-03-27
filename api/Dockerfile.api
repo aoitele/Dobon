@@ -6,6 +6,11 @@ ENV NODE_ENV=production
 COPY /api /usr/src/api
 WORKDIR /usr/src/api
 
-RUN npm install
+# for prisma openssl
+RUN apt-get -qy update \
+  && apt-get -qy install openssl
 
+RUN npm install
+  
+CMD [ "npm", "migrate:prisma" ]
 CMD [ "npm", "start" ]
