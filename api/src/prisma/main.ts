@@ -5,7 +5,6 @@ const prisma = new PrismaClient({
 })
 
 async function main() {
-    console.log('main fire2')
     const allUsers = await prisma.users.findMany().catch(err => console.log(err, 'err'))
     return allUsers
 }

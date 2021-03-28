@@ -42,8 +42,7 @@ export default {
     async submit() {
       this.logging = true;
       try {
-        //const res = await this.$axios.get('/api/login', { params:{ invitationcode: this.invitationCode }})
-        const res = await this.$axios.get('/room');
+        const res = await this.$axios.get('/prisma');
         console.log(res, 'res');
       } catch(e) {
         console.log(e, 'e')

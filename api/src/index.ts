@@ -1,10 +1,11 @@
 import express from "express";
 import cors from "cors";
-import router from "../routes/index";
+import router from "./routes/index";
 
 const app: express.Express = express();
+
 app.use(cors({
-  origin: 'https://dobon-web.herokuapp.com/',
+  origin: process.env.ALLOW_ORIGIN,
   optionsSuccessStatus: 200
 }));
 

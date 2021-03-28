@@ -1,5 +1,5 @@
 {
-  "watch": ["server", "prisma", "routes"],
+  "watch": ["src"],
   "ext": "ts",
-  "exec": "ts-node ./server/server.ts"
+  "exec": "ts-node ./src/index.ts"
 }

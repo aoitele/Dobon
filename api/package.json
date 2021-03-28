@@ -5,9 +5,9 @@
   "author": "Takuto Eto",
   "main": "index.ts",
   "scripts": {
-    "dev": "NODE_ENV=development ts-node ./server/server.ts",
+    "dev": "NODE_ENV=development ts-node ./src/index.ts",
     "dev-api": "nodemon --config nodemon.json",
-    "start": "NODE_ENV=production ts-node ./server/server.ts",
+    "start": "NODE_ENV=production node ./dist/index.js",
     "build": "npx tsc",
     "migrate:prisma": "prisma migrate dev --preview-feature --name init",
     "test": "jest"
