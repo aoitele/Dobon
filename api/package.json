@@ -8,7 +8,7 @@
     "dev": "NODE_ENV=development ts-node ./src/index.ts",
     "dev-api": "nodemon --config nodemon.json",
     "start": "NODE_ENV=production node ./dist/index.js",
-    "build": "npx tsc",
+    "postinstall": "npx tsc",
     "migrate:prisma": "prisma migrate dev --preview-feature --name init",
     "test": "jest"
   },
