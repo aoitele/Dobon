@@ -9,6 +9,7 @@
     "dev-api": "nodemon --config nodemon.json",
     "start": "NODE_ENV=production node ./dist/index.js",
     "postinstall": "npx tsc",
+    "heroku-postbuild": "npx prisma introspect && npx prisma generate --schema=./src/prisma/schema.prisma",
     "migrate:prisma": "prisma migrate dev --preview-feature --name init",
     "test": "jest"
   },
