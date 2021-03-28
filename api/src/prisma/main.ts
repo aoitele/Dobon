@@ -5,7 +5,7 @@ const prisma = new PrismaClient({
 })
 
 async function main() {
-    const allUsers = await prisma.users.findMany().catch(err => console.log(err, 'err'))
+    const allUsers = await prisma.users.findMany().catch((err: any) => console.log(err, 'err'))
     return allUsers
 }
 
