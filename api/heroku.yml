@@ -5,7 +5,7 @@ build:
   config:
     NODE_ENV: development
   docker:
-    web: Dockerfile.api
+    web: Dockerfile
 release:
   command:
     - npm run tsc && npm run prisma generate
