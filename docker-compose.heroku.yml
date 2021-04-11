@@ -7,7 +7,7 @@ services:
       dockerfile: ./api/Dockerfile.api
     image: dobon_api
     container_name: dobon_api
-    command: npm run tsc && npm run prisma:generate && npm run start
+    command: npm run install && npm run tsc && npm run prisma:generate && npm run start
     volumes:
       - ./api:/usr/src/api
       - ./api/node_modules:/usr/src/api/node_modules
