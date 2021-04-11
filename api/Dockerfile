@@ -12,6 +12,5 @@ RUN apt-get -qy update \
 
 RUN npm install
 RUN npm run tsc
-RUN npm run prisma:generate
 
 CMD [ "npm", "start" ]
