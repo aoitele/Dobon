@@ -24,10 +24,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build, Push and Deploy to Heroku #set the whatever name you want to this step
-        id: heroku
-        uses: snithyanantham/docker-compose-multiple-apps-heroku-deploy@v1.0  # use the latest version of the action
+        uses: akhileshns/heroku-deploy@v3.12.12  # use the latest version of the action
         with:
-          email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
-          api_key: ${{ secrets.HEROKU_API_KEY }} # your  heroku api key
-          docker_compose_file: 'docker-compose.heroku.yml' # set the path to the folder where the docker-compose file is located
-          heroku_apps: '[{"imagename":"dobon_web","appname":"dobon-web","apptype":"web"}, {"imagename":"dobon_api","appname":"dobon-api","apptype":"web"}]' # List of Docker Image name, Heroku app and Heroku app type
+          heroku_email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }} # your  heroku api key
+          heroku_app_name: 'dobon-api' # set the path to the folder where the docker-compose file is located
+          appdir: 'api'

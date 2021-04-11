@@ -10,7 +10,6 @@ WORKDIR /usr/src/api
 RUN apt-get -qy update \
   && apt-get -qy install openssl
 
-RUN npm install
-  
-CMD [ "npm", "migrate:prisma" ]
+RUN npm install && npm run tsc && npm run prisma:generate
+
 CMD [ "npm", "start" ]
