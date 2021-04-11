@@ -33,5 +33,5 @@ jobs:
           appdir: 'api'
           docker_build_args: | # PATH - Build Context
             PATH
-          env:
-            PATH: .
+        env:
+          PATH: .
