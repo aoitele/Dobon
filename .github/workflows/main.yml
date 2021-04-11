@@ -29,4 +29,5 @@ jobs:
           heroku_email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }} # your  heroku api key
           heroku_app_name: 'dobon-api' # set the path to the folder where the docker-compose file is located
+          usedocker: true
           appdir: 'api'
