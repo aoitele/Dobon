@@ -4,8 +4,8 @@ services:
   api:
     env_file: .env
     build:
-      context: .
-      dockerfile: ./api/Dockerfile
+      context: ./api
+      dockerfile: Dockerfile
     image: dobon_api
     container_name: dobon_api
     command: npm run dev-api
