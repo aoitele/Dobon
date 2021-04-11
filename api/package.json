@@ -7,11 +7,11 @@
   "scripts": {
     "dev": "NODE_ENV=development ts-node ./src/index.ts",
     "dev-api": "nodemon --config nodemon.json",
-    "prepare": "npm install && npm run tsc && npm run prisma:generate",
-    "start": "NODE_ENV=production npm run prepare && node ./dist/index.js",
+    "start": "NODE_ENV=production node ./dist/index.js",
     "tsc": "npx tsc",
     "prisma:generate": "npx prisma generate --schema=./src/prisma/schema.prisma",
     "migrate:prisma": "prisma migrate dev --schema=./src/prisma/schema.prisma --preview-feature --name init",
+    "heroku-prebuild": "echo StartHerokuPostbuild && npm run tsc && npm run prisma:generate",
     "test": "jest"
   },
   "dependencies": {

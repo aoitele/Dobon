@@ -1,1 +1,1 @@
-web: npm run install && npm run tsc && npm run prisma:generate && npm run start
+web: NODE_ENV=production node ./dist/index.js
