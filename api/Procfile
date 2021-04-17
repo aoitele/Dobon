@@ -1,2 +1,1 @@
-release: npx tsc && prisma migrate deploy --schema=./src/prisma/schema.prisma
 web: NODE_ENV=production node ./dist/index.js
