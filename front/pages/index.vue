@@ -1,34 +1,45 @@
 <template>
-  <div class="container">
-    <div>
-      <Logo />
-      <h1 class="title">dobon web</h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
+  <div>
+    <div class='index-wrap'>
+      <h1 class='title'>Dobon</h1>
+      <!-- logging: {{ logging }} -->
+      <img src='image/numa_hamaru_woman.png' class='mv' />
+      <div>
+        <!-- <form id='app'>
+          <input
+            type='text'
+            v-model='invitationCode'
+            placeholder='enter your invitation code'
+            class='invitaionForm'
+          />
+           <p v-if="errors.length">
+            <ul>
+              <li 
+              v-for="error in errors" 
+              :key="error">
+              {{ error }}
+              </li>
+            </ul>
+            </p>
+            <input type="button" @click="submit" value="参加する">
+        </form> -->
+      
       </div>
+      <NuxtLink to='/room'>ルームを選んで参加する</NuxtLink>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent, useContext } from '@nuxtjs/composition-api';
 
-export default Vue.extend({})
+export default defineComponent({
+  setup() {
+    const { route } = useContext()
+    console.log(route)
+    return {}
+  }
+})
 </script>
 
 <style>
@@ -46,7 +57,7 @@ export default Vue.extend({})
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: block;
   font-weight: 300;
-  font-size: 100px;
+  font-size: 30px;
   color: #35495e;
   letter-spacing: 1px;
 }
