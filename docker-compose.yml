@@ -24,15 +24,15 @@ services:
     env_file: .env
     build:
       context: .
-      dockerfile: ./frontend/Dockerfile.web
+      dockerfile: ./front/Dockerfile.web
     image: dobon_web
     container_name: dobon_web
     command: npm run dev
     environment:
       NODE_ENV: development
     volumes:
-      - ./frontend:/usr/src/frontend
-      - ./frontend/node_modules:/usr/src/frontend/node_modules
+      - ./front:/usr/src/frontend
+      - /usr/src/frontend/node_modules
     ports:
       - "3000:3000"
     tty: true
