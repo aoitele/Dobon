@@ -8,6 +8,6 @@ WORKDIR /usr/src/frontend
 COPY /front/package*.json /usr/src/frontend
 RUN npm install
 
-COPY /front/. .
+COPY /front /usr/src/frontend
 
 EXPOSE 3000
