@@ -6,14 +6,14 @@ export default {
   head: {
     title: 'app',
     htmlAttrs: {
-      lang: 'en',
+      lang: 'en'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
+      { hid: 'description', name: 'description', content: '' }
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -36,5 +36,5 @@ export default {
   modules: [],
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
-  build: {},
+  build: {}
 }

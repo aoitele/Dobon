@@ -2,14 +2,17 @@ module.exports = {
   root: true,
   env: {
     browser: true,
-    node: true,
+    node: true
   },
   extends: [
     '@nuxtjs/eslint-config-typescript',
-    'plugin:prettier/recommended',
     'plugin:nuxt/recommended',
+    'eslint:recommended',
+    "prettier" // eslintルールと競合するため必ず最後に加える
   ],
   plugins: [],
   // add your custom rules here
-  rules: {},
+  rules: {
+    '@typescript-eslint/no-unused-vars': 'error'
+  }
 }
