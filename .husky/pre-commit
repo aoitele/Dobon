@@ -1,4 +1,24 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm run lint-staged
+# commitファイルが存在するディレクトリでtest/lintを実行する
+# dirRegex[1]=/\/api\/**\/.*\(js|ts|jsx|tsx|vue\)/
+
+files=($(git diff --cached --name-only)) # commit対象ファイルパスを配列に格納
+
+if printf '%s\n' ${files[@]} | egrep "^front/**/*" | egrep "\.(js$|ts$|jsx$|tsx$|vue$)" > /dev/null >&2; then
+  echo "/front directory test & lint starting"
+  cd front
+  npm run test 
+  npm run lint-staged
+  # if lintResult echo -n "よろしいですか？ [y/N]: "
+  # read ANS
+fi
+
+if printf '%s\n' ${files[@]} | egrep "^api/**/*" | egrep "\.(js$|ts$|jsx$|tsx$|vue$)" > /dev/null >&2; then
+  echo "/api directory test starting"
+  cd api
+  npm run test 
+fi
+
+exit 0

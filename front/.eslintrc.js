@@ -7,12 +7,15 @@ module.exports = {
   extends: [
     '@nuxtjs/eslint-config-typescript',
     'plugin:nuxt/recommended',
-    'eslint:recommended',
-    "prettier" // eslintルールと競合するため必ず最後に加える
+    'eslint:all',
+    "prettier", // eslintルールと競合するため必ず最後に加える
   ],
   plugins: [],
-  // add your custom rules here
+  // Add your custom rules here
   rules: {
-    '@typescript-eslint/no-unused-vars': 'error'
+    '@typescript-eslint/no-unused-vars': 'error',
+    "sort-keys": "off",
+    "sort-imports" : "off",
+    "no-inline-comments": "off"
   }
 }

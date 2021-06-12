@@ -7,14 +7,14 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "lint": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
-    "lint:fix": "eslint --fix --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
+    "lint": "eslint --ext \".js,.ts,jsx,tsx,.vue\" --ignore-path .gitignore .",
+    "lint:fix": "eslint --fix --ext \".js,.ts,jsx,tsx,.vue\" --ignore-path .gitignore .",
     "test": "jest",
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install",
     "lint-staged": "lint-staged"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": [
+    "*.{js,ts,jsx,tsx,vue}": [
       "npm run lint:fix"
     ]
   },
