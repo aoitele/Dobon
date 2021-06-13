@@ -20,8 +20,8 @@ fi
 
 if printf '%s\n' ${files[@]} | egrep "^api/**/*" | egrep "\.(js$|ts$|jsx$|tsx$|vue$)" > /dev/null >&2; then
   echo "/api directory test starting"
-  cd api
-  npm run test 
+  #cd api
+  #npm run test 
 fi
 
 exit 0

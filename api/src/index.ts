@@ -16,3 +16,5 @@ const HOST = process.env.NODE_ENV === "production" ? "https://dobon-api.herokuap
 
 app.listen(PORT);
 console.log(`running on ${HOST}:${PORT}`);
+
+module.exports = app
