@@ -12,7 +12,7 @@ if printf '%s\n' ${files[@]} | egrep "^front/**/*" | egrep "\.(js$|ts$|jsx$|tsx$
 fi
 
 if printf '%s\n' ${files[@]} | egrep "^next-app/**/*" | egrep "\.(js$|ts$|jsx$|tsx$)" > /dev/null >&2; then
-  echo "/front directory test & lint starting"
+  echo "/next-app directory test & lint starting"
   cd front
   npm run test 
   npm run lint-staged
