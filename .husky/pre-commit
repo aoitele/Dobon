@@ -11,6 +11,13 @@ if printf '%s\n' ${files[@]} | egrep "^front/**/*" | egrep "\.(js$|ts$|jsx$|tsx$
   npm run lint-staged
 fi
 
+if printf '%s\n' ${files[@]} | egrep "^next-app/**/*" | egrep "\.(js$|ts$|jsx$|tsx$)" > /dev/null >&2; then
+  echo "/front directory test & lint starting"
+  cd front
+  npm run test 
+  npm run lint-staged
+fi
+
 if printf '%s\n' ${files[@]} | egrep "^api/**/*" | egrep "\.(js$|ts$|jsx$|tsx$|vue$)" > /dev/null >&2; then
   echo "/api directory test starting"
   cd api

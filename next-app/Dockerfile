@@ -1,0 +1,13 @@
+FROM node:14.16.0-buster-slim
+ENV HOST 0.0.0.0
+
+RUN apt-get update && apt-get install -y \
+    curl
+
+WORKDIR /usr/src/next-app
+COPY /next-app/package*.json /usr/src/next-app
+RUN npm install
+
+COPY /next-app /usr/src/next-app
+
+EXPOSE 3000
