@@ -11,7 +11,7 @@
     "tsc": "npx tsc",
     "prisma:generate": "npx prisma generate --schema=./src/prisma/schema.prisma",
     "migrate:prisma": "prisma migrate dev --schema=./src/prisma/schema.prisma --preview-feature --name init",
-    "postinstall": "npm run tsc && npm run prisma:generate",
+    "build": "npm run tsc && prisma:generate",
     "test": "jest"
   },
   "dependencies": {
