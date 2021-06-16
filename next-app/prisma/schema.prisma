@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id              Int       @id @default(autoincrement())
+  nickname        String?
+  status          Int?
+  invitation_code String?
+  expired_date    DateTime? @db.Timestamp(6)
+  last_login      DateTime? @db.Timestamp(6)
+  created         DateTime? @db.Timestamp(6)
+  modified        DateTime? @db.Timestamp(6)
+}
+
+model rooms {
+  id       Int       @id @default(autoincrement())
+  title    String?
+  status   Int?
+  max_seat Int?
+  rate     Int?
+  created  DateTime? @db.Timestamp(6)
+  modified DateTime? @db.Timestamp(6)
+}
+
+model gamelogs {
+  id          Int     @id @default(autoincrement())
+  room_id     Int?
+  user_id     Int?
+  action_type Int?
+  card        String?
+  affect_user Int?
+  score       Int?
+  endgame     Boolean?
+}

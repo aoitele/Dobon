@@ -10,7 +10,9 @@
     "lint:fix": "eslint --fix --ext \".js,.ts,jsx,tsx\" .",
     "test": "jest",
     "prepare": "cd .. && husky install",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "prisma:generate": "npx prisma generate --schema=./prisma/schema.prisma",
+    "migrate:prisma": "prisma migrate dev --schema=./prisma/schema.prisma --preview-feature --name init"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
@@ -18,6 +20,7 @@
     ]
   },
   "dependencies": {
+    "@prisma/client": "^2.24.1",
     "next": "10.2.3",
     "react": "17.0.2",
     "react-dom": "17.0.2"
@@ -33,6 +36,7 @@
     "jest": "^27.0.4",
     "lint-staged": "^11.0.0",
     "prettier": "^2.3.1",
+    "prisma": "^2.24.1",
     "ts-jest": "^27.0.3",
     "typescript": "4.3.2"
   }

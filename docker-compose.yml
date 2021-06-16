@@ -32,7 +32,7 @@ services:
       NODE_ENV: development
     volumes:
       - ./next-app:/usr/src/next-app
-      - /usr/src/next-app/node_modules
+      - ./next-app/node_modules:/usr/src/next-app/node_modules
     ports:
       - "3000:3000"
     tty: true
