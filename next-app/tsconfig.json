@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "sourceMap": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -8,6 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true, // module import時のコンパイルエラー回避のために追加した
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,

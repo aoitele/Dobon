@@ -1,18 +1,38 @@
 module.exports = {
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1',
-    '^~/(.*)$': '<rootDir>/$1',
-    '^vue$': 'vue/dist/vue.common.js'
-  },
-  moduleFileExtensions: ['ts', 'js', 'vue', 'json'],
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: [
+    '<rootDir>'
+  ],
+  setupFiles: ['<rootDir>/__tests__/setup/setEnvVars.js'],
+  setupFilesAfterEnv: ['<rootDir>/__tests__/setup/setupTests.ts'],
+  testPathIgnorePatterns: [
+    '<rootDir>/.next/',
+    '<rootDir>/node_modules/',
+    '<rootDir>/__tests__/setup/',
+  ],
+  snapshotSerializers: ['enzyme-to-json/serializer'],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
-    '^.+\\.js$': 'babel-jest',
-    '.*\\.(vue)$': 'vue-jest'
+    '^.+\\.(ts|tsx)$': 'ts-jest'
   },
-  collectCoverage: true,
-  collectCoverageFrom: [
-    '<rootDir>/components/**/*.vue',
-    '<rootDir>/pages/**/*.vue'
+  moduleFileExtensions: [
+    'ts',
+    'tsx',
+    'js',
+    'jsx',
+    'json',
+    'node'
+  ],
+  // https://github.com/zeit/next.js/issues/8663#issue-490553899
+  globals: {
+    // we must specify a custom tsconfig for tests because we need the typescript transform
+    // to transform jsx into js rather than leaving it jsx such as the next build requires. you
+    // can see this setting in tsconfig.jest.json -> "jsx": "react"
+    'ts-jest': {
+      'tsconfig': '<rootDir>/__tests__/setup/tsconfig.jest.json'
+    }
+  },
+  "testMatch": [
+    "<rootDir>/__tests__/modules/*.spec.tsx"
   ]
-}
+};
