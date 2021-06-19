@@ -21,12 +21,14 @@ module.exports = {
   // Add your custom rules here
   rules: {
     "no-use-before-define": "off",
+    "no-console": "off",
     'no-unused-vars': 'error',
     'no-magic-numbers': "off",
     'max-lines-per-function': "off",
     "sort-keys": "off",
     "sort-imports" : "off",
-    "no-inline-comments": "off"
+    "no-inline-comments": "off",
+    "one-var": "off"
   },
   "settings": {
     "react": {
