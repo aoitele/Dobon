@@ -22,4 +22,11 @@ describe('Score TestCases', () => {
         const result = culcGetScore(cards);
         expect(result).toStrictEqual(expected)
     })
+    it('ドボン返しの場合はスコアがさらに2倍される', () => {
+        const cards = [10, 0, 11, 3];
+        const expected = 1200;
+
+        const result = culcGetScore(cards, true);
+        expect(result).toStrictEqual(expected)
+    })
 })
