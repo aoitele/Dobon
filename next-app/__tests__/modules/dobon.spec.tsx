@@ -1,4 +1,4 @@
-import { dobonJudge } from '../../../utils/dobon/index'
+import { dobonJudge } from '../../utils/dobon/index'
 
 describe('Dobon Judge TestCases', () => {
     it('手札が2枚の時、手札の合計/差分のどちらかが出されたカードと合致すればドボン成功', () => {

@@ -30,7 +30,10 @@ module.exports = {
     "sort-imports" : "off",
     "no-inline-comments": "off",
     "one-var": "off",
-    "line-comment-position": "off"
+    "line-comment-position": "off",
+    "id-length": "off",
+    "no-ternary": "off",
+    "no-nested-ternary": "off"
   },
   "settings": {
     "react": {
