@@ -1,10 +1,10 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  globalSetup: '<rootDir>/__tests__/setup/setupEnv.ts',
   roots: [
     '<rootDir>'
   ],
-  setupFiles: ['<rootDir>/__tests__/setup/setEnvVars.js'],
   setupFilesAfterEnv: ['<rootDir>/__tests__/setup/setupTests.ts'],
   testPathIgnorePatterns: [
     '<rootDir>/.next/',

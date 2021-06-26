@@ -2,7 +2,8 @@ module.exports = {
   root: true,
   env: {
     browser: true,
-    node: true
+    node: true,
+    "jest/globals": true
   },
   parser: '@typescript-eslint/parser',
   extends: [
@@ -17,7 +18,7 @@ module.exports = {
       "jsx": true,
     }
   },
-  plugins: [],
+  plugins: ["jest"],
   // Add your custom rules here
   rules: {
     "no-use-before-define": "off",
@@ -28,7 +29,8 @@ module.exports = {
     "sort-keys": "off",
     "sort-imports" : "off",
     "no-inline-comments": "off",
-    "one-var": "off"
+    "one-var": "off",
+    "line-comment-position": "off"
   },
   "settings": {
     "react": {
