@@ -33,7 +33,8 @@ module.exports = {
     "line-comment-position": "off",
     "id-length": "off",
     "no-ternary": "off",
-    "no-nested-ternary": "off"
+    "no-nested-ternary": "off",
+    "camelcase": "off"
   },
   "settings": {
     "react": {
