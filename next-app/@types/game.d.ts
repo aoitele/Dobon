@@ -21,3 +21,5 @@ export type Player = {
     turn: number;
     score: number;
 }
+
+export type Action = 'avoidEffect' | 'notAvoidEffect';
