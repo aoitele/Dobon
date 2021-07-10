@@ -34,7 +34,8 @@ module.exports = {
     "id-length": "off",
     "no-ternary": "off",
     "no-nested-ternary": "off",
-    "camelcase": "off"
+    "camelcase": "off",
+    "react/prop-types": "off"
   },
   "settings": {
     "react": {
