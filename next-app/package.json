@@ -24,7 +24,8 @@
     "@prisma/client": "^2.24.1",
     "next": "^11.0.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "sass": "^1.35.2"
   },
   "devDependencies": {
     "@types/enzyme-adapter-react-16": "^1.0.6",
