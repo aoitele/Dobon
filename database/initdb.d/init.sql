@@ -22,15 +22,16 @@ create table rooms
   title text,
   status integer,
   max_seat integer,
+  set_count integer,
   rate integer,
   created timestamp,
   modified timestamp
 );
 
-insert into rooms(title, status, max_seat, rate, created, modified) values
-  ('ドボン王決定戦ファイナルマッチ', 0, 4, 3, now() - interval '2 week',  now() - interval '1 week'),
-  ('初心者の部屋', 1, 4, 2, now() - interval '2 week',  now() - interval '1 week'),
-  ('ドボンしようぜ', 1, 4, 1, now() - interval '2 week',  now() - interval '1 week');
+insert into rooms(title, status, max_seat, set_count, rate, created, modified) values
+  ('ドボン王決定戦ファイナルマッチ', 0, 4, 10, 3, now() - interval '2 week',  now() - interval '1 week'),
+  ('初心者の部屋', 1, 4, 20, 2, now() - interval '2 week',  now() - interval '1 week'),
+  ('ドボンしようぜ', 1, 4, 10, 1, now() - interval '2 week',  now() - interval '1 week');
 
 create table gamelogs
 (

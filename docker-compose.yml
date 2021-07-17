@@ -39,6 +39,7 @@ services:
     depends_on:
       - db
   db:
+    env_file: .env
     image: postgres:13-alpine
     container_name: dobon_db
     volumes:

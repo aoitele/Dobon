@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import hasProperty from '../function/hasProperty';
 
-const AxiosInstance = (options?: AxiosRequestConfig) => {
+const axiosInstance = (options?: AxiosRequestConfig) => {
    
     const client = axios.create({
         baseURL: process.env.NEXT_PUBLIC_API_SERVER_URL || 'http://localhost:3000',
@@ -33,4 +33,4 @@ const AxiosInstance = (options?: AxiosRequestConfig) => {
         post: <T = any, R = AxiosResponse<T>> (url: string, data: Record<string, unknown>): Promise<R> => client.post(url, data)
     }
 }
-export default AxiosInstance
+export default axiosInstance

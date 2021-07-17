@@ -11,5 +11,6 @@ COPY /next-app/package*.json /usr/src/next-app
 RUN npm install
 
 COPY /next-app /usr/src/next-app
+RUN npm run prisma:generate
 
 EXPOSE 3000
