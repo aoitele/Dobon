@@ -4,7 +4,7 @@
  * 2か13が出された場合は3秒間ユーザーの入力を待ち、その間に同数値のカードを出すか/出さないかを選択できる
  * 入力がない場合は効果を受け入れると処理し、ゲームが続行する
  */
-import {isPutOut2or13, hasSameCard, chkAvoidCardEffect} from '../../utils/playing/checkHand'
+import {isPutOut2or13, hasSameCard, chkAvoidCardEffect} from '../../utils/game/checkHand'
 
 describe('checkHand TestCases', () => {
     it('2か13が出されたか', () => {

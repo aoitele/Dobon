@@ -1,4 +1,4 @@
-import { shuffle } from "../../utils/playing/shuffle";
+import { shuffle } from "../../utils/game/shuffle";
 import type { Deck } from '../../@types/card';
 
 describe('shuffle TestCases', () => {

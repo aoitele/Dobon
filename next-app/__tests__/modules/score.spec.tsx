@@ -1,4 +1,4 @@
-import { culcGetScore } from '../../utils/playing/culcGetScore'
+import { culcGetScore } from '../../utils/game/culcGetScore'
 
 describe('Score TestCases', () => {
     it('与えられたカードの合計積を計算する', () => {

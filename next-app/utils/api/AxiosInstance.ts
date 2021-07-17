@@ -1,0 +1,36 @@
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import hasProperty from '../function/hasProperty';
+
+const AxiosInstance = (options?: AxiosRequestConfig) => {
+   
+    const client = axios.create({
+        baseURL: process.env.NEXT_PUBLIC_API_SERVER_URL || 'http://localhost:3000',
+        timeout: 3000,
+    });
+
+    client.interceptors.request.use(config => {
+        if(options?.headers) {
+            for(const property in options) {
+                if(hasProperty(options, property)) {
+                    config.headers.common[property] = options.headers[property]
+                }
+            }
+        }
+        return config;
+    })
+    
+    client.interceptors.response.use(
+        response => onSuccess(response),
+        error => onError(error) 
+    );
+
+    const onSuccess = (response: any) => response
+    const onError = (error: AxiosResponse<any>) => Promise.reject(error)
+
+    return {
+        client,
+        get: <T = any, R = AxiosResponse<T>>(url:string): Promise<R> => client.get(url),
+        post: <T = any, R = AxiosResponse<T>> (url: string, data: Record<string, unknown>): Promise<R> => client.post(url, data)
+    }
+}
+export default AxiosInstance
