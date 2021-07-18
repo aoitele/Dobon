@@ -6,6 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model users {
@@ -15,8 +16,8 @@ model users {
   invitation_code String?
   expired_date    DateTime? @db.Timestamp(6)
   last_login      DateTime? @db.Timestamp(6)
-  created         DateTime? @db.Timestamp(6)
-  modified        DateTime? @db.Timestamp(6)
+  created_at         DateTime? @db.Timestamp(6)
+  updated_at        DateTime? @db.Timestamp(6)
 }
 
 model rooms {
@@ -26,8 +27,8 @@ model rooms {
   max_seat  Int?
   set_count Int?
   rate      Int?
-  created   DateTime? @db.Timestamp(6)
-  modified  DateTime? @db.Timestamp(6)
+  created_at   DateTime? @db.Timestamp(6)
+  updated_at  DateTime? @db.Timestamp(6)
 }
 
 model gamelogs {
@@ -39,4 +40,6 @@ model gamelogs {
   affect_user Int?
   score       Int?
   endgame     Boolean?
+  created_at   DateTime? @db.Timestamp(6)
+  updated_at  DateTime? @db.Timestamp(6)
 }

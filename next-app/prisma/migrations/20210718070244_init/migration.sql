@@ -6,8 +6,8 @@ CREATE TABLE "users" (
     "invitation_code" TEXT,
     "expired_date" TIMESTAMP(6),
     "last_login" TIMESTAMP(6),
-    "created" TIMESTAMP(6),
-    "modified" TIMESTAMP(6),
+    "created_at" TIMESTAMP(6),
+    "updated_at" TIMESTAMP(6),
 
     PRIMARY KEY ("id")
 );
@@ -18,9 +18,10 @@ CREATE TABLE "rooms" (
     "title" TEXT,
     "status" INTEGER,
     "max_seat" INTEGER,
+    "set_count" INTEGER,
     "rate" INTEGER,
-    "created" TIMESTAMP(6),
-    "modified" TIMESTAMP(6),
+    "created_at" TIMESTAMP(6),
+    "updated_at" TIMESTAMP(6),
 
     PRIMARY KEY ("id")
 );
@@ -35,6 +36,8 @@ CREATE TABLE "gamelogs" (
     "affect_user" INTEGER,
     "score" INTEGER,
     "endgame" BOOLEAN,
+    "created_at" TIMESTAMP(6),
+    "updated_at" TIMESTAMP(6),
 
     PRIMARY KEY ("id")
 );
