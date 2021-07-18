@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
-import axiosInstance from '../../utils/api/AxiosInstance';
-import { Room } from '../../@types/game'
+import axiosInstance from '../../utils/api/axiosInstance'
+import { Room } from 'prisma/prisma-client'
 
 interface Props {
     rooms: Room[]
@@ -25,7 +25,7 @@ export const getServerSideProps = async ()=> {
     const axios = axiosInstance();
     try {
         const res = await axios.get('/api/room');
-        const rooms = res.data?.rooms;
+        const rooms: Room[] = res.data?.rooms;
         return {
             props: { rooms }
         }

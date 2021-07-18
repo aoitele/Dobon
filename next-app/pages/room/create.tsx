@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import axiosInstance from '../../utils/api/AxiosInstance';
+import axiosInstance from '../../utils/api/axiosInstance';
 
 const initialValue = {
     title: '',

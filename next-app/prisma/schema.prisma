@@ -9,7 +9,8 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-model users {
+model User {
+  @@map(name: "users")
   id              Int       @id @default(autoincrement())
   nickname        String?
   status          Int?
@@ -20,7 +21,8 @@ model users {
   updated_at        DateTime? @db.Timestamp(6)
 }
 
-model rooms {
+model Room {
+  @@map(name: "rooms")
   id        Int       @id @default(autoincrement())
   title     String?
   status    Int?
@@ -31,7 +33,8 @@ model rooms {
   updated_at  DateTime? @db.Timestamp(6)
 }
 
-model gamelogs {
+model Gamelog {
+  @@map(name: "gamelogs")
   id          Int     @id @default(autoincrement())
   room_id     Int?
   user_id     Int?

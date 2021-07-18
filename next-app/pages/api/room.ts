@@ -6,8 +6,8 @@ const prisma = new PrismaClient({
 })
 
 const rooms = async (req: NextApiRequest, res: NextApiResponse) => {
-    const allRooms = await prisma.rooms.findMany().catch((err: any) => console.log(err, 'err'))
-    res.status(200).json({ rooms: allRooms })
+    const response = await prisma.room.findMany().catch((err: any) => console.log(err, 'err'))
+    res.status(200).json({ rooms: response })
 }
 
 export default rooms;
