@@ -1,4 +1,4 @@
-create table users
+create table IF NOT EXISTS users
 (
   id serial,
   nickname text,
@@ -16,7 +16,7 @@ insert into users(nickname, status, invitation_code, expired_date, last_login, c
   ('saburo', 1, 'test333', now() + interval '1 week', current_date, now() - interval '2 week',  now() - interval '1 week');
 
 
-create table rooms
+create table IF NOT EXISTS rooms
 (
   id serial,
   title text,
@@ -33,7 +33,7 @@ insert into rooms(title, status, max_seat, set_count, rate, created_at, updated_
   ('初心者の部屋', 1, 4, 20, 2, now() - interval '2 week',  now() - interval '1 week'),
   ('ドボンしようぜ', 1, 4, 10, 1, now() - interval '2 week',  now() - interval '1 week');
 
-create table gamelogs
+create table IF NOT EXISTS gamelogs
 (
   id serial,
   room_id integer,
