@@ -6,6 +6,7 @@ const axiosInstance = (options?: AxiosRequestConfig) => {
     const client = axios.create({
         baseURL: process.env.NEXT_PUBLIC_API_SERVER_URL || 'http://localhost:3000',
         timeout: 3000,
+        responseType: 'json'
     });
 
     client.interceptors.request.use(config => {
