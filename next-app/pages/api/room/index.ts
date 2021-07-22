@@ -24,7 +24,7 @@ const room = async (res: NextApiResponse) => {
 
 const create = (req: NextApiRequest, res: NextApiResponse) => {
     console.log(req.body,'body')
-    res.status(200).json({ method: 'create' })
+    return res.status(200).json({ method: 'create' })
 }
 
 export default handler;

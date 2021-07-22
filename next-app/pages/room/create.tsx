@@ -20,7 +20,7 @@ const createRoom: React.FC = () => {
         try {
             axios.post('/api/room', form)
         } catch(e) {
-            console.log(e)
+            console.log('post error!')
         }
     }
     return (
