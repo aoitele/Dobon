@@ -17,7 +17,11 @@ const createRoom: React.FC = () => {
     
     const handleSubmit = () => {
         const axios = axiosInstance();
-        axios.post('/api/room', form)
+        try {
+            axios.post('/api/room', form)
+        } catch(e) {
+            console.log(e)
+        }
     }
     return (
     <>
@@ -40,7 +44,7 @@ const createRoom: React.FC = () => {
                 <input type="text" name='rate' value={form.rate} onChange={e => handleChange(e)}/>
             </div>
         </form>
-        <button onClick={() => handleSubmit}>Submit</button>
+        <button onClick={() => handleSubmit()}>Submit</button>
     </>
     )
 }
