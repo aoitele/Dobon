@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:vercel": "npm run prisma:generate && npx prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint --ext \".js,.ts,jsx,tsx\" .",
     "lint:fix": "eslint --fix --ext \".js,.ts,jsx,tsx\" .",
@@ -25,12 +26,14 @@
   "dependencies": {
     "@prisma/client": "^2.24.1",
     "axios": "^0.21.1",
+    "cors": "^2.8.5",
     "next": "^11.0.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "sass": "^1.35.2"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@types/jest": "^26.0.23",
     "@types/react": "17.0.11",
