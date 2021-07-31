@@ -8,3 +8,9 @@ export type User = {
     created: Date;
     modified: Date;
 }
+
+export type GameUserInfo = {
+    nickname: string;
+    image?: string;
+    score: number;
+}
