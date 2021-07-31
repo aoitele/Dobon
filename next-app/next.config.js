@@ -1,4 +1,9 @@
+const path = require('path')
+
 module.exports = {
+    sassOptions: {
+      includePaths: [path.join(__dirname, 'styles')],
+    },
     headers() {
       return [
         {
@@ -12,5 +17,8 @@ module.exports = {
           ]
         }
       ]
-    }
+    },
+    images: {
+      domains: ['placehold.jp'],
+    },
   };
