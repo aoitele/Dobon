@@ -1,30 +1,33 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, prisma } from '../../../prisma'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-const prisma = new PrismaClient({
-    log: ["query", "error", "info", "warn"],
-})
-
-const handler = (req: NextApiRequest, res: NextApiResponse) => {
-    console.log(req.method,'req.method')
+const handle = (req: NextApiRequest, res: NextApiResponse) => {
+    
     switch(req.method) {
         case 'GET':
-            return room(res)
+            return handleGET(res)
         case 'POST':
-            return create(req, res);
+            return handlePOST(req, res);
         default:
             return res.status(405).end(`Method ${req.method} Not Allowed`)
     }
 }
 
-const room = async (res: NextApiResponse) => {
-    const response = await prisma.room.findMany().catch((err: any) => console.log(err, 'err'))
-    return res.status(200).json({ rooms: response })
+const handleGET = async (res: NextApiResponse) => {
+    const rooms = await prisma.room.findMany()
+    res.json({ rooms })
 }
 
-const create = (req: NextApiRequest, res: NextApiResponse) => {
-    console.log(req.body,'body')
-    return res.status(200).json({ method: 'create' })
+const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
+    const { title, status, max_seat, set_count, rate } = req.body
+    const payload: Prisma.RoomCreateInput = { title, status, max_seat, set_count, rate }
+
+    try {
+        const result = await prisma.room.create({ data: payload })
+        res.json({ result })
+    } catch(e) {
+        console.log(e)
+    }
 }
 
-export default handler;
+export default handle;

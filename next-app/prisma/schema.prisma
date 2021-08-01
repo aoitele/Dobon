@@ -24,11 +24,11 @@ model User {
 model Room {
   @@map(name: "rooms")
   id        Int       @id @default(autoincrement())
-  title     String?
-  status    Int?
-  max_seat  Int?
-  set_count Int?
-  rate      Int?
+  title     String
+  status    Int
+  max_seat  Int
+  set_count Int
+  rate      Int
   created_at   DateTime? @db.Timestamp(6)
   updated_at  DateTime? @db.Timestamp(6)
 }

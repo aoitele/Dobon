@@ -3,6 +3,7 @@ import axiosInstance from '../../utils/api/axiosInstance';
 
 const initialValue = {
     title: '',
+    status: 1,
     max_seat: 2,
     set_count: 10,
     rate: 1
