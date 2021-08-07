@@ -1,0 +1,17 @@
+.wrapRight {
+    width: 70px;
+    display: flex;
+    align-items: center;
+}
+.wrapBottom {
+    width: 40px;
+}
+.cardCountWrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.cardCount {
+    font-size: 12px;
+    font-weight: bold;
+}
