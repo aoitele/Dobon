@@ -16,10 +16,12 @@ export type DevidedCardWithStatus = {
 }
 
 export type Rank = {
-	0: 'Jocker Free';
-	2: 'add Draw Two';
-	8: 'Choice Suit';
-	11: 'Eleven Back';
-	13: 'Open Card';
+	0: 'JockerFree',
+	1: 'Skip',
+	2: '+DrawTwo',
+	8: 'SelectSuit',
+	11: 'ElevenBack',
+	13: 'OpenCard',
 }
-export type RankCard = keyof Rank;
+export type RankCardNum = keyof Rank;
+export type RankCardText = Rank[keyof Rank];

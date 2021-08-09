@@ -1,0 +1,20 @@
+@import "../../styles/scss/foundation/variables.module.scss";
+
+.wrap {
+    width: 35%;
+}
+.effectText {
+    border: 1px solid $orange;
+    text-align: center;
+}
+.avoidBtn {
+    padding: 3px;
+    text-align: center;
+    background-color: $green;
+    border: 1px solid $green;
+    border-radius: 50px;
+    opacity: 0.8;
+    span {
+        font-weight: bold;
+    }
+}

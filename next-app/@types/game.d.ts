@@ -23,3 +23,4 @@ export type Player = {
 }
 
 export type Action = 'avoidEffect' | 'notAvoidEffect';
+export type Order = 'skip' | 'draw' | 'wild' | 'elevenback' | 'opencard' | null;

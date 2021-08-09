@@ -3,6 +3,7 @@ import { GameSet } from '../../components/game/GameSet'
 import { UserInfo } from '../../components/game/UserInfo'
 import { SingleCard } from '../../components/game/SingleCard'
 import CardWithCount from '../../components/game/CardWithCount'
+import CardEffect from '../../components/game/CardEffect'
 
 const Room = () => (
     <>
@@ -57,6 +58,14 @@ const Room = () => (
             }
         ]}
         numStyle='bottom'
+        />
+        <CardEffect
+        order={'draw'}
+        value={2}
+        />
+         <CardEffect
+        order={'opencard'}
+        value={13}
         />
     </>
     )
