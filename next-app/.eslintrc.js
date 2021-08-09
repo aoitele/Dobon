@@ -35,7 +35,9 @@ module.exports = {
     "no-ternary": "off",
     "no-nested-ternary": "off",
     "camelcase": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "max-statements": "off",
+    "prefer-destructuring": "off"
   },
   "settings": {
     "react": {
