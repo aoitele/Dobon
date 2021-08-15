@@ -4,8 +4,8 @@ services:
   web:
     env_file: ./next-app/.env
     build:
-      context: .
-      dockerfile: ./next-app/Dockerfile
+      context: ./next-app/
+      dockerfile: Dockerfile
     image: dobon_web
     container_name: dobon_web
     command: npm run dev
