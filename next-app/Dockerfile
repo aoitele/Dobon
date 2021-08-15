@@ -7,10 +7,10 @@ RUN apt-get update && apt-get install -y \
     openssl 
 
 WORKDIR /usr/src/next-app
-COPY package*.json /usr/src/next-app
+COPY package*.json /usr/src/next-app/
 RUN npm install
 
-COPY . /usr/src/next-app
+COPY . /usr/src/next-app/
 RUN npm run prisma:generate
 
 EXPOSE 3000

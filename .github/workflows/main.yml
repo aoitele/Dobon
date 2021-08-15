@@ -29,5 +29,5 @@ jobs:
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: 'dobon-web'
-          appdir: 'next-app/'
+          appdir: 'next-app'
           usedocker: true
