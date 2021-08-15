@@ -10,7 +10,7 @@ interface Props {
 const RoomList: React.FC<Props> = ({ rooms }) => (
     <>
         <div>RoomList</div>
-        { rooms.map((room, idx) => 
+        { rooms && rooms.map((room, idx) => 
             <div key={idx}>
                 <Link href={`/room/${room.id}`}>
                     <p>{room.title}</p>
@@ -25,7 +25,7 @@ export const getServerSideProps = async ()=> {
     const axios = axiosInstance();
     try {
         const res = await axios.get('/api/room');
-        const rooms: Room[] = res.data?.rooms;
+        const rooms: Room[] | undefined = res.data?.rooms;
         return {
             props: { rooms }
         }
