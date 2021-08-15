@@ -1,5 +1,6 @@
 const next = require('next')
-const fastify = require('fastify')
+const fastify = require('fastify')()
+const socketio = require('fastify-socket.io')
 
 const dev = process.env.NODE_ENV !== 'production'
 const port = 3000
@@ -8,15 +9,35 @@ const host = '0.0.0.0'
 const app = next({ dev })
 const handle = app.getRequestHandler()
 
-const server = fastify()
+const registerPlugin = () => {
+    console.log('registerPlugin...')
+    fastify.addHook('onReady', () => {
+        console.log('fastify server ready...')
+    })
+    
+    fastify.register(socketio, {
+        cors: {
+            origin: process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN,
+            methods: ["GET", "POST"]
+        }
+    })
+    return fastify // Pluginが登録されたfastify instanceを返す
+}
 
-server.register(require('fastify-socket.io'), {})
-app.prepare().then(() => {
-    server.all('*', (req, res) => handle(req.raw, res.raw))
+app.prepare().then(async () => {
+    const fastifyWithPlugin = await registerPlugin();
 
-    server.listen(port, host, (err, address) => {
+    fastifyWithPlugin.all('*', (req, res) => handle(req.raw, res.raw))
+    
+    fastifyWithPlugin.io.on('connection', (socket) => {
+        console.log('a user connected');
+        socket.on('chat message', (msg) => {
+            console.log(`message: ${  msg}`);
+        });
+    });
+
+    fastifyWithPlugin.listen(port, host, (err, address) => {
         if(err) throw err
         console.log(`Server listening at ${address}`)
-    })    
+    })
 })
-
