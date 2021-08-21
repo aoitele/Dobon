@@ -2,11 +2,14 @@
   "name": "next-app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "12.13.1"
+  },
   "scripts": {
     "dev": "node server/index.js",
     "build": "next build",
     "build:vercel": "npm run prisma:generate && npx prisma migrate deploy && next build",
-    "start": "NODE_ENV=production node server/index.ts",
+    "start": "NODE_ENV=production node server/index.js",
     "lint": "eslint --ext \".js,.ts,jsx,tsx\" .",
     "lint:fix": "eslint --fix --ext \".js,.ts,jsx,tsx\" .",
     "prettier:check": "prettier --check '**/*.{js,jsx,ts,tsx}'",
