@@ -30,4 +30,6 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: 'dobon-web'
           appdir: 'next-app'
-          usedocker: true
+          buildpack: "https://github.com/heroku/heroku-buildpack-nodejs#latest"
+          usedocker: false
+          procfile: "web: npm run prisma:generate && npm start"
