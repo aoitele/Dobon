@@ -1,0 +1,10 @@
+build:
+  config:
+    NODE_ENV: production
+  docker:
+    web: Dockerfile
+release:
+  command:
+    - npm run build && npm run prisma generate
+run:
+  web: npm run start
