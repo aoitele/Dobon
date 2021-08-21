@@ -3,7 +3,7 @@ const fastify = require('fastify')()
 const socketio = require('fastify-socket.io')
 
 const dev = process.env.NODE_ENV !== 'production'
-const port = 3000
+const port = process.env.PORT || 3000
 const host = '0.0.0.0'
 
 const app = next({ dev })
