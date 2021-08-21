@@ -32,4 +32,4 @@ jobs:
           appdir: 'next-app'
           buildpack: "https://github.com/heroku/heroku-buildpack-nodejs#latest"
           usedocker: false
-          procfile: "web: npm run prisma:generate && npm start"
+          procfile: "web: npm start"
