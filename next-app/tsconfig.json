@@ -17,6 +17,6 @@
     "jsx": "preserve",
     "declaration": true // fastify plugin 使用のため追加
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "server/index.js", "server/index.js", "server/server.js"],
-  "exclude": ["node_modules"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "server/index.ts", "server/index.ts", "server/server.js"],
+  "exclude": ["node_modules", ".next"]
 }
