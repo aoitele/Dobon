@@ -1,0 +1,42 @@
+.wrap {
+    width: 90%;
+    height: 120px;
+    background-color: black;        
+    border-radius: 5px;
+    padding: 4px;
+    .inputArea {
+        background-color: rgb(244, 241, 241);
+        color: black;
+    }
+    .post {
+        height: 100%;
+        .message {
+            color: white;
+            font-size: 12px;
+        }
+
+        // .newmessage {
+        //     color: white;
+        //     -webkit-animation: blink 0.6s ease-in-out infinite alternate;
+        //     animation: blink 0.6s ease-in-out infinite alternate;
+        //     font-size: 14px;
+        // }
+        @-webkit-keyframes blink {
+            0% {opacity: 0.7;}
+            100% {opacity: 1;}
+        }
+        @keyframes blink {
+            0% {opacity: 0.7;}
+            100% {opacity: 1;}
+        }
+    }
+    .submitBtn {
+        background-color: whitesmoke;
+        border-radius: 5px;
+        display: inline-block;
+        width: 70px;
+        padding: 5px;
+        margin-left: 5px;
+        text-align: center;
+    }
+}
