@@ -7,7 +7,7 @@ services:
       context: ./next-app/
       dockerfile: Dockerfile
     image: dobon_web
-    container_name: dobon_web
+    container_name: dobon
     command: npm run dev
     environment:
       NODE_ENV: development
