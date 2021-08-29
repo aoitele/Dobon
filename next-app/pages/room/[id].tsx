@@ -6,7 +6,7 @@ import CardWithCount from '../../components/game/CardWithCount'
 import CardEffect from '../../components/game/CardEffect'
 import ChatBoard from '../../components/game/ChatBoard'
 import { SocketClient, resSocketClient } from '../../utils/socket/client'
-import { Emit } from '../../@types/socket'
+import { Emit, HandleEmitFn } from '../../@types/socket'
 
 interface initialState {
     connected: boolean;
@@ -35,23 +35,15 @@ const Room:React.FC = () => {
     if(!state.connected) {
         return <>loading...</>
     }
-    
-    const sendData = () => {
-        if(state.wsClient !== null) {
-            const data: Emit = {
-                roomId:1,
-                userId: 1,
-                nickname: 'taro',
-                event: 'chat',
-                data: { message: 'hello dobon!' }
-            }
+
+    const handleEmit: HandleEmitFn = (data: Emit) => {
+        if (state.wsClient !== null) {
             state.wsClient.socket.emit('emit', data)
         }
     }
     
     return (
     <>
-        <button onClick={() => sendData()} style={{ backgroundColor: 'lightgray', borderRadius: '10px', padding: '6px' }}>Send Data!</button>
         <GameSet gameSet={1} setCount={10} />
         <UserInfo nickname={'taro'} score={200} />
         <SingleCard suit='c' num={1} isOpen={true} />
@@ -112,7 +104,7 @@ const Room:React.FC = () => {
         order={'opencard'}
         value={13}
         />
-        <ChatBoard user='taro' post='コメント'/>
+        <ChatBoard user='taro' post='コメント' handleEmit={handleEmit}/>
     </>
     )
 }

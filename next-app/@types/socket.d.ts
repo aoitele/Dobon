@@ -16,3 +16,7 @@ export type Emit = {
     event: Event;
     data?: Required<Card> | EmitAction | Chat;
 }
+
+export type HandleEmitFn = (data: Emit) => void; // eslint-disable-line no-unused-vars
+
+

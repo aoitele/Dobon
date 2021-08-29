@@ -29,7 +29,6 @@ app.prepare().then(async () => {
 
     fastifyWithPlugin.all('*', (req, res) => handle(req.raw, res.raw))
     fastifyWithPlugin.io.on('connection', (socket) => {
-        // Console.log(socket, 'socket')
         const { room } = socket.handshake.query;
         socket.join(room); 
 
