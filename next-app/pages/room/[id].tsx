@@ -1,12 +1,57 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { GameSet } from '../../components/game/GameSet'
 import { UserInfo } from '../../components/game/UserInfo'
 import { SingleCard } from '../../components/game/SingleCard'
 import CardWithCount from '../../components/game/CardWithCount'
 import CardEffect from '../../components/game/CardEffect'
+import ChatBoard from '../../components/game/ChatBoard'
+import { SocketClient, resSocketClient } from '../../utils/socket/client'
+import { Emit } from '../../@types/socket'
 
-const Room = () => (
+interface initialState {
+    connected: boolean;
+    wsClient: SocketClient | null;
+}
+
+const Room:React.FC = () => {
+    const [state, setState] = useState<initialState>({connected:false, wsClient:null})
+    
+    useEffect(() => {
+        const establishWS = async() => {
+            if(!state.connected && typeof window !== 'undefined') {
+                const wsClient = await resSocketClient(location.pathname)
+                if (wsClient) {
+                    const newState: initialState = {
+                        connected: true,
+                        wsClient
+                    }
+                    setState(newState) 
+                }
+            }
+        }
+        establishWS()
+    }, [state.connected])
+
+    if(!state.connected) {
+        return <>loading...</>
+    }
+    
+    const sendData = () => {
+        if(state.wsClient !== null) {
+            const data: Emit = {
+                roomId:1,
+                userId: 1,
+                nickname: 'taro',
+                event: 'chat',
+                data: { message: 'hello dobon!' }
+            }
+            state.wsClient.socket.emit('emit', data)
+        }
+    }
+    
+    return (
     <>
+        <button onClick={() => sendData()} style={{ backgroundColor: 'lightgray', borderRadius: '10px', padding: '6px' }}>Send Data!</button>
         <GameSet gameSet={1} setCount={10} />
         <UserInfo nickname={'taro'} score={200} />
         <SingleCard suit='c' num={1} isOpen={true} />
@@ -67,7 +112,9 @@ const Room = () => (
         order={'opencard'}
         value={13}
         />
+        <ChatBoard user='taro' post='コメント'/>
     </>
     )
+}
 
 export default Room

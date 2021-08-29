@@ -28,13 +28,24 @@ app.prepare().then(async () => {
     const fastifyWithPlugin = await registerPlugin();
 
     fastifyWithPlugin.all('*', (req, res) => handle(req.raw, res.raw))
-    
     fastifyWithPlugin.io.on('connection', (socket) => {
-        console.log('a user connected');
-        socket.on('chat message', (msg) => {
-            console.log(`message: ${  msg}`);
+        // Console.log(socket, 'socket')
+        const { room } = socket.handshake.query;
+        socket.join(room); 
+
+        socket.on('emit', (data) => {
+            console.log('---- data get ----');
+            console.log(data);
         });
     });
+    fastifyWithPlugin.io.of("/").adapter.on("create-room", (room) => {
+        console.log(`room ${room} was created`);
+    });
+      
+    fastifyWithPlugin.io.of("/").adapter.on("join-room", (room, id) => {
+        console.log(`socket ${id} has joined room ${room}`);
+    });
+      
 
     fastifyWithPlugin.listen(port, host, (err, address) => {
         if(err) throw err
