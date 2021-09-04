@@ -1,6 +1,8 @@
 const next = require('next')
 const fastify = require('fastify')()
 const socketio = require('fastify-socket.io')
+const { createAdapter } = require('socket.io-redis')
+const { RedisClient } = require('redis')
 
 const dev = process.env.NODE_ENV !== 'production'
 const port = process.env.PORT || 3000
@@ -8,7 +10,12 @@ const host = '0.0.0.0'
 
 const app = next({ dev })
 const handle = app.getRequestHandler()
+const pubClient = new RedisClient({ host: process.env.REDIS_SERVER_HOST, port: process.env.REDIS_SERVER_PORT });
+const subClient = pubClient.duplicate();
 
+/**
+ * Fastify http Server with WebSocket Plugin
+ */
 const registerPlugin = () => {
     console.log('registerPlugin...')
     fastify.addHook('onReady', () => {
@@ -21,7 +28,7 @@ const registerPlugin = () => {
             methods: ["GET", "POST"]
         }
     })
-    return fastify // Pluginが登録されたfastify instanceを返す
+    return fastify
 }
 
 app.prepare().then(async () => {
@@ -30,21 +37,24 @@ app.prepare().then(async () => {
     fastifyWithPlugin.all('*', (req, res) => handle(req.raw, res.raw))
     fastifyWithPlugin.io.on('connection', (socket) => {
         const { room } = socket.handshake.query;
-        socket.join(room); 
+        socket.join(room)
+        socket.to(room).emit('hello', 'new user comming!!')
 
-        socket.on('emit', (data) => {
-            console.log('---- data get ----');
-            console.log(data);
+        socket.on('emit', (payload) => {
+            console.log(payload, 'payload');
+
+            if (payload.event === 'chat') {
+                const { channel } = payload 
+                const { message } = payload.data
+                socket.to(channel).emit('message', message)
+            }
         });
     });
-    fastifyWithPlugin.io.of("/").adapter.on("create-room", (room) => {
-        console.log(`room ${room} was created`);
-    });
-      
+
     fastifyWithPlugin.io.of("/").adapter.on("join-room", (room, id) => {
         console.log(`socket ${id} has joined room ${room}`);
     });
-      
+    fastifyWithPlugin.io.adapter(createAdapter({ pubClient, subClient }));
 
     fastifyWithPlugin.listen(port, host, (err, address) => {
         if(err) throw err

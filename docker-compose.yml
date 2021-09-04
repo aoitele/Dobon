@@ -17,6 +17,8 @@ services:
     ports:
       - "3000:3000"
     tty: true
+    links:
+      - redis
   redis:
     image: "redis:latest"
     container_name: dobon_redis

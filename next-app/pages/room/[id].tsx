@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/router';
 import { GameSet } from '../../components/game/GameSet'
 import { UserInfo } from '../../components/game/UserInfo'
 import { SingleCard } from '../../components/game/SingleCard'
@@ -15,7 +16,15 @@ interface initialState {
 
 const Room:React.FC = () => {
     const [state, setState] = useState<initialState>({connected:false, wsClient:null})
-    
+    const router = useRouter() ;
+
+    const posts = [
+        {nickname: '一郎', message: 'おはようございます'},
+        {nickname: '二郎', message: 'こんにちは'},
+        {nickname: '三郎', message: 'こんばんは'},
+        {nickname: '四郎', message: 'おはこんばんちは'},
+    ]
+
     useEffect(() => {
         const establishWS = async() => {
             if(!state.connected && typeof window !== 'undefined') {
@@ -104,7 +113,7 @@ const Room:React.FC = () => {
         order={'opencard'}
         value={13}
         />
-        <ChatBoard user='taro' post='コメント' handleEmit={handleEmit}/>
+        <ChatBoard room={router.asPath} posts={posts} handleEmit={handleEmit}/>
     </>
     )
 }
