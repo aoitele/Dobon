@@ -10,7 +10,7 @@ type Chat = {
 }
 
 export type Emit = {
-    roomId: number;
+    room: string;
     userId: number;
     nickname: string;
     event: Event;
