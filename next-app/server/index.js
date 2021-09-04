@@ -11,7 +11,7 @@ const host = '0.0.0.0'
 const app = next({ dev })
 const handle = app.getRequestHandler()
 
-const redisClientOpts = dev ? { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT) } : { redis_url :process.env.REDIS_URL, tls: { rejectUnauthorized: false } }
+const redisClientOpts = dev ? { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT) } : process.env.REDIS_URL
 const pubClient = createClient(redisClientOpts)
 const subClient = pubClient.duplicate();
 
