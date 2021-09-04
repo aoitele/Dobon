@@ -2,7 +2,7 @@ const next = require('next')
 const fastify = require('fastify')()
 const socketio = require('fastify-socket.io')
 const { createAdapter } = require('socket.io-redis')
-const { RedisClient } = require('redis')
+const { createClient } = require('redis')
 
 const dev = process.env.NODE_ENV !== 'production'
 const port = process.env.PORT || 3000
@@ -11,8 +11,8 @@ const host = '0.0.0.0'
 const app = next({ dev })
 const handle = app.getRequestHandler()
 
-const redisClientOpts = dev ? { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT } : { url:process.env.REDIS_URL, tls: { rejectUnauthorized: false } }
-const pubClient = new RedisClient(redisClientOpts);
+const redisClientOpts = dev ? { host: process.env.REDIS_HOST, port: Number(process.env.REDIS_PORT) } : { redis_url :process.env.REDIS_URL, tls: { rejectUnauthorized: false } }
+const pubClient = createClient(redisClientOpts)
 const subClient = pubClient.duplicate();
 
 /**
