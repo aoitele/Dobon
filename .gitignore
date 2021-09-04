@@ -4,3 +4,4 @@
 node_modules
 .devcontainer.json
 dist
+redis/data/**
