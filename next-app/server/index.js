@@ -44,9 +44,8 @@ app.prepare().then(async () => {
             console.log(payload, 'payload');
 
             if (payload.event === 'chat') {
-                const { channel } = payload 
                 const { message } = payload.data
-                socket.to(channel).emit('message', message)
+                socket.to(payload.room).emit('message', message)
             }
         });
     });
