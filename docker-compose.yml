@@ -12,7 +12,7 @@ services:
     environment:
       NODE_ENV: development
     volumes:
-      - ./next-app:/usr/src/next-app
+      - ./next-app:/usr/src/next-app:delegated
       - /usr/src/next-app/node_modules
     ports:
       - "3000:3000"

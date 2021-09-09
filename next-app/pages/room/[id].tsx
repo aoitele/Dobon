@@ -16,7 +16,7 @@ interface initialState {
 
 const Room:React.FC = () => {
     const [state, setState] = useState<initialState>({connected:false, wsClient:null})
-    const router = useRouter() ;
+    const router = useRouter()
 
     const posts = [
         {nickname: '一郎', message: 'おはようございます'},
