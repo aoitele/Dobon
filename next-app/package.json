@@ -20,7 +20,8 @@
     "prepare": "cd .. && husky install",
     "lint-staged": "lint-staged",
     "prisma:generate": "npx prisma generate --schema=./prisma/schema.prisma",
-    "migrate:prisma": "prisma migrate dev --schema=./prisma/schema.prisma --preview-feature --name init"
+    "migrate:prisma": "prisma migrate dev --schema=./prisma/schema.prisma --preview-feature --name init",
+    "heroku-postbuild": "npm run build:next && npm run build:server && npm run prisma:generate"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
