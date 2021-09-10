@@ -1,2 +1,2 @@
-release: npm run build:next && npm run build:server && npm run prisma generate
+release: npm run build:next && npm run build:server && npm run prisma:generate
 web: npm start
