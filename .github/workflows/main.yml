@@ -32,4 +32,3 @@ jobs:
           appdir: 'next-app'
           buildpack: "https://github.com/heroku/heroku-buildpack-nodejs#latest"
           usedocker: false
-          procfile: "web: npm start"
