@@ -1,0 +1,69 @@
+@import './scss/foundation/variables.module';
+.modalWrap {
+    position: absolute;
+    width: calc(100% - 20px);
+    top: 50px;
+    padding: 0 10px;
+    opacity: 0;
+    z-index: -100;
+    transition: 0.3s ease-in-out;
+}
+.modalOpen {
+    opacity: 1;
+    z-index: 10000; /*最前面に*/
+}
+.modalBack {
+    position: fixed;
+    z-index: 9500;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    opacity: 0.5;
+    transition: 0.6s ease-in-out;
+}
+.modalInner {
+    padding: 20px;
+    text-align: center;
+    background-color: #ffffff;
+    color: $font-color;
+    border-radius: 10px;
+
+    .statusText {
+        font-weight: bold;
+    }
+    .info {
+        padding: 10px;
+        border-radius: 10px;
+        .waiting {
+            margin-left: 5px;
+            padding: 2px;
+            background-color: brown;
+            color:#ffffff;
+            border-radius: 3px;
+            text-align: center;
+            animation: flash 1s linear infinite;
+        }
+        ul {
+            display: inline-block;
+        }
+    }
+    .startBtn {
+        background-color: $green;
+        color:#ffffff;
+        margin: 40px 0;
+        padding: 10px;
+        border-radius: 10px;
+    }
+}
+
+@keyframes flash {
+  0%,100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}

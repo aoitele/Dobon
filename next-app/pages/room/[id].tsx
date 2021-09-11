@@ -8,14 +8,25 @@ import CardEffect from '../../components/game/CardEffect'
 import ChatBoard from '../../components/game/ChatBoard'
 import { SocketClient, resSocketClient } from '../../utils/socket/client'
 import { Emit, HandleEmitFn } from '../../@types/socket'
+import { Game, GameStatus } from '../../@types/game'
+import Modal from '../../components/game/Modal';
 
-interface initialState {
+interface gameInitialState {
+    game: Game;
     connected: boolean;
     wsClient: SocketClient | null;
 }
 
+const initialState: gameInitialState= {
+    game: {
+        id: null,
+        status: 'created',
+    },
+    connected: false,
+    wsClient: null,
+}
 const Room:React.FC = () => {
-    const [state, setState] = useState<initialState>({connected:false, wsClient:null})
+    const [state, setState] = useState(initialState)
     const router = useRouter()
 
     const posts = [
@@ -30,27 +41,27 @@ const Room:React.FC = () => {
             if(!state.connected && typeof window !== 'undefined') {
                 const wsClient = await resSocketClient(location.pathname)
                 if (wsClient) {
-                    const newState: initialState = {
-                        connected: true,
-                        wsClient
-                    }
-                    setState(newState) 
+                    setState({...state, connected: true, wsClient}) 
                 }
             }
         }
         establishWS()
     }, [state.connected])
 
-    if(!state.connected) {
-        return <>loading...</>
-    }
-
     const handleEmit: HandleEmitFn = (data: Emit) => {
         if (state.wsClient !== null) {
             state.wsClient.socket.emit('emit', data)
         }
     }
-    
+
+    const stateChangeFn = (id: number, status: GameStatus) => {
+        setState({...state, game:{ id, status }})
+    }
+
+    if(state.game.status !== 'playing') {
+        return <Modal status={state.game.status} stateChangeFn={stateChangeFn}/>
+    }
+
     return (
     <>
         <GameSet gameSet={1} setCount={10} />
