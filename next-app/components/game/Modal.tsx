@@ -1,24 +1,25 @@
 import React from 'react'
 import style from './Modal.module.scss'
 import { GameStatus } from '../../@types/game'
+import { HandleEmitFn } from '../../@types/socket'
 
 interface Props {
+    room: string;
     status: GameStatus;
-    stateChangeFn: (arg0: number, arg1: GameStatus) => void // eslint-disable-line no-unused-vars
+    handleEmit: HandleEmitFn;
 }
-const modal:React.FC<Props> = ({ status, stateChangeFn }) => (
+const modal:React.FC<Props> = ({ room, status, handleEmit }) => (
         <>
           <div className={`${style.modalWrap} ${style.modalOpen}`}>
                 <div className={style.modalInner}>
-                    { modalInner(status, stateChangeFn) }
+                    { modalInner(room, status, handleEmit) }
                 </div>
             </div>
             <div className={style.modalBack}/>
         </>
     )
 
-const modalInner = (status: GameStatus, stateChangeFn:Props['stateChangeFn']) => {
-
+const modalInner = (room: string, status: GameStatus, handleEmit: HandleEmitFn) => {
     switch(status) {
         case 'created': return (
             <div>
@@ -42,8 +43,15 @@ const modalInner = (status: GameStatus, stateChangeFn:Props['stateChangeFn']) =>
                         <li>さぶろう</li>
                     </ul>
                 </div>
-                <a href="#" className={style.startBtn} onClick={() => stateChangeFn(1, 'playing')}>ゲームスタート</a>
+                <a href="#" className={style.startBtn} onClick={() => handleEmit({room, event: 'gamestart'})}>ゲームスタート</a>
             </div>  
+        )
+        case 'loading': return (
+            <div className={style.modalBack}>
+                <div className={style.loader}>
+                    <p>ロード中...</p>
+                </div>
+            </div>
         )
         case 'ended': return (
             <div className={style.modalBack}>

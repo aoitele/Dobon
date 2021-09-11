@@ -11,7 +11,7 @@ export type Room = {
 
 export type Game = {
     id: number | null;
-    status: 'created' | 'playing' | 'ended' | 'connection loss';
+    status: 'created' | 'playing' | 'ended' | 'loading' | 'connection loss' | undefined;
 }
 export type GameStatus = Game['status']
 

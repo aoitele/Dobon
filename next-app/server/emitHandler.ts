@@ -11,6 +11,10 @@ const emitHandler = (socket:any) => {
             // Socket.to(payload.room).emit('message', message)
             adapterPubClient.xadd('myStream', 'MAXLEN', '2', '*', 'user', payload.nickname,'message', message)
         }
+
+        if (payload.event === 'gamestart') {
+            socket.to(payload.room).emit('message', 'gamestart!!')
+        }
     });
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useReducer } from 'react'
 import { useRouter } from 'next/router';
 import { GameSet } from '../../components/game/GameSet'
 import { UserInfo } from '../../components/game/UserInfo'
@@ -6,18 +6,12 @@ import { SingleCard } from '../../components/game/SingleCard'
 import CardWithCount from '../../components/game/CardWithCount'
 import CardEffect from '../../components/game/CardEffect'
 import ChatBoard from '../../components/game/ChatBoard'
-import { SocketClient, resSocketClient } from '../../utils/socket/client'
+import { resSocketClient } from '../../utils/socket/client'
 import { Emit, HandleEmitFn } from '../../@types/socket'
-import { Game, GameStatus } from '../../@types/game'
 import Modal from '../../components/game/Modal';
+import { reducer, gameInitialState } from '../../utils/game/roomStateReducer'
 
-interface gameInitialState {
-    game: Game;
-    connected: boolean;
-    wsClient: SocketClient | null;
-}
-
-const initialState: gameInitialState= {
+const initialState: gameInitialState = {
     game: {
         id: null,
         status: 'created',
@@ -25,8 +19,9 @@ const initialState: gameInitialState= {
     connected: false,
     wsClient: null,
 }
+
 const Room:React.FC = () => {
-    const [state, setState] = useState(initialState)
+    const [state, dispatch] = useReducer(reducer, initialState);
     const router = useRouter()
 
     const posts = [
@@ -41,7 +36,7 @@ const Room:React.FC = () => {
             if(!state.connected && typeof window !== 'undefined') {
                 const wsClient = await resSocketClient(location.pathname)
                 if (wsClient) {
-                    setState({...state, connected: true, wsClient}) 
+                    dispatch({ type:'set', payload:{ connected: true, wsClient }})
                 }
             }
         }
@@ -54,12 +49,8 @@ const Room:React.FC = () => {
         }
     }
 
-    const stateChangeFn = (id: number, status: GameStatus) => {
-        setState({...state, game:{ id, status }})
-    }
-
-    if(state.game.status !== 'playing') {
-        return <Modal status={state.game.status} stateChangeFn={stateChangeFn}/>
+    if(state.game?.status !== 'playing') {
+        return <Modal room={router.asPath} status={state.game?.status} handleEmit={handleEmit}/>
     }
 
     return (
