@@ -36,7 +36,8 @@ const Room:React.FC = () => {
             if(!state.connected && typeof window !== 'undefined') {
                 const wsClient = await resSocketClient(location.pathname)
                 if (wsClient) {
-                    dispatch({ type:'set', payload:{ connected: true, wsClient }})
+                    dispatch({ type:'wsClientSet', payload:{ connected: true, wsClient }})
+                    wsClient.dispatch = dispatch
                 }
             }
         }
@@ -44,13 +45,13 @@ const Room:React.FC = () => {
     }, [state.connected])
 
     const handleEmit: HandleEmitFn = (data: Emit) => {
-        if (state.wsClient !== null) {
+        if (state.wsClient && state.wsClient !== null) {
             state.wsClient.socket.emit('emit', data)
         }
     }
 
     if(state.game?.status !== 'playing') {
-        return <Modal room={router.asPath} status={state.game?.status} handleEmit={handleEmit}/>
+        return <Modal room={router.asPath} status={state.game?.status} handleEmit={handleEmit} />
     }
 
     return (

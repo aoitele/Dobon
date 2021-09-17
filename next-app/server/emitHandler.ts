@@ -1,6 +1,7 @@
 import { Redis } from "ioredis";
+import { reducerPayload } from "../utils/game/roomStateReducer";
 
-const emitHandler = (socket:any) => {
+const emitHandler = (io:any, socket:any) => {
     const adapterPubClient:Redis = socket.adapter.pubClient;
 
     socket.on('emit', (payload: any) => {
@@ -13,7 +14,13 @@ const emitHandler = (socket:any) => {
         }
 
         if (payload.event === 'gamestart') {
-            socket.to(payload.room).emit('message', 'gamestart!!')
+            const state:reducerPayload = {
+                game: {
+                    id: payload.room,
+                    status: 'playing'
+                }
+            }
+            io.in(payload.room).emit('updateState', state)
         }
     });
 }
