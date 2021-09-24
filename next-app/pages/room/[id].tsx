@@ -12,6 +12,7 @@ import Modal from '../../components/game/Modal';
 import { reducer, gameInitialState } from '../../utils/game/roomStateReducer'
 
 const initialState: gameInitialState = {
+    roomId: null,
     game: {
         id: null,
         status: 'created',
@@ -33,16 +34,20 @@ const Room:React.FC = () => {
 
     useEffect(() => {
         const establishWS = async() => {
-            if(!state.connected && typeof window !== 'undefined') {
-                const wsClient = await resSocketClient(location.pathname)
+            if (!router.isReady) return;
+            const roomId = router.query.id
+           
+            if (!state.connected && typeof window !== 'undefined' && roomId) {
+                const rid = typeof roomId === 'string' ? roomId : roomId[0] // 同じクエリパラメータから取得する値が複数あると配列が返るため
+                const wsClient = await resSocketClient(rid)
                 if (wsClient) {
-                    dispatch({ type:'wsClientSet', payload:{ connected: true, wsClient }})
+                    dispatch({ type:'wsClientSet', payload:{ connected: true, wsClient, roomId: Number(rid) }})
                     wsClient.dispatch = dispatch
                 }
             }
         }
         establishWS()
-    }, [state.connected])
+    }, [router.isReady])
 
     const handleEmit: HandleEmitFn = (data: Emit) => {
         if (state.wsClient && state.wsClient !== null) {
@@ -50,10 +55,13 @@ const Room:React.FC = () => {
         }
     }
 
-    if(state.game?.status !== 'playing') {
-        return <Modal room={router.asPath} status={state.game?.status} handleEmit={handleEmit} />
+    if (state.game?.status !== 'playing') {
+        return state.roomId
+        ? <Modal roomId={state.roomId} status={state.game?.status} handleEmit={handleEmit} />
+        : <Modal status='loading' handleEmit={handleEmit} />
     }
 
+     
     return (
     <>
         <GameSet gameSet={1} setCount={10} />
@@ -112,11 +120,11 @@ const Room:React.FC = () => {
         order={'draw'}
         value={2}
         />
-         <CardEffect
+        <CardEffect
         order={'opencard'}
         value={13}
         />
-        <ChatBoard room={router.asPath} posts={posts} handleEmit={handleEmit}/>
+        { state.roomId && <ChatBoard roomId={state.roomId} posts={posts} handleEmit={handleEmit}/> }
     </>
     )
 }

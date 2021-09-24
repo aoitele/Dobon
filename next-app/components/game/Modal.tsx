@@ -4,25 +4,23 @@ import { GameStatus } from '../../@types/game'
 import { HandleEmitFn } from '../../@types/socket'
 
 interface Props {
-    room: string;
+    roomId?: number;
     status: GameStatus;
     handleEmit: HandleEmitFn;
 }
-const modal:React.FC<Props> = ({ room, status, handleEmit }) => (
+const modal:React.FC<Props> = ({ roomId, status, handleEmit }) => (
         <>
           <div className={`${style.modalWrap} ${style.modalOpen}`}>
-                <div className={style.modalInner}>
-                    { modalInner(room, status, handleEmit) }
-                </div>
+                { modalInner(status, handleEmit, roomId) }
             </div>
             <div className={style.modalBack}/>
         </>
     )
 
-const modalInner = (room: string, status: GameStatus, handleEmit: HandleEmitFn) => {
+const modalInner = (status: GameStatus, handleEmit: HandleEmitFn, roomId?: number, ) => {
     switch(status) {
         case 'created': return (
-            <div>
+            <div className={style.modalInner}>
                 <p className={style.statusText}>ゲーム開始前です</p>
 
                 <div className={style.info}>
@@ -43,20 +41,20 @@ const modalInner = (room: string, status: GameStatus, handleEmit: HandleEmitFn) 
                         <li>さぶろう</li>
                     </ul>
                 </div>
-                <a href="#" className={style.startBtn} onClick={() => handleEmit({room, event: 'gamestart'})}>ゲームスタート</a>
+                { roomId && <a href="#" className={style.startBtn} onClick={() => handleEmit({roomId, event: 'gamestart'})}>ゲームスタート</a> }
             </div>  
         )
         case 'loading': return (
             <div className={style.modalBack}>
-                <div className={style.loader}>
-                    <p>ロード中...</p>
-                </div>
+                <div className={style.loader}/>
             </div>
         )
         case 'ended': return (
-            <div className={style.modalBack}>
-                <div className={style.modalInner}>
-                    <p>ゲームが終了しました</p>
+            <div className={style.modalInner}>
+                <div className={style.modalBack}>
+                    <div className={style.modalInner}>
+                        <p>ゲームが終了しました</p>
+                    </div>
                 </div>
             </div>
         )

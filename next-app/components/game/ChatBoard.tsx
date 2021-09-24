@@ -3,7 +3,7 @@ import style from './ChatBoard.module.scss'
 import { Emit, HandleEmitFn } from '../../@types/socket'
 
 interface Props {
-    room: string;
+    roomId: number;
     posts: {
         nickname: string;
         message: string;
@@ -11,17 +11,20 @@ interface Props {
     handleEmit: HandleEmitFn;
 }
 
-const chatBoard:React.FC<Props> = ({ room, posts, handleEmit }) => {
+const chatBoard:React.FC<Props> = ({ roomId, posts, handleEmit }) => {
     const [inputNewPost] = useState(false)
     const [message, setMessage] = useState('')
 
     const submit = () => {
         const data:Emit = {
-            room,
+            roomId,
             userId: 1,
             nickname: 'taro',
             event: 'chat',
-            data: { message }
+            data: { 
+                type: 'chat',
+                message
+            }
         }
         handleEmit(data)
     }

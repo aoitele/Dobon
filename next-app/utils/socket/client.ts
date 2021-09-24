@@ -7,8 +7,8 @@ class SocketClient {
 
     dispatch: Dispatch<Action>;
 
-    constructor(roomName: string) {
-        this.socket = io(`${process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN}?room=${roomName}`);
+    constructor(roomId: string) {
+        this.socket = io(`${process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN}?roomId=${roomId}`);
         this.dispatch = () => {} // eslint-disable-line
     }
 
@@ -17,9 +17,8 @@ class SocketClient {
         this.dispatch({type:'updateGameState', payload:{ game }})
     }
 }
-const resSocketClient = async(roomName: string): Promise<SocketClient | null> => {
-    console.log('-----establish start------')
-    const sc = await new SocketClient(roomName)
+const resSocketClient = async(roomId: string): Promise<SocketClient | null> => {
+    const sc = await new SocketClient(roomId)
     sc.socket.on('hello', (message) => console.log(`hello:${message}`))
     sc.socket.on('message', (message) => console.log(`message:${message}`))
     sc.socket.on('updateState', (state: reducerPayload) => sc.updateState(state))

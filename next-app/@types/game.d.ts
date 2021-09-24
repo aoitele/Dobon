@@ -10,7 +10,7 @@ export type Room = {
 }
 
 export type Game = {
-    id: number | null;
+    id: number | null | string | string[];
     status: 'created' | 'playing' | 'ended' | 'loading' | 'connection loss' | undefined;
 }
 export type GameStatus = Game['status']

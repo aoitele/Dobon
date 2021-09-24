@@ -1,7 +1,7 @@
 import next from 'next'
 import { createAdapter } from 'socket.io-redis';
 import { fastifyWithSocketIO } from './fastifyWithSocketIO';
-import { pubClient, subClient } from './redisClient';
+import { pubClient, subClient, initData } from './redisClient';
 import emitHandler from './emitHandler';
 
 const port = process.env.PORT || 3000
@@ -17,8 +17,9 @@ app.prepare().then(async () => {
     
     fastify.all('*', (req: any, res: any) => handle(req.raw, res.raw))
     fastify.io.on('connection', (socket: any) => {
-        const { room } = socket.handshake.query;
-        if (room) {
+        const { roomId } = socket.handshake.query;
+        if (roomId) {
+            const room = `room${roomId}`
             socket.join(room)
             fastify.io.in(room).emit('hello', 'new user comming!!')
             emitHandler(io, socket)   
@@ -36,4 +37,5 @@ app.prepare().then(async () => {
         if(err) throw err
         console.log(`Server listening at ${address}`)
     })
+    initData()
 })
