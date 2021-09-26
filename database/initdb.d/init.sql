@@ -24,14 +24,15 @@ create table IF NOT EXISTS rooms
   max_seat integer,
   set_count integer,
   rate integer,
+  create_user_id integer,
   created_at timestamp,
   updated_at timestamp
 );
 
-insert into rooms(title, status, max_seat, set_count, rate, created_at, updated_at) values
-  ('ドボン王決定戦ファイナルマッチ', 0, 4, 10, 3, now() - interval '2 week',  now() - interval '1 week'),
-  ('初心者の部屋', 1, 4, 20, 2, now() - interval '2 week',  now() - interval '1 week'),
-  ('ドボンしようぜ', 1, 4, 10, 1, now() - interval '2 week',  now() - interval '1 week');
+insert into rooms(title, status, max_seat, set_count, rate, create_user_id, created_at, updated_at) values
+  ('ドボン王決定戦ファイナルマッチ', 0, 4, 10, 3, 1, now() - interval '2 week',  now() - interval '1 week'),
+  ('初心者の部屋', 1, 4, 20, 2, 2, now() - interval '2 week',  now() - interval '1 week'),
+  ('ドボンしようぜ', 1, 4, 10, 1, 3, now() - interval '2 week',  now() - interval '1 week');
 
 create table IF NOT EXISTS gamelogs
 (
