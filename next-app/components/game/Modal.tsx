@@ -4,6 +4,7 @@ import { GameStatus } from '../../@types/game'
 import { HandleEmitFn } from '../../@types/socket'
 
 interface Props {
+    gameId?: string;
     roomId?: number;
     status: GameStatus;
     handleEmit: HandleEmitFn;
@@ -17,7 +18,7 @@ const modal:React.FC<Props> = ({ roomId, status, handleEmit }) => (
         </>
     )
 
-const modalInner = (status: GameStatus, handleEmit: HandleEmitFn, roomId?: number, ) => {
+const modalInner = (status: GameStatus, handleEmit: HandleEmitFn, roomId?: number) => {
     switch(status) {
         case 'created': return (
             <div className={style.modalInner}>

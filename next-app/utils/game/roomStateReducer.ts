@@ -1,14 +1,16 @@
 import { Game } from '../../@types/game'
 import { SocketClient } from '../socket/client'
+import { PartiallyPartial } from '../../@types/utility'
 
 export interface gameInitialState {
     roomId: number | null;
+    userId?: number | null;
     game?: Game;
     connected: boolean;
     wsClient: SocketClient | null;
 }
 
-export type reducerPayload = Partial<gameInitialState>;
+export type reducerPayload = PartiallyPartial<gameInitialState, 'connected' | 'wsClient'>;
 
 export interface wsClientSet {
     type: 'wsClientSet';
@@ -23,8 +25,8 @@ export interface updateGameState {
 export type Action = wsClientSet | updateGameState;
 
 export const reducer = (state: reducerPayload, action: Action) => {
-    const {connected, wsClient, roomId, game} = action.payload;
-    console.log(game, 'game')
+    const { connected, wsClient, roomId, game} = action.payload;
+    console.log(action.payload,'action.payload')
 
     switch (action.type) {
         case 'wsClientSet': return {...state, connected, wsClient, roomId}

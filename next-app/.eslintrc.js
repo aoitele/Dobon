@@ -37,7 +37,9 @@ module.exports = {
     "camelcase": "off",
     "react/prop-types": "off",
     "max-statements": "off",
-    "prefer-destructuring": "off"
+    "prefer-destructuring": "off",
+    "max-params": "off",
+    "no-undefined": "off"
   },
   "settings": {
     "react": {

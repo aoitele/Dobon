@@ -1,3 +1,5 @@
+import { Event } from './socket'
+
 export type Room = {
     id: number;
     title: string;
@@ -10,8 +12,10 @@ export type Room = {
 }
 
 export type Game = {
-    id: number | null | string | string[];
+    id: number | null;
     status: 'created' | 'playing' | 'ended' | 'loading' | 'connection loss' | undefined;
+    event: Event;
+    board: Board;
 }
 export type GameStatus = Game['status']
 
@@ -21,6 +25,13 @@ export type Player = {
     image?: string;
     turn: number;
     score: number;
+}
+
+export type Board = {
+    users: Player[];
+    deck: string[];
+    hands: string[];
+    trash: string[];
 }
 
 export type Action = 'avoidEffect' | 'notAvoidEffect';

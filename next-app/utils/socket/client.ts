@@ -13,15 +13,19 @@ class SocketClient {
     }
 
     updateState(state: reducerPayload) {
-        const {game} = state;
-        this.dispatch({type:'updateGameState', payload:{ game }})
+        const { roomId, game} = state;
+        this.dispatch({type:'updateGameState', payload:{ roomId, game }})
+    }
+
+    response(data: reducerPayload) {
+        console.log(this, 'data')
+        return data
     }
 }
 const resSocketClient = async(roomId: string): Promise<SocketClient | null> => {
     const sc = await new SocketClient(roomId)
-    sc.socket.on('hello', (message) => console.log(`hello:${message}`))
-    sc.socket.on('message', (message) => console.log(`message:${message}`))
     sc.socket.on('updateState', (state: reducerPayload) => sc.updateState(state))
+    sc.socket.on('response', (data: reducerPayload) => sc.response(data))
     return sc
 }
 

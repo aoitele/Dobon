@@ -18,6 +18,7 @@ const chatBoard:React.FC<Props> = ({ roomId, posts, handleEmit }) => {
     const submit = () => {
         const data:Emit = {
             roomId,
+            gameId: 1,
             userId: 1,
             nickname: 'taro',
             event: 'chat',

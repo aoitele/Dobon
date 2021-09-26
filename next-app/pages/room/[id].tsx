@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer } from 'react'
+import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { GameSet } from '../../components/game/GameSet'
 import { UserInfo } from '../../components/game/UserInfo'
@@ -10,20 +11,37 @@ import { resSocketClient } from '../../utils/socket/client'
 import { Emit, HandleEmitFn } from '../../@types/socket'
 import Modal from '../../components/game/Modal';
 import { reducer, gameInitialState } from '../../utils/game/roomStateReducer'
+import useEventHooks from '../../hooks/useEventHooks'
+import axiosInstance from '../../utils/api/axiosInstance'
+import { RoomAPIResponse } from '../../@types/api/roomAPI';
+
+interface Props {
+    room: RoomAPIResponse.RoomInfo
+}
 
 const initialState: gameInitialState = {
     roomId: null,
+    userId: null,
     game: {
         id: null,
         status: 'created',
+        event: null,
+        board: {
+            users:[],
+            deck:[],
+            hands:[],
+            trash:[]
+        }
     },
     connected: false,
     wsClient: null,
 }
 
-const Room:React.FC = () => {
+const Room:React.FC<Props> = ({ room }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const router = useRouter()
+    const { user } = room
+    console.log(user,'user')
 
     const posts = [
         {nickname: '一郎', message: 'おはようございます'},
@@ -31,29 +49,40 @@ const Room:React.FC = () => {
         {nickname: '三郎', message: 'こんばんは'},
         {nickname: '四郎', message: 'おはこんばんちは'},
     ]
-
-    useEffect(() => {
-        const establishWS = async() => {
-            if (!router.isReady) return;
-            const roomId = router.query.id
-           
-            if (!state.connected && typeof window !== 'undefined' && roomId) {
-                const rid = typeof roomId === 'string' ? roomId : roomId[0] // 同じクエリパラメータから取得する値が複数あると配列が返るため
-                const wsClient = await resSocketClient(rid)
-                if (wsClient) {
-                    dispatch({ type:'wsClientSet', payload:{ connected: true, wsClient, roomId: Number(rid) }})
-                    wsClient.dispatch = dispatch
-                }
-            }
-        }
-        establishWS()
-    }, [router.isReady])
-
+    
     const handleEmit: HandleEmitFn = (data: Emit) => {
         if (state.wsClient && state.wsClient !== null) {
             state.wsClient.socket.emit('emit', data)
         }
     }
+
+    const establishWS = async() => {
+        if (!router.isReady) return;
+        const roomId = router.query.id
+       
+        if (!state.connected && roomId) {
+            const rid = typeof roomId === 'string' ? roomId : roomId[0] // 同じクエリパラメータから取得する値が複数あると配列が返るため
+            const wsClient = await resSocketClient(rid)
+            if (wsClient) {
+                dispatch({ type:'wsClientSet', payload:{ connected: true, wsClient, roomId: Number(rid) }})
+                wsClient.dispatch = dispatch
+                wsClient.socket.on('close', () => {
+                    console.log('Socket is closed.')
+                })
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {   
+            const init = async() => {
+                await establishWS()
+            }
+            init()
+        }
+    }, [router.isReady])
+    
+    useEventHooks(state, handleEmit)
 
     if (state.game?.status !== 'playing') {
         return state.roomId
@@ -127,6 +156,23 @@ const Room:React.FC = () => {
         { state.roomId && <ChatBoard roomId={state.roomId} posts={posts} handleEmit={handleEmit}/> }
     </>
     )
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx)=> {
+    if (ctx.params) {
+        const axios = axiosInstance();
+        const url = `/api/room/${ctx.params.id}`
+        try {
+            const res = await axios.get(url)
+            const { room } = res.data
+            return room ? { props: { room } } : { props: {} }
+        }
+        catch(e) {
+            console.log(e, 'error')
+            return { props: {} }
+        }
+    }
+    return { props: {} }
 }
 
 export default Room

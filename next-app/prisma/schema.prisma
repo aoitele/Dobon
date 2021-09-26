@@ -11,32 +11,34 @@ datasource db {
 
 model User {
   @@map(name: "users")
-  id              Int       @id @default(autoincrement())
+  id              Int @id @default(autoincrement())
   nickname        String?
   status          Int?
   invitation_code String?
   expired_date    DateTime? @db.Timestamp(6)
   last_login      DateTime? @db.Timestamp(6)
-  created_at         DateTime? @db.Timestamp(6)
-  updated_at        DateTime? @db.Timestamp(6)
+  created_at      DateTime? @db.Timestamp(6)
+  updated_at      DateTime? @db.Timestamp(6)
+  room            Room[]
 }
 
 model Room {
   @@map(name: "rooms")
-  id        Int       @id @default(autoincrement())
-  title     String
-  status    Int
-  max_seat  Int
-  set_count Int
-  rate      Int
+  id             Int @id @default(autoincrement())
+  title          String
+  status         Int
+  max_seat       Int
+  set_count      Int
+  rate           Int
+  user           User @relation(fields: [create_user_id], references: [id])
   create_user_id Int
-  created_at   DateTime? @db.Timestamp(6)
-  updated_at  DateTime? @db.Timestamp(6)
+  created_at     DateTime? @db.Timestamp(6)
+  updated_at     DateTime? @db.Timestamp(6)
 }
 
 model Gamelog {
   @@map(name: "gamelogs")
-  id          Int     @id @default(autoincrement())
+  id          Int @id @default(autoincrement())
   room_id     Int?
   user_id     Int?
   action_type Int?
@@ -44,6 +46,6 @@ model Gamelog {
   affect_user Int?
   score       Int?
   endgame     Boolean?
-  created_at   DateTime? @db.Timestamp(6)
+  created_at  DateTime? @db.Timestamp(6)
   updated_at  DateTime? @db.Timestamp(6)
 }
