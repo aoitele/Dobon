@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
-import hasProperty from '../function/hasProperty';
 
 const axiosInstance = (options?: AxiosRequestConfig) => {
    
@@ -10,11 +9,9 @@ const axiosInstance = (options?: AxiosRequestConfig) => {
     });
 
     client.interceptors.request.use(config => {
-        if(options?.headers) {
-            for(const property in options) {
-                if(hasProperty(options, property)) {
-                    config.headers.common[property] = options.headers[property]
-                }
+        if (options?.headers) {
+            for (const key of Object.keys(options.headers)) {
+                config.headers.common[key] = options.headers[key]
             }
         }
         return config;
