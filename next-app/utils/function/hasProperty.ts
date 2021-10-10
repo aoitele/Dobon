@@ -1,12 +1,5 @@
-interface hasSpecifyKeyObj {
-  [x: string]: any;
-}
-
-const hasProperty = (arg: unknown, key: string): arg is hasSpecifyKeyObj => {
-  if (typeof arg ==='object' && arg !== null) {
-    return Boolean(arg) && Object.prototype.hasOwnProperty.call(arg, key)
-  }
-  return false
+function hasProperty<K extends string>(x: unknown, ...keys: K[]): x is { [M in K]: unknown } { // eslint-disable-line
+  return x instanceof Object && keys.every(key => key in x)
 }
 
 export default hasProperty

@@ -49,6 +49,20 @@
             display: inline-block;
         }
     }
+    .form {
+      margin: 20px;
+      .formInput {
+        font-size: 20px;
+        background-color: $form-color;
+        border-radius: 5px;
+        border: $border-color;
+        padding: 10px;
+        :focus{
+          border-color: #C0D85C;
+          box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.2);
+        }
+      }
+    }
     .startBtn {
         background-color: $green;
         color:#ffffff;
@@ -56,6 +70,13 @@
         padding: 10px;
         border-radius: 10px;
     }
+    .startBtnDisabled {
+      background-color: lightgray;
+      color:#ffffff;
+      margin: 40px 0;
+      padding: 10px;
+      border-radius: 10px;
+  }
 }
 
 .loader {

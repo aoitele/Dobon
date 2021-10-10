@@ -1,25 +1,60 @@
-import React from 'react'
+import React, { useState } from 'react'
 import style from './Modal.module.scss'
-import { GameStatus } from '../../@types/game'
+import { Game } from '../../@types/game'
 import { HandleEmitFn } from '../../@types/socket'
 
 interface Props {
     gameId?: string;
     roomId?: number;
-    status: GameStatus;
+    game?: Game;
     handleEmit: HandleEmitFn;
 }
-const modal:React.FC<Props> = ({ roomId, status, handleEmit }) => (
+const modal:React.FC<Props> = ({ roomId, game, handleEmit }) => {
+    const [nickname, setNickname] = useState('')
+    return (
         <>
-          <div className={`${style.modalWrap} ${style.modalOpen}`}>
-                { modalInner(status, handleEmit, roomId) }
+            <div className={`${style.modalWrap} ${style.modalOpen}`}>
+                { modalInner(handleEmit, nickname, setNickname, game, roomId) }
             </div>
             <div className={style.modalBack}/>
         </>
     )
+}
 
-const modalInner = (status: GameStatus, handleEmit: HandleEmitFn, roomId?: number) => {
-    switch(status) {
+const modalInner = (handleEmit: HandleEmitFn, nickname:string, setNickname: { (value: React.SetStateAction<string>): void; (arg0: string): void }, game?:Game, roomId?: number) => { // eslint-disable-line no-unused-vars
+    if (!game) {
+        return ( // Loading
+            <div className={style.modalBack}><div className={style.loader}/></div>
+        )
+    }
+    
+    switch(game.status) {
+        case 'join': 
+        
+        return (
+            <div className={style.modalInner}>
+                <div className={style.info}>
+                    <p>ドボンしようぜ</p>
+                    <ul>
+                        <li>レート：x1</li>
+                        <li>参加枠：4</li>
+                    </ul>                    
+                </div>
+                <div className={style.info}>
+                    <p>
+                        現在の参加者
+                        <span className={style.waiting}>受付中！</span>
+                    </p>
+                    <ul>
+                        { game.board.users.map((user,idx) => <li key={idx}>{user.nickname}</li>) }
+                    </ul>
+                </div>
+                <div className={style.form}>
+                    <input className={style.formInput} type="text" placeholder="名前を入力" onChange={(e)=>{ setNickname(e.target.value) }}/>
+                </div>
+                { roomId && <a href="#" className={nickname ? style.startBtn : style.startBtnDisabled} onClick={() => handleEmit({roomId, nickname, event: 'join' })}>参加する</a> }
+            </div>
+        )
         case 'created': return (
             <div className={style.modalInner}>
                 <p className={style.statusText}>ゲーム開始前です</p>
@@ -37,18 +72,11 @@ const modalInner = (status: GameStatus, handleEmit: HandleEmitFn, roomId?: numbe
                         <span className={style.waiting}>受付中！</span>
                     </p>
                     <ul>
-                        <li>たろう</li>
-                        <li>じろう</li>
-                        <li>さぶろう</li>
+                        { game.board.users.map((user,idx) => <li key={idx}>{user.nickname}</li>) }
                     </ul>
                 </div>
                 { roomId && <a href="#" className={style.startBtn} onClick={() => handleEmit({roomId, event: 'gamestart'})}>ゲームスタート</a> }
             </div>  
-        )
-        case 'loading': return (
-            <div className={style.modalBack}>
-                <div className={style.loader}/>
-            </div>
         )
         case 'ended': return (
             <div className={style.modalInner}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react'
+import React, { useReducer } from 'react'
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { GameSet } from '../../components/game/GameSet'
@@ -7,13 +7,14 @@ import { SingleCard } from '../../components/game/SingleCard'
 import CardWithCount from '../../components/game/CardWithCount'
 import CardEffect from '../../components/game/CardEffect'
 import ChatBoard from '../../components/game/ChatBoard'
-import { resSocketClient } from '../../utils/socket/client'
 import { Emit, HandleEmitFn } from '../../@types/socket'
 import Modal from '../../components/game/Modal';
 import { reducer, gameInitialState } from '../../utils/game/roomStateReducer'
+import useWsConnectHooks from '../../hooks/useWsConnectHooks'
 import useEventHooks from '../../hooks/useEventHooks'
 import axiosInstance from '../../utils/api/axiosInstance'
 import { RoomAPIResponse } from '../../@types/api/roomAPI';
+import hasProperty from '../../utils/function/hasProperty'
 
 interface Props {
     room: RoomAPIResponse.RoomInfo
@@ -24,7 +25,7 @@ const initialState: gameInitialState = {
     userId: null,
     game: {
         id: null,
-        status: 'created',
+        status: 'join',
         event: null,
         board: {
             users:[],
@@ -37,11 +38,9 @@ const initialState: gameInitialState = {
     wsClient: null,
 }
 
-const Room:React.FC<Props> = ({ room }) => {
+const Room:React.FC<Props> = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const router = useRouter()
-    const { user } = room
-    console.log(user,'user')
 
     const posts = [
         {nickname: '一郎', message: 'おはようございます'},
@@ -51,43 +50,19 @@ const Room:React.FC<Props> = ({ room }) => {
     ]
     
     const handleEmit: HandleEmitFn = (data: Emit) => {
-        if (state.wsClient && state.wsClient !== null) {
-            state.wsClient.socket.emit('emit', data)
+        if (hasProperty(state, 'wsClient') && state.wsClient?.socket !== null) {
+            console.log(state,'state')
+            state.wsClient?.socket.emit('emit', data)
         }
     }
-
-    const establishWS = async() => {
-        if (!router.isReady) return;
-        const roomId = router.query.id
-       
-        if (!state.connected && roomId) {
-            const rid = typeof roomId === 'string' ? roomId : roomId[0] // 同じクエリパラメータから取得する値が複数あると配列が返るため
-            const wsClient = await resSocketClient(rid)
-            if (wsClient) {
-                dispatch({ type:'wsClientSet', payload:{ connected: true, wsClient, roomId: Number(rid) }})
-                wsClient.dispatch = dispatch
-                wsClient.socket.on('close', () => {
-                    console.log('Socket is closed.')
-                })
-            }
-        }
-    }
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {   
-            const init = async() => {
-                await establishWS()
-            }
-            init()
-        }
-    }, [router.isReady])
-    
+   
+    useWsConnectHooks(router, state, dispatch)
     useEventHooks(state, handleEmit)
 
-    if (state.game?.status !== 'playing') {
+    if (hasProperty(state, 'game') && state.game?.status !== 'playing') {
         return state.roomId
-        ? <Modal roomId={state.roomId} status={state.game?.status} handleEmit={handleEmit} />
-        : <Modal status='loading' handleEmit={handleEmit} />
+        ? <Modal roomId={state.roomId} game={state.game} handleEmit={handleEmit} />
+        : <Modal handleEmit={handleEmit} />
     }
 
      

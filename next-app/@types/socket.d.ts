@@ -2,7 +2,7 @@ import { Card } from './card'
 import { Action, Order } from './game'
 import { LiteralUnion } from 'type-fest';
 
-type Event = LiteralUnion<"drawcard"| "playcard" | "call" | "chat" | "gamestart" | "gameend" | "gethand", string> | null;
+type Event = LiteralUnion<"drawcard"| "playcard" | "call" | "chat" | "join" | "gamestart" | "gameend" | "gethand", string> | null;
 
 export type EmitCard = {
     type: 'card';

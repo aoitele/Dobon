@@ -1,16 +1,23 @@
 import { useEffect } from 'react'
 import { HandleEmitFn, Emit } from '../@types/socket'
-import { reducerPayload } from '../utils/game/roomStateReducer'
+import { gameInitialState } from '../utils/game/roomStateReducer'
 
-const useEventHooks = (state: reducerPayload, handleEmit: HandleEmitFn) => {
+const useEventHooks = (state: gameInitialState, handleEmit: HandleEmitFn) => {
     const { roomId, game } = state
 
     useEffect(() => {
-        if(!state || !game?.event) return;
+        if(!state || !game?.event) {
+            return
+        }
 
         const handler = () => {        
             switch(game.event) {
+                case 'join': {
+                    console.log('join')
+                    break;
+                }
                 case 'gamestart': {
+                    console.log('ゲームを開始します')
                     // Get users hands
                     if (game.status === 'playing' && roomId) {   
                         const data:Emit = {
@@ -22,8 +29,6 @@ const useEventHooks = (state: reducerPayload, handleEmit: HandleEmitFn) => {
                         const hands = handleEmit(data)
                         console.log(hands, 'hands')
                     }
-
-
                     break;   
                 }
                 case 'gethand': {

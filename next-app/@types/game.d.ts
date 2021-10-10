@@ -13,7 +13,7 @@ export type Room = {
 
 export type Game = {
     id: number | null;
-    status: 'created' | 'playing' | 'ended' | 'loading' | 'connection loss' | undefined;
+    status: 'join' | 'created' | 'playing' | 'ended' | 'loading' | 'connection loss' | undefined;
     event: Event;
     board: Board;
 }

@@ -1,35 +1,58 @@
 import { Redis } from "ioredis";
 import { Socket } from "socket.io";
-import { reducerPayload } from '../utils/game/roomStateReducer';
+import { reducerPayloadSpecify } from '../utils/game/roomStateReducer';
 import { Emit } from '../@types/socket';
 import { isEmitChat } from '../utils/function/useEmitDataType'
-
-const initialState:reducerPayload = {
-    roomId: null,
-    game: {
-        id: null,
-        status: undefined,
-        event: null,
-        board: {
-            users:[],
-            deck:[],
-            hands:[],
-            trash:[]
-        }
-    }
-}
 
 const emitHandler = (io:Socket, socket:any) => {
     const adapterPubClient:Redis = socket.adapter.pubClient;
 
     socket.on('emit', async (payload: Emit) => {
-        console.log(payload, 'payload');
-        const { event, gameId, roomId } = payload
+        console.log(payload,'payload')
+        const { event, roomId, nickname } = payload
         const room = `room${payload.roomId}`
         const response = {}
 
         switch (event) {
-            case 'gamestart': {           
+            case 'join': {
+                const usersKey = `room:${roomId}:users`
+                const userCount = await adapterPubClient.scard(usersKey)
+                if (userCount > 4) {
+                    await adapterPubClient.del(usersKey) // eslint-disable-line no-await-in-loop
+                }                            
+                adapterPubClient.sadd(usersKey, String(nickname)) // Redisにユーザー追加
+                const users = await adapterPubClient.smembers(usersKey)
+
+                const userData = [];
+                for (let i=1; i <= userCount; i+=1) {
+                    userData.push({ id: i, nickname: users[i] || '', turn: i, score:0 })
+                }
+
+                // Game.board.usersにユーザーを追加
+                let reducerPayload:reducerPayloadSpecify = {
+                    'game': {
+                        'board': {
+                            'users': userData
+                        },
+                        'event': 'gamestart'
+                    }
+                }
+                socket.broadcast.to(room).emit('updateStateSpecify', reducerPayload); // 送信者以外を更新
+
+                // 送信者はgame.statusを更新させる
+                reducerPayload = {
+                    'game': {
+                        'board': {
+                            'users': userData
+                        },
+                        'status':'created'
+                    }
+                }
+                socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
+                return response
+            }
+            case 'gamestart': {
+                console.log('gamestart')
                 const deckKey = `room:${roomId}:deck`
                 await adapterPubClient.sunionstore(deckKey, 'deck') // Redis copy deck for room
 
@@ -46,16 +69,12 @@ const emitHandler = (io:Socket, socket:any) => {
                     adapterPubClient.sadd(userHandsKey, hands)
                 }
 
-                const state = { 
-                    ...initialState,
-                    roomId,
-                    game: {
-                        ...initialState.game,
-                        id: gameId || 1,
-                        status:'playing'
+                const reducerPayload:reducerPayloadSpecify = {
+                    'game': {
+                        'event': 'gamestart'
                     }
                 }
-                io.in(room).emit('updateState', state)
+                io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員のステータスを更新
                 return response
             }
             case 'gethand': {
@@ -66,7 +85,7 @@ const emitHandler = (io:Socket, socket:any) => {
                 return hands
             }
             case 'chat': {
-                const { nickname, data } = payload
+                const { data } = payload
                 let message = '';
 
                 if (isEmitChat(data)) { 

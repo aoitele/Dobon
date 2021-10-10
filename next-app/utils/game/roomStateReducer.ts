@@ -1,8 +1,8 @@
 import { Game } from '../../@types/game'
 import { SocketClient } from '../socket/client'
-import { PartiallyPartial } from '../../@types/utility'
+import { PartiallyPartial, NestedPartial } from '../../@types/utility'
 
-export interface gameInitialState {
+export type gameInitialState = {
     roomId: number | null;
     userId?: number | null;
     game?: Game;
@@ -10,28 +10,48 @@ export interface gameInitialState {
     wsClient: SocketClient | null;
 }
 
+// State全体の更新時に使用
 export type reducerPayload = PartiallyPartial<gameInitialState, 'connected' | 'wsClient'>;
+
+// 指定プロパティのみ更新時に使用(roomIdは必須)
+export type reducerPayloadSpecify = NestedPartial<gameInitialState>
+// [K in keyof gameInitialState]?: Partial<gameInitialState[K]>;
+
+// Export type reducerPayloadSpecify = PartiallyRequired<PartialPayload, 'roomId'>
 
 export interface wsClientSet {
     type: 'wsClientSet';
     payload: gameInitialState;
 }
 
-export interface updateGameState {
-    type: 'updateGameState';
+export interface updateState {
+    type: 'updateState';
     payload: reducerPayload;
 }
 
-export type Action = wsClientSet | updateGameState;
+export interface updateStateSpecify {
+    type: 'updateStateSpecify';
+    payload: reducerPayloadSpecify;
+}
 
-export const reducer = (state: reducerPayload, action: Action) => {
-    const { connected, wsClient, roomId, game} = action.payload;
-    console.log(action.payload,'action.payload')
+export type Action = wsClientSet | updateState | updateStateSpecify;
+
+export const reducer = (state: gameInitialState, action: Action) => {
 
     switch (action.type) {
-        case 'wsClientSet': return {...state, connected, wsClient, roomId}
-        case 'updateGameState': return {...state, game}
+        case 'wsClientSet': {
+            const { connected, wsClient, roomId } = action.payload;
+            return {...state, connected, wsClient, roomId}
+        }
+        case 'updateState': {
+            console.log(state,'updateState state')
+            const { roomId, game } = action.payload;
+            return {...state, roomId, game}
+        }
+        case 'updateStateSpecify': {
+            return { ...state }
+        }
         default:
-            throw new Error();
+            return state
     }
 }
