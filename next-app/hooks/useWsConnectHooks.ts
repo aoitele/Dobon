@@ -4,6 +4,7 @@ import { gameInitialState, Action } from '../utils/game/roomStateReducer'
 import hasProperty from '../utils/function/hasProperty'
 import { resSocketClient } from '../utils/socket/client'
 import { useUpdateStateFn } from "../utils/game/state";
+import nookies from 'nookies'
 
 const useWsConnectHooks = (router:NextRouter, state: gameInitialState, dispatch: Dispatch<Action>) => {
 
@@ -23,6 +24,12 @@ const useWsConnectHooks = (router:NextRouter, state: gameInitialState, dispatch:
                         wsClient.socket.on('updateStateSpecify', data => {
                             const newState = useUpdateStateFn(state, data)
                             dispatch({ type:'updateStateSpecify', payload: newState})
+                        })
+                        wsClient.socket.on('createToken', token => {
+                            nookies.set(null, 'accesstoken', token, {
+                                maxAge: 24 * 60 * 60, // 1day
+                                path: '/',
+                              })
                         })
                         dispatch({ type:'wsClientSet', payload:{ connected: true, wsClient, roomId: Number(rid) }})
                     }

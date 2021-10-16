@@ -38,7 +38,7 @@ const initialState: gameInitialState = {
     wsClient: null,
 }
 
-const Room:React.FC<Props> = () => {
+const Room:React.FC<Props> = ({ room }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const router = useRouter()
 
@@ -61,7 +61,7 @@ const Room:React.FC<Props> = () => {
 
     if (hasProperty(state, 'game') && state.game?.status !== 'playing') {
         return state.roomId
-        ? <Modal roomId={state.roomId} game={state.game} handleEmit={handleEmit} />
+        ? <Modal room={room} roomId={state.roomId} game={state.game} handleEmit={handleEmit} />
         : <Modal handleEmit={handleEmit} />
     }
 

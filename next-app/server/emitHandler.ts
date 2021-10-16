@@ -3,6 +3,7 @@ import { Socket } from "socket.io";
 import { reducerPayloadSpecify } from '../utils/game/roomStateReducer';
 import { Emit } from '../@types/socket';
 import { isEmitChat } from '../utils/function/useEmitDataType'
+import createAccessToken from "../utils/function/createHash";
 
 const emitHandler = (io:Socket, socket:any) => {
     const adapterPubClient:Redis = socket.adapter.pubClient;
@@ -11,10 +12,19 @@ const emitHandler = (io:Socket, socket:any) => {
         console.log(payload,'payload')
         const { event, roomId, nickname } = payload
         const room = `room${payload.roomId}`
-        const response = {}
 
         switch (event) {
             case 'join': {
+                if (!roomId || !nickname) return {}
+                /**
+                 * トークンを発行して room:1:token : {token} の形式でredisに保存
+                 * クライアント側でcookieにセット
+                 * 以降リクエストヘッダに乗せてゲームへの参加ユーザーとして認証する
+                 */
+                const tokenKey = `room:${roomId}:token`
+                const token = createAccessToken(String(roomId), nickname)
+                adapterPubClient.sadd(tokenKey, token)
+
                 const usersKey = `room:${roomId}:users`
                 const userCount = await adapterPubClient.scard(usersKey)
                 if (userCount > 4) {
@@ -49,7 +59,8 @@ const emitHandler = (io:Socket, socket:any) => {
                     }
                 }
                 socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
-                return response
+                socket.emit('createToken', token); // 以降emitで使うtokenを返す
+                break;
             }
             case 'gamestart': {
                 console.log('gamestart')
@@ -75,7 +86,7 @@ const emitHandler = (io:Socket, socket:any) => {
                     }
                 }
                 io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員のステータスを更新
-                return response
+                break;
             }
             case 'gethand': {
                 // Const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
@@ -94,10 +105,11 @@ const emitHandler = (io:Socket, socket:any) => {
                 if (nickname && message) {
                     adapterPubClient.xadd('myStream', 'MAXLEN', '2', '*', 'user', nickname, 'message', message)
                 }
-                return response
+                break;
             }
-            default: return response
+            default: return {}
         }
+        return {}
     });
 }
 
