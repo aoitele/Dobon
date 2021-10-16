@@ -14,7 +14,7 @@ model User {
   id              Int @id @default(autoincrement())
   nickname        String?
   status          Int?
-  invitation_code String?
+  access_token    String?
   expired_date    DateTime? @db.Timestamp(6)
   last_login      DateTime? @db.Timestamp(6)
   created_at      DateTime? @db.Timestamp(6)
@@ -24,16 +24,17 @@ model User {
 
 model Room {
   @@map(name: "rooms")
-  id             Int @id @default(autoincrement())
-  title          String
-  status         Int
-  max_seat       Int
-  set_count      Int
-  rate           Int
-  user           User @relation(fields: [create_user_id], references: [id])
-  create_user_id Int
-  created_at     DateTime? @db.Timestamp(6)
-  updated_at     DateTime? @db.Timestamp(6)
+  id              Int @id @default(autoincrement())
+  invitation_code String
+  title           String
+  status          Int
+  max_seat        Int
+  set_count       Int
+  rate            Int
+  user            User @relation(fields: [create_user_id], references: [id])
+  create_user_id  Int
+  created_at      DateTime? @db.Timestamp(6)
+  updated_at      DateTime? @db.Timestamp(6)
 }
 
 model Gamelog {
