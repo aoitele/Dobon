@@ -3,7 +3,6 @@ import { Socket } from "socket.io";
 import { reducerPayloadSpecify } from '../utils/game/roomStateReducer';
 import { Emit } from '../@types/socket';
 import { isEmitChat } from '../utils/function/useEmitDataType'
-import createAccessToken from "../utils/function/createHash";
 
 const emitHandler = (io:Socket, socket:any) => {
     const adapterPubClient:Redis = socket.adapter.pubClient;
@@ -16,15 +15,6 @@ const emitHandler = (io:Socket, socket:any) => {
         switch (event) {
             case 'join': {
                 if (!roomId || !nickname) return {}
-                /**
-                 * トークンを発行して room:1:token : {token} の形式でredisに保存
-                 * クライアント側でcookieにセット
-                 * 以降リクエストヘッダに乗せてゲームへの参加ユーザーとして認証する
-                 */
-                const tokenKey = `room:${roomId}:token`
-                const token = createAccessToken(String(roomId), nickname)
-                adapterPubClient.sadd(tokenKey, token)
-
                 const usersKey = `room:${roomId}:users`
                 const userCount = await adapterPubClient.scard(usersKey)
                 if (userCount > 4) {
@@ -59,7 +49,6 @@ const emitHandler = (io:Socket, socket:any) => {
                     }
                 }
                 socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
-                socket.emit('createToken', token); // 以降emitで使うtokenを返す
                 break;
             }
             case 'gamestart': {
