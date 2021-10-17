@@ -12,9 +12,10 @@ datasource db {
 model User {
   @@map(name: "users")
   id              Int @id @default(autoincrement())
-  nickname        String?
+  nickname        String? @unique
   status          Int?
   access_token    String?
+  password        String?
   expired_date    DateTime? @db.Timestamp(6)
   last_login      DateTime? @db.Timestamp(6)
   created_at      DateTime? @db.Timestamp(6)

@@ -1,8 +1,9 @@
 create table IF NOT EXISTS users
 (
   id serial,
-  nickname text,
+  nickname text UNIQUE,
   access_token text,
+  password text,
   expired_date timestamp,
   last_login timestamp,
   created_at timestamp,

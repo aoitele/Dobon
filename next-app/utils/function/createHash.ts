@@ -17,4 +17,11 @@ const createAccessToken = (roomId:string, nickname:string) => {
     return token
 }
 
-export default createAccessToken
+const hashedPassword = (nickname:string, password:string) => {
+    const message = `${process.env.PASSWORD_SEED_MESSAGE}pass${password}${nickname}:`
+    const key = process.env.PASSWORD_SEED_KEY
+    const hpass = createHash(message, key)
+    return hpass
+}
+
+export { createAccessToken, hashedPassword}

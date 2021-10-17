@@ -1,10 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 
 const axiosInstance = (options?: AxiosRequestConfig) => {
-   
     const client = axios.create({
         baseURL: process.env.NEXT_PUBLIC_API_SERVER_URL || `http://0.0.0.0:${process.env.PORT}`,
-        timeout: Number(process.env.AXIOS_CONFIG_TIMEOUT) || 3000,
+        timeout: Number(process.env.NEXT_PUBLIC_AXIOS_CONFIG_TIMEOUT) || 3000,
         responseType: 'json'
     });
 
