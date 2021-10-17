@@ -27,9 +27,9 @@ const createRoom: React.FC = () => {
                 })    
             }
         } catch(e: any) {
-            console.log(e.response)
-            const { error, messages } = e.response.data
-            setForm({...form, error, messages })
+            console.log(e, 'error')
+            // Const { error, messages } = e.response.data
+            setForm({...form })
         }
     }
     return (
