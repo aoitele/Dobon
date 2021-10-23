@@ -6,7 +6,7 @@ create table IF NOT EXISTS users
   password text,
   expired_date timestamp,
   last_login timestamp,
-  created_at timestamp,
+  created_at timestamp default CURRENT_TIMESTAMP,
   updated_at timestamp
 );
 
@@ -26,7 +26,7 @@ create table IF NOT EXISTS rooms
   set_count integer,
   rate integer,
   create_user_id integer,
-  created_at timestamp,
+  created_at timestamp default CURRENT_TIMESTAMP,
   updated_at timestamp
 );
 
@@ -45,7 +45,7 @@ create table IF NOT EXISTS gamelogs
   affect_user integer,
   score integer,
   endgame boolean,
-  created_at timestamp,
+  created_at timestamp default CURRENT_TIMESTAMP,
   updated_at timestamp
 );
 
