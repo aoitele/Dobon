@@ -5,8 +5,8 @@ import type { AppProps } from 'next/app'
 import { AuthProvider } from '../context/authProvider'
 
 const MyApp = ({ Component, pageProps }: AppProps) => (
-    <AuthProvider>
-      <Component {...pageProps} />
-    </AuthProvider>
-  )
+  <AuthProvider>
+    <Component {...pageProps} />
+  </AuthProvider>
+)
 export default MyApp

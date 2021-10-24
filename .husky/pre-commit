@@ -7,8 +7,8 @@ files=($(git diff --cached --name-only)) # commit対象ファイルパスを配�
 if printf '%s\n' ${files[@]} | egrep "^next-app/**/*" | egrep "\.(js$|ts$|jsx$|tsx$)" > /dev/null >&2; then
   echo "/next-app directory test & lint starting"
   cd next-app
-  npm run lint-staged
-  npm run test 
+  npx lint-staged
+  npm run test
 fi
 
 if printf '%s\n' ${files[@]} | egrep "^api/**/*" | egrep "\.(js$|ts$|jsx$|tsx$|vue$)" > /dev/null >&2; then

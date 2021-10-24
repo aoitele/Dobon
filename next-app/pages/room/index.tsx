@@ -4,35 +4,35 @@ import axiosInstance from '../../utils/api/axiosInstance'
 import { Room } from 'prisma/prisma-client'
 
 interface Props {
-    rooms: Room[]
+  rooms: Room[]
 }
 
 const RoomList: React.FC<Props> = ({ rooms }) => (
-    <>
-        <div>RoomList</div>
-        { rooms && rooms.map((room, idx) => 
-            <div key={idx}>
-                <Link href={`/room/${room.id}`}>
-                    <p>{room.title}</p>
-                </Link>
-            </div>
-        ) }
-        <Link href='/room/create'>Create Room</Link>
-    </>
-    )
+  <>
+    <div>RoomList</div>
+    {rooms &&
+      rooms.map((room, idx) => (
+        <div key={idx}>
+          <Link href={`/room/${room.id}`}>
+            <p>{room.title}</p>
+          </Link>
+        </div>
+      ))}
+    <Link href="/room/create">Create Room</Link>
+  </>
+)
 
-export const getServerSideProps = async ()=> {
-    const axios = axiosInstance();
-    try {
-        const res = await axios.get('/api/room');
-        const rooms: Room[] | undefined = res.data?.rooms;
-        return {
-            props: { rooms }
-        }
+export const getServerSideProps = async () => {
+  const axios = axiosInstance()
+  try {
+    const res = await axios.get('/api/room')
+    const rooms: Room[] | undefined = res.data?.rooms
+    return {
+      props: { rooms }
     }
-    catch(e) {
-        console.log(e, 'error')
-        return { props: {} }
-    }
+  } catch (e) {
+    console.log(e, 'error')
+    return { props: {} }
+  }
 }
 export default RoomList

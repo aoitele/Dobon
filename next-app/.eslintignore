@@ -10,10 +10,14 @@
 /coverage
 jest.config.js
 
+# lint
+.lintstagedrc.js
+
 # next.js
 /.next/
 /out/
 next-env.d.ts
+/@types/
 
 # production
 /build

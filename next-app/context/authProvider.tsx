@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, Dispatch, useReducer } from 'react'
 import loginWithToken from '../utils/auth/loginWithToken'
-import hasProperty from "../utils/function/hasProperty"
+import hasProperty from '../utils/function/hasProperty'
 
 /**
  **
@@ -12,17 +12,17 @@ import hasProperty from "../utils/function/hasProperty"
  */
 
 export type AuthState = {
-    authUser: AuthAPIResponse.UserMe | null | undefined
-    fetched?: boolean
+  authUser: AuthAPIResponse.UserMe | null | undefined
+  fetched?: boolean
 }
 
-type Action = 
+type Action =
   | {
-      type: 'CREATE';
+      type: 'CREATE'
       authUser: AuthAPIResponse.UserMe | null | undefined
       fetched: boolean
     }
- | { type: 'REMOVE' }
+  | { type: 'REMOVE' }
 
 export type AuthDispatch = Dispatch<Action> | undefined
 
@@ -33,22 +33,22 @@ export type AuthDispatch = Dispatch<Action> | undefined
  * 更新用(AuthDispatchContext)
  */
 const AuthStateContext = createContext<AuthState>({
-    authUser: undefined,
-    fetched: false,
+  authUser: undefined,
+  fetched: false
 })
 const AuthDispatchContext = createContext<AuthDispatch>(undefined)
 
 /**
  * Reducer
  */
-const authReducer = (state:AuthState, action:Action): AuthState => {
-  switch(action.type) {
+const authReducer = (state: AuthState, action: Action): AuthState => {
+  switch (action.type) {
     case 'CREATE':
-      return { authUser:action.authUser, fetched: action.fetched }
-      case 'REMOVE':
-        return { authUser: null }
-      default :
-        throw new Error('Invalid reducer action')
+      return { authUser: action.authUser, fetched: action.fetched }
+    case 'REMOVE':
+      return { authUser: null }
+    default:
+      throw new Error('Invalid reducer action')
   }
 }
 
@@ -61,24 +61,26 @@ const AuthProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState)
 
   useEffect(() => {
-    if (!state.fetched) {	
-      const userChk = async() => {	
+    if (!state.fetched) {
+      const userChk = async () => {
         try {
-          const userInfo = await loginWithToken()		
-          if (userInfo.result && hasProperty(userInfo, 'data')) {				
+          const userInfo = await loginWithToken()
+          if (userInfo.result && hasProperty(userInfo, 'data')) {
             dispatch({ type: 'CREATE', authUser: userInfo.data, fetched: true })
           }
-        } catch(err) {
-          dispatch({ type: 'CREATE', authUser: null, fetched: true })		
+        } catch (err) {
+          dispatch({ type: 'CREATE', authUser: null, fetched: true })
         }
       }
       userChk()
     }
   }, [state.fetched])
-  
+
   return (
     <AuthDispatchContext.Provider value={dispatch}>
-      <AuthStateContext.Provider value={state}>{children}</AuthStateContext.Provider>
+      <AuthStateContext.Provider value={state}>
+        {children}
+      </AuthStateContext.Provider>
     </AuthDispatchContext.Provider>
   )
 }
