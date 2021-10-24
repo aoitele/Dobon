@@ -40,7 +40,8 @@ module.exports = {
     "prefer-destructuring": "off",
     "max-params": "off",
     "no-undef": "off",
-    "max-statements-per-line": "off"
+    "max-statements-per-line": "off",
+    "no-undefined": "off"
   },
   "settings": {
     "react": {
