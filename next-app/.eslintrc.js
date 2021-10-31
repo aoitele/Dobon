@@ -34,14 +34,15 @@ module.exports = {
     'id-length': 'off',
     'no-ternary': 'off',
     'no-nested-ternary': 'off',
-    camelcase: 'off',
+    'camelcase': 'off',
     'react/prop-types': 'off',
     'max-statements': 'off',
     'prefer-destructuring': 'off',
     'max-params': 'off',
     'no-undef': 'off',
     'max-statements-per-line': 'off',
-    'no-undefined': 'off'
+    'no-undefined': 'off',
+    'no-alert': 'off'
   },
   settings: {
     react: {

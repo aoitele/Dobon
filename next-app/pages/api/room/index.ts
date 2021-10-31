@@ -18,23 +18,30 @@ const handleGET = async (res: NextApiResponse) => {
 }
 
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { title, status, invitation_code, max_seat, set_count, rate, user } =
+  const { title, status, invitation_code, max_seat, set_count, rate, create_user_id } =
     req.body
-  const payload: Prisma.RoomCreateInput = {
+  console.log(req.body,'body')
+  const payload: Prisma.RoomUncheckedCreateInput = {
     title,
     status,
     invitation_code,
     max_seat,
     set_count,
     rate,
-    user
+    create_user_id
   }
 
   try {
     const result = await prisma.room.create({ data: payload })
-    res.json({ result })
+    res.json({
+      result: true,
+      data: result
+    })
   } catch (e) {
-    console.log(e)
+    res.json({
+      result: false,
+      error: e
+    })
   }
 }
 

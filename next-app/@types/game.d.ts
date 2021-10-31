@@ -7,6 +7,8 @@ export type Room = {
   max_seat: number
   set_count: number
   rate: number
+  invitation_code: string
+  create_user_id: number | null
   created: Date
   modified: Date
 }
