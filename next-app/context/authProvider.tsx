@@ -65,8 +65,11 @@ const AuthProvider: React.FC = ({ children }) => {
       const userChk = async () => {
         try {
           const userInfo = await loginWithToken()
+          console.log(userInfo, 'userInfo')
           if (userInfo.result && hasProperty(userInfo, 'data')) {
             dispatch({ type: 'CREATE', authUser: userInfo.data, fetched: true })
+          } else {
+            dispatch({ type: 'CREATE', authUser: null, fetched: true })
           }
         } catch (err) {
           dispatch({ type: 'CREATE', authUser: null, fetched: true })

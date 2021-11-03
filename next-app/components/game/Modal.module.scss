@@ -45,6 +45,14 @@
             text-align: center;
             animation: flash 1s linear infinite;
         }
+        .closed {
+          margin-left: 5px;
+          padding: 2px;
+          background-color:grey;
+          color:#ffffff;
+          border-radius: 3px;
+          text-align: center;
+      }
         ul {
             display: inline-block;
         }

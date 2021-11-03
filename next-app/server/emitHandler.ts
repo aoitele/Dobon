@@ -13,6 +13,23 @@ const emitHandler = (io: Socket, socket: any) => {
     const room = `room${payload.roomId}`
 
     switch (event) {
+      case 'getUsers': {
+        const usersKey = `room:${roomId}:users`
+        const users = await adapterPubClient.smembers(usersKey)
+        const userData = []
+        for (let i = 1; i <= users.length; i += 1) {
+          userData.push({ id: i, nickname: users[i-1], turn: i, score: 0 })
+        }
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              users: userData
+            }
+          }
+        }
+        socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
+        break;
+      }
       case 'join': {
         if (!roomId || !nickname) return {}
         const usersKey = `room:${roomId}:users`
