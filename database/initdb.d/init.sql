@@ -35,6 +35,24 @@ insert into rooms(invitation_code, title, status, max_seat, set_count, rate, cre
   ('test', '初心者の部屋', 1, 4, 20, 2, 2, now() - interval '2 week',  now() - interval '1 week'),
   ('test', 'ドボンしようぜ', 1, 4, 10, 1, 3, now() - interval '2 week',  now() - interval '1 week');
 
+create table IF NOT EXISTS participants
+(
+  id serial,
+  room_id integer,
+  user_id integer,
+  created_at timestamp default CURRENT_TIMESTAMP,
+  updated_at timestamp
+);
+
+insert into participants(room_id, user_id, created_at, updated_at) values
+  (1, 1, now() - interval '2 week',  now() - interval '1 week'),
+  (1, 2, now() - interval '2 week',  now() - interval '1 week'),
+  (1, 3, now() - interval '2 week',  now() - interval '1 week'),
+  (2, 1, now() - interval '2 week',  now() - interval '1 week'),
+  (2, 4, now() - interval '2 week',  now() - interval '1 week'),
+  (3, 4, now() - interval '2 week',  now() - interval '1 week'),
+  (3, 5, now() - interval '2 week',  now() - interval '1 week');
+
 create table IF NOT EXISTS gamelogs
 (
   id serial,

@@ -36,6 +36,17 @@ model Room {
   create_user_id  Int
   created_at      DateTime? @db.Timestamp(6) @default(now())
   updated_at      DateTime? @db.Timestamp(6)
+  participant     Participant[]
+}
+
+model Participant {
+  @@map(name: "participants")
+  id          Int @id @default(autoincrement())
+  room_id     Int
+  user_id     Int
+  created_at  DateTime? @db.Timestamp(6) @default(now())
+  updated_at  DateTime? @db.Timestamp(6)
+  room        Room @relation(fields: [room_id], references: [id])
 }
 
 model Gamelog {
