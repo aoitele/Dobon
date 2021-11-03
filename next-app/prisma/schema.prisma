@@ -47,6 +47,7 @@ model Participant {
   created_at  DateTime? @db.Timestamp(6) @default(now())
   updated_at  DateTime? @db.Timestamp(6)
   room        Room @relation(fields: [room_id], references: [id])
+  @@unique([room_id, user_id])
 }
 
 model Gamelog {

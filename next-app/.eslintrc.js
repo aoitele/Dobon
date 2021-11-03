@@ -42,7 +42,8 @@ module.exports = {
     'no-undef': 'off',
     'max-statements-per-line': 'off',
     'no-undefined': 'off',
-    'no-alert': 'off'
+    'no-alert': 'off',
+    'arrow-body-style': 'off'
   },
   settings: {
     react: {

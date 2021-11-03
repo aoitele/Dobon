@@ -42,6 +42,7 @@ create table IF NOT EXISTS participants
   user_id integer,
   created_at timestamp default CURRENT_TIMESTAMP,
   updated_at timestamp
+  UNIQUE ("room_id", "user_id")
 );
 
 insert into participants(room_id, user_id, created_at, updated_at) values
