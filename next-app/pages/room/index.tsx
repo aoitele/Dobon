@@ -13,9 +13,9 @@ const RoomList: React.FC<Props> = ({ rooms }) => (
     {rooms &&
       rooms.map((room, idx) => (
         <div key={idx}>
-          <Link href={`/room/${room.id}`}>
+          <a href={`/room/${room.id}`}>
             <p>{room.title}</p>
-          </Link>
+          </a>
         </div>
       ))}
     <Link href="/room/create">Create Room</Link>

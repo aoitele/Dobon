@@ -3,13 +3,15 @@ import { Socket } from 'socket.io'
 import { reducerPayloadSpecify } from '../utils/game/roomStateReducer'
 import { Emit } from '../@types/socket'
 import { isEmitChat } from '../utils/function/useEmitDataType'
+import { rowQuery } from '../prisma/prismaExec'
+import { prisma, Prisma } from '../prisma'
 
 const emitHandler = (io: Socket, socket: any) => {
   const adapterPubClient: Redis = socket.adapter.pubClient
 
   socket.on('emit', async (payload: Emit) => {
     console.log(payload, 'payload')
-    const { event, roomId, nickname } = payload
+    const { event, roomId, userId, nickname } = payload
     const room = `room${payload.roomId}`
 
     switch (event) {
@@ -31,36 +33,45 @@ const emitHandler = (io: Socket, socket: any) => {
         break;
       }
       case 'join': {
-        if (!roomId || !nickname) return {}
+        if (!roomId || !userId || !nickname) return {}
         const usersKey = `room:${roomId}:users`
         const userCount = await adapterPubClient.scard(usersKey)
         if (userCount > 4) {
           await adapterPubClient.del(usersKey) // eslint-disable-line no-await-in-loop
         }
-        adapterPubClient.sadd(usersKey, String(nickname)) // Redisにユーザー追加
-        const users = await adapterPubClient.smembers(usersKey)
 
-        const userData = []
-        for (let i = 1; i <= userCount; i += 1) {
-          userData.push({ id: i, nickname: users[i] || '', turn: i, score: 0 })
+        const userKey = `room:${roomId}:user${userId}`
+        const redisUserId = await adapterPubClient.hmget(userKey, 'id')
+
+        // Redisにユーザーデータがない場合、参加者をDBに保存
+        if (!redisUserId) {
+          const data:Prisma.ParticipantUncheckedCreateInput = {
+            user_id: userId,
+            room_id: roomId
+          }
+          await prisma.participant.create({data})
+          // Redisにユーザーデータセット
+          const userDataMini = [{ id: userId, nickname }]
+          adapterPubClient.hmset(userKey, userDataMini)
         }
-
+        const participants = await prisma.$queryRaw(rowQuery({ model: 'Participant', method: 'GameBoardUsersInit' })) // 参加者データ取得
+                
         // Game.board.usersにユーザーを追加
         let reducerPayload: reducerPayloadSpecify = {
           game: {
             board: {
-              users: userData
+              users: participants
             },
             event: 'gamestart'
           }
         }
         socket.broadcast.to(room).emit('updateStateSpecify', reducerPayload) // 送信者以外を更新
 
-        // 送信者はgame.statusを更新させる
+        // 送信者はgame.statusをcreatedに
         reducerPayload = {
           game: {
             board: {
-              users: userData
+              users: participants
             },
             status: 'created'
           }

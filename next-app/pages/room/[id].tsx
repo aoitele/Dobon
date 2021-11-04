@@ -1,4 +1,4 @@
-import React, { useReducer, useContext, useEffect } from 'react'
+import React, { useReducer, useContext } from 'react'
 import RequireUserRegister from '../../components/feedback/requireUserRegister'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
@@ -6,6 +6,7 @@ import { Emit, HandleEmitFn } from '../../@types/socket'
 import Modal from '../../components/game/Modal'
 import { reducer, gameInitialState } from '../../utils/game/roomStateReducer'
 import useWsConnectHooks from '../../hooks/useWsConnectHooks'
+import useStateHooks from '../../hooks/useStateHooks'
 import useEventHooks from '../../hooks/useEventHooks'
 import axiosInstance from '../../utils/api/axiosInstance'
 import { RoomAPIResponse } from '../../@types/api/roomAPI'
@@ -47,17 +48,8 @@ const Room: React.FC<Props> = ({ room }) => {
   }
 
   useWsConnectHooks(router, state, dispatch)
+  useStateHooks(router, state, handleEmit, authUser, room)
   useEventHooks(state, handleEmit)
-
-  useEffect(() => {
-    if (state.connected) {
-      const data: Emit = {
-        roomId: Number(router.query.id),
-        event: 'getUsers'
-      }
-      handleEmit(data)
-    }
-  },[state.connected])
 
   // Before fetch authUser from context
   if (!authUser) {
@@ -76,7 +68,7 @@ const Room: React.FC<Props> = ({ room }) => {
     state.game.status = 'created'
   }
   
-  return <Modal room={room} game={state.game} handleEmit={handleEmit} />
+  return <Modal room={room} game={state.game} handleEmit={handleEmit} authUser={authUser}/>
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {

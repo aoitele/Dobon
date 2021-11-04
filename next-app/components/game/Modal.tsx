@@ -1,22 +1,24 @@
-import React, { useState } from 'react'
+import React from 'react'
 import style from './Modal.module.scss'
 import { Game } from '../../@types/game'
 import { HandleEmitFn } from '../../@types/socket'
 import { RoomAPIResponse } from '../../@types/api/roomAPI'
 import Link from 'next/link'
+import { AuthState } from '../../context/authProvider'
 
 interface Props {
   room?: RoomAPIResponse.RoomInfo
   game?: Game
   handleEmit: HandleEmitFn
   loading?: boolean
+  authUser?: AuthState['authUser']
 }
-const modal: React.FC<Props> = ({ room, game, handleEmit, loading }) => {
-  const [nickname, setNickname] = useState('')
+const modal: React.FC<Props> = ({ room, game, handleEmit, loading, authUser }) => {
+
   return (
     <>
       <div className={`${style.modalWrap} ${style.modalOpen}`}>
-        {modalInner(handleEmit, nickname, setNickname, game, room, loading)}
+        {modalInner(handleEmit, authUser, game, room, loading)}
       </div>
       <div className={style.modalBack} />
     </>
@@ -24,12 +26,15 @@ const modal: React.FC<Props> = ({ room, game, handleEmit, loading }) => {
 }
 
 // Prettier-ignore
-const modalInner = (handleEmit: HandleEmitFn, nickname:string, setNickname: { (value: React.SetStateAction<string>): void; (arg0: string): void }, game?:Game, room?: RoomAPIResponse.RoomInfo, loading?:boolean) => { // eslint-disable-line no-unused-vars
+const modalInner = (handleEmit: HandleEmitFn, authUser: AuthAPIResponse.UserMe | null | undefined, game?:Game, room?: RoomAPIResponse.RoomInfo, loading?:boolean) => { // eslint-disable-line no-unused-vars
   if (loading) {
     return <div className={style.modalBack}><div className={style.loader} /></div>
   }
 
-  if (room && game) {
+  if (room && game && authUser) {
+    const userId = authUser.id
+    const joinedUserIds = game.board.users.map(_ => _.id)
+    
     switch (game.status) {
       case 'join':
         return (
@@ -57,23 +62,18 @@ const modalInner = (handleEmit: HandleEmitFn, nickname:string, setNickname: { (v
             { game.board.users.length < room.max_seat
             ?
               <>
-                <div className={style.form}>
-                  <input
-                    className={style.formInput}
-                    type="text"
-                    placeholder="名前を入力"
-                    onChange={(e) => {
-                      setNickname(e.target.value)
-                    }}
-                  />
-                </div>
+              <div className={style.info}>
+                <p>あなた：{ authUser.nickname }</p>
+              </div>
+              { !joinedUserIds.includes(userId) &&
                 <a
                   href="#"
-                  className={nickname ? style.startBtn : style.startBtnDisabled}
-                  onClick={() => handleEmit({ roomId:room.id, nickname, event: 'join' })}
+                  className={style.startBtn}
+                  onClick={() => handleEmit({ roomId:room.id, userId, nickname:authUser.nickname, event: 'join' })}
                 >
                   参加する
                 </a>
+              }
               </>
             : <Link href="/room"><a className={style.startBtn}>ルーム一覧へ戻る</a></Link>  
             }
