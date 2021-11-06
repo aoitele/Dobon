@@ -42,17 +42,20 @@ const emitHandler = (io: Socket, socket: any) => {
 
         const userKey = `room:${roomId}:user${userId}`
         const redisUserId = await adapterPubClient.hmget(userKey, 'id')
-
         // Redisにユーザーデータがない場合、参加者をDBに保存
-        if (!redisUserId) {
+        if (redisUserId[0] === null) {
           const data:Prisma.ParticipantUncheckedCreateInput = {
             user_id: userId,
             room_id: roomId
           }
-          await prisma.participant.create({data})
-          // Redisにユーザーデータセット
-          const userDataMini = [{ id: userId, nickname }]
-          adapterPubClient.hmset(userKey, userDataMini)
+          try {
+            await prisma.participant.create({ data })
+            // Redisにユーザーデータセット
+            const userDataMini = [{ id: userId, nickname }]
+            await adapterPubClient.hmset(userKey, userDataMini)
+          } catch(e) {
+            console.log(e,'e')
+          }
         }
         const participants = await prisma.$queryRaw(rowQuery({ model: 'Participant', method: 'GameBoardUsersInit' })) // 参加者データ取得
                 

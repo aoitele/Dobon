@@ -44,6 +44,7 @@ create table IF NOT EXISTS participants
   updated_at timestamp
   UNIQUE ("room_id", "user_id")
 );
+ALTER TABLE "participants" ADD CONSTRAINT "participants_room_id_user_id_unique_constraint" UNIQUE ("room_id", "user_id");
 
 insert into participants(room_id, user_id, created_at, updated_at) values
   (1, 1, now() - interval '2 week',  now() - interval '1 week'),
