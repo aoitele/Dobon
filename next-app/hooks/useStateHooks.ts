@@ -4,6 +4,7 @@ import { HandleEmitFn, Emit } from '../@types/socket'
 import { gameInitialState } from '../utils/game/roomStateReducer'
 import { AuthState } from '../context/authProvider'
 import { RoomAPIResponse } from '../@types/api/roomAPI'
+import hasProperty from '../utils/function/hasProperty'
 
 const useStateHooks = (
   router:NextRouter,
@@ -11,10 +12,11 @@ const useStateHooks = (
   handleEmit: HandleEmitFn,
   authUser:AuthState['authUser'],
   room: RoomAPIResponse.RoomInfo) => {
-    // If you are created_user, join room
+    // If you are joined room, join event hooks run
     useEffect(() => {
       if (!state.connected || !state.roomId || !authUser) return
-      if (room.create_user_id === authUser.id) {
+      if (!hasProperty(authUser, 'participate_room_id')) return
+      if (authUser.participate_room_id.includes(room.id)) {
         handleEmit({ roomId:room.id, userId:authUser.id, nickname:authUser.nickname, event: 'join' })
       }
   },[authUser])

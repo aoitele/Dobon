@@ -7,5 +7,7 @@ declare namespace AuthAPIResponse {
     last_login: Date
     created_at: Date
     updated_at: Date
+    create_room_id: number[]
+    participate_room_id: number[]
   }
 }

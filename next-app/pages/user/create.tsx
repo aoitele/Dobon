@@ -37,7 +37,7 @@ const createRoom: React.FC = () => {
       <div>UserCreate</div>
       <form>
         <div>
-          <label htmlFor="name">Nickname:</label>
+          <label htmlFor="name">ニックネーム</label>
           <input
             type="text"
             name="nickname"
@@ -46,7 +46,7 @@ const createRoom: React.FC = () => {
           />
         </div>
         <div>
-          <label htmlFor="name">Password</label>
+          <label htmlFor="name">パスワード</label>
           <input
             type="text"
             name="password"
@@ -62,7 +62,7 @@ const createRoom: React.FC = () => {
           ))}
         </ul>
       )}
-      <button onClick={() => handleSubmit()}>Submit</button>
+      <a href="#" onClick={() => handleSubmit()}>登録</a>
     </>
   )
 }

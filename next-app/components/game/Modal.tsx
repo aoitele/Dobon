@@ -47,13 +47,17 @@ const modalInner = (handleEmit: HandleEmitFn, authUser: AuthAPIResponse.UserMe |
             </ul>
           </div>
           <div className={style.info}>
-            <p>現在の参加者
-            { game.board.users.length < room.max_seat
+            <p>現在の参加者</p>
+            { 
+            game.board.users.length === 0
+            ? <div className={style.userFetchAnnounce}>
+                <p>ユーザー情報取得中...</p>
+              </div>
+            : game.board.users.length < room.max_seat
               ? <span className={style.waiting}>受付中</span>
               : <span className={style.closed}>受付終了🔒</span>
             }
-            </p>
-            <ul>{game.board.users.map((user, idx) => <li key={idx}>{user.nickname}</li>)}</ul>
+            <ul className={style.userNameUl}>{game.board.users.map((user, idx) => <li key={idx}>👤{user.nickname}</li>)}</ul>
           </div>
         </>
       )
