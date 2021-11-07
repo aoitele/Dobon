@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 
 const defaultValues: RoomCreateForm = {
     title: '',
-    status: 1,
+    status: 0,
     max_seat: 2,
     set_count: 10,
     rate: 1,

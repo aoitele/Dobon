@@ -54,7 +54,7 @@ const modalInner = (handleEmit: HandleEmitFn, authUser: AuthAPIResponse.UserMe |
                 <p>ユーザー情報取得中...</p>
               </div>
             : game.board.users.length < room.max_seat
-              ? <span className={style.waiting}>受付中</span>
+              ? <span className={style.waiting}>参加受付中💓</span>
               : <span className={style.closed}>受付終了🔒</span>
             }
             <ul className={style.userNameUl}>{game.board.users.map((user, idx) => <li key={idx}>👤{user.nickname}</li>)}</ul>
@@ -72,7 +72,7 @@ const modalInner = (handleEmit: HandleEmitFn, authUser: AuthAPIResponse.UserMe |
             ?
               <>
               <div className={style.info}>
-                <p>あなた：{ authUser.nickname }</p>
+                <p>あなた：👤{authUser.nickname}</p>
               </div>
               { !joinedUserIds.includes(userId)
               && room.status === DobonConst.DOBON_ROOM_STATUS_WAITING

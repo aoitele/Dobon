@@ -11,6 +11,29 @@ const usersMeApiCall = async (req: NextApiRequest, res: NextApiResponse) => {
       ]
     })
   }
+  // ユーザーデータ取得
+  const user = await prisma.user.findFirst({
+    where: {
+      access_token: accesstoken
+    },
+    select: {
+      id: true,
+      nickname: true,
+      status: true,
+      expired_date: true,
+      last_login: true
+    }
+  })
+  if (user === null) {
+    return res.status(500).json({
+      error: true,
+      message: [
+        `ユーザー使用期限が切れました。${process.env.NEXT_PUBLIC_DOBON_HTTPS_URL}/user/create より再登録を行ってください。`
+      ]
+    })
+  }
+
+  // 作成部屋、参加部屋データを取得
   const sql = `
   SELECT
     MOGE.id,
@@ -32,9 +55,10 @@ const usersMeApiCall = async (req: NextApiRequest, res: NextApiResponse) => {
       users U,
       rooms R
     WHERE U.id = R.create_user_id
+    AND U.id = ${user.id}
   GROUP BY U.id
   ) AS MOGE, participants P
-  WHERE P.user_id = 1
+  WHERE MOGE.id = P.user_id
   GROUP BY
     MOGE.id,
     MOGE.nickname,
@@ -44,18 +68,9 @@ const usersMeApiCall = async (req: NextApiRequest, res: NextApiResponse) => {
     MOGE.create_room_id,
     P.id
   `
-  // ユーザーデータ取得
-  const response = await prisma.$queryRaw(sql)
-  if (response[0] === null) {
-    return res.status(500).json({
-      error: true,
-      message: [
-        `ユーザー使用期限が切れました。${process.env.NEXT_PUBLIC_DOBON_HTTPS_URL}/user/create より再登録を行ってください。`
-      ]
-    })
-  }
+  const addInfouser = await prisma.$queryRaw(sql)
 
-  return res.json(response[0])
+  return typeof addInfouser[0] === 'undefined' ? res.json(user) : res.json(addInfouser[0])
 }
 
 export default usersMeApiCall

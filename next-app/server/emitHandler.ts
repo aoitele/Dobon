@@ -5,6 +5,7 @@ import { Emit } from '../@types/socket'
 import { isEmitChat } from '../utils/function/useEmitDataType'
 import { rowQuery } from '../prisma/prismaExec'
 import { prisma, Prisma } from '../prisma'
+import { Player } from '../@types/game'
 
 const emitHandler = (io: Socket, socket: any) => {
   const adapterPubClient: Redis = socket.adapter.pubClient
@@ -19,8 +20,9 @@ const emitHandler = (io: Socket, socket: any) => {
         const usersKey = `room:${roomId}:users`
         const users = await adapterPubClient.smembers(usersKey)
         const userData = []
-        for (let i = 1; i <= users.length; i += 1) {
-          userData.push({ id: i, nickname: users[i-1], turn: i, score: 0 })
+       
+        for (let i = 0; i < users.length; i += 1) {
+          userData.push({ id: 0, nickname: users[i] || 'no user', turn: 0, score: 0 })
         }
         const reducerPayload: reducerPayloadSpecify = {
           game: {
@@ -34,13 +36,7 @@ const emitHandler = (io: Socket, socket: any) => {
       }
       case 'join': {
         if (!roomId || !userId || !nickname) return {}
-        const usersKey = `room:${roomId}:users`
-        const userCount = await adapterPubClient.scard(usersKey)
-        if (userCount > 4) {
-          await adapterPubClient.del(usersKey) // eslint-disable-line no-await-in-loop
-        }
-
-        const userKey = `room:${roomId}:user${userId}`
+        const userKey = `room:${roomId}:user:${userId}`
         const redisUserId = await adapterPubClient.hmget(userKey, 'id')
         // Redisにユーザーデータがない場合、参加者をDBに保存
         if (redisUserId[0] === null) {
@@ -57,7 +53,13 @@ const emitHandler = (io: Socket, socket: any) => {
             console.log(e,'e')
           }
         }
-        const participants = await prisma.$queryRaw(rowQuery({ model: 'Participant', method: 'GameBoardUsersInit' })) // 参加者データ取得
+        // 参加者データ取得
+        const participants:Player[] = await prisma.$queryRaw(
+          rowQuery({
+            model: 'Participant',
+            method: 'GameBoardUsersInit'
+          })
+        )
                 
         // Game.board.usersにユーザーを追加
         let reducerPayload: reducerPayloadSpecify = {
@@ -80,6 +82,14 @@ const emitHandler = (io: Socket, socket: any) => {
           }
         }
         socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
+
+        // Redisに保存しているルーム参加者を更新する(ユーザー名表示のみに使うためnickname配列で保存)
+        const usersKey = `room:${roomId}:users`
+        await adapterPubClient.del(usersKey)
+        if (participants.length) {
+          const nicknameArray = participants.map(_ => _.nickname)
+          await adapterPubClient.sadd(usersKey, nicknameArray)
+        }
         break
       }
       case 'gamestart': {
