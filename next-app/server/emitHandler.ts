@@ -20,7 +20,7 @@ const emitHandler = (io: Socket, socket: any) => {
         const usersKey = `room:${roomId}:users`
         const users = await adapterPubClient.smembers(usersKey)
         const userData = []
-       
+        console.log(users, 'test')
         for (let i = 0; i < users.length; i += 1) {
           userData.push({ id: 0, nickname: users[i] || 'no user', turn: 0, score: 0 })
         }
@@ -57,10 +57,11 @@ const emitHandler = (io: Socket, socket: any) => {
         const participants:Player[] = await prisma.$queryRaw(
           rowQuery({
             model: 'Participant',
-            method: 'GameBoardUsersInit'
+            method: 'GameBoardUsersInit',
+            params: { roomId }
           })
         )
-                
+        console.log(participants, 'participants')
         // Game.board.usersにユーザーを追加
         let reducerPayload: reducerPayloadSpecify = {
           game: {
