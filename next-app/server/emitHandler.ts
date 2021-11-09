@@ -113,6 +113,7 @@ const emitHandler = (io: Socket, socket: any) => {
 
         const reducerPayload: reducerPayloadSpecify = {
           game: {
+            status: 'playing',
             event: 'gamestart'
           }
         }
@@ -120,11 +121,18 @@ const emitHandler = (io: Socket, socket: any) => {
         break
       }
       case 'gethand': {
-        // Const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
-        const userHandsKey = `room:3:user:0:hands`
+        const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
         const hands = await adapterPubClient.smembers(userHandsKey)
-        io.in(socket.id).emit('response', hands)
-        return hands
+        console.log(hands, 'hands')
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              hands
+            }
+          }
+        }
+        io.in(socket.id).emit('updateStateSpecify', reducerPayload)
+        break
       }
       case 'chat': {
         const { data } = payload

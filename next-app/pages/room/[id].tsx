@@ -60,7 +60,7 @@ const Room: React.FC<Props> = ({ room }) => {
   
   // After fetched authUser,rendering depend on game.status
   if (state.game?.status === 'playing') {
-    return <Board room={room} handleEmit={handleEmit} />
+    return <Board room={room} handleEmit={handleEmit} state={state} authUser={authUser}/>
   }
 
   const isCreatedUser = authUser.id === room.create_user_id

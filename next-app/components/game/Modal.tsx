@@ -58,7 +58,12 @@ const modalInner = (handleEmit: HandleEmitFn, authUser: AuthAPIResponse.UserMe |
               ? <span className={style.waiting}>参加受付中💓</span>
               : <span className={style.closed}>受付終了🔒</span>
             }
-            <ul className={style.userNameUl}>{game.board.users.map((user, idx) => <li key={idx}>{userIcon[idx]}{user.nickname}</li>)}</ul>
+            <ul className={style.userNameUl}>
+              { game.board.users.map((user, idx) =>
+              <li key={idx}>
+                {userIcon[idx]}{user.nickname}{authUser.nickname === user.nickname && '(あなた)'}
+              </li>)}
+            </ul>
           </div>
         </>
       )

@@ -4,19 +4,33 @@ import { UserInfo } from '../UserInfo'
 import { SingleCard } from '../SingleCard'
 import CardWithCount from '../CardWithCount'
 import CardEffect from '../CardEffect'
-import ChatBoard from '../ChatBoard'
+import { RoomAPIResponse } from '../../../@types/api/roomAPI'
+import { HandleEmitFn } from '../../../@types/socket'
+import style from './index.module.scss'
+import { gameInitialState } from '../../../utils/game/roomStateReducer'
+import { AuthState } from '../../../context/authProvider'
 
-const board = (room: any, handleEmit: any) => {
-  const posts = [
-    { nickname: '一郎', message: 'おはようございます' },
-    { nickname: '二郎', message: 'こんにちは' },
-    { nickname: '三郎', message: 'こんばんは' },
-    { nickname: '四郎', message: 'おはこんばんちは' }
-  ]
+interface Props {
+  room: RoomAPIResponse.RoomInfo
+  handleEmit: HandleEmitFn
+  state: gameInitialState
+  authUser: AuthState['authUser']
+}
+
+const board = (data: Props) => {
+  const { room, state, authUser } = data
   return (
     <>
-      <GameSet gameSet={1} setCount={10} />
-      <UserInfo nickname={'taro'} score={200} />
+      <div className={style.roomInfo}>
+        <h1 className={style.title}>{room.title}</h1>
+        <GameSet gameSet={state.game?.id ? state.game.id : 1} setCount={room.set_count} />
+      </div>
+      { 
+      state.game?.board.users.map(
+        user => authUser?.id !== user.id && 
+        <UserInfo nickname={user.nickname} score={user.score} />
+      )
+      }
       <SingleCard suit="c" num={1} isOpen={true} />
       <SingleCard suit="c" num={2} isOpen={false} />
       <SingleCard suit="x" num={0} isOpen={true} />
@@ -74,13 +88,6 @@ const board = (room: any, handleEmit: any) => {
       />
       <CardEffect order={'draw'} value={2} />
       <CardEffect order={'opencard'} value={13} />
-      {room.id && (
-        <ChatBoard
-          roomId={room.id}
-          posts={posts}
-          handleEmit={handleEmit}
-        />
-      )}
     </>
   )
 }
