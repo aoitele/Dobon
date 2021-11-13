@@ -29,7 +29,8 @@ describe('gameState TestCases', () => {
           users: [],
           deck: [],
           hands: [],
-          trash: []
+          trash: [],
+          otherHands: []
         }
       },
       connected: false,
@@ -66,7 +67,8 @@ describe('gameState TestCases', () => {
           users: [user],
           deck: [],
           hands: [],
-          trash: []
+          trash: [],
+          otherHands: []
         }
       },
       connected: false,

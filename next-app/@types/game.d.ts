@@ -1,4 +1,5 @@
 import { Event } from './socket'
+import { HandCards } from './card'
 
 export type Room = {
   id: number
@@ -35,12 +36,17 @@ export type Player = {
   turn: number
   score: number
 }
+export type OtherHands = {
+  userId: number
+  hands: HandCards[]
+}
 
 export type Board = {
   users: Player[]
   deck: string[]
   hands: string[]
   trash: string[]
+  otherHands: OtherHands[]
 }
 
 export type Action = 'avoidEffect' | 'notAvoidEffect'

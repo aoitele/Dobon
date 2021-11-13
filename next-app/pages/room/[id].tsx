@@ -29,7 +29,8 @@ const initialState: gameInitialState = {
       users: [],
       deck: [],
       hands: [],
-      trash: []
+      trash: [],
+      otherHands: []
     }
   },
   connected: false,

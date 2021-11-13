@@ -1,22 +1,47 @@
 import React from 'react'
 import Image from 'next/image'
-import type { GameUserInfo } from '../../@types/user'
+import type { Player, OtherHands } from '../../@types/game'
 import style from './UserInfo.module.scss'
+import CardWithCount from './CardWithCount'
+import spreadCardState from '../../utils/game/spreadCardState'
+import { HaveAllPropertyCard } from '../../@types/card'
 
-export const UserInfo: React.FC<GameUserInfo> = ({ nickname, score }) => {
+interface Props {
+  user: Player
+  otherHands: OtherHands[]
+}
+
+const userInfo: React.FC<Props> = ({ user, otherHands }) => {
+  const hand = otherHands.filter(_ => _.userId === user.id)[0]
+  let hands: HaveAllPropertyCard[] = []
+
+  if (hand?.hands) {
+    hands = spreadCardState(hand.hands)
+  }
 
   return (
     <div className={style.wrap}>
-    <Image
-      src="https://placehold.jp/b8b8b8/ffffff/150x150.jpg?text=userIcon&amp;css=%7B%22border-radius%22%3A%2250%25%22%7D"
-      width={40}
-      height={40}
-      layout="fixed"
-    />
-    <div>
-      <p>{nickname}</p>
-      <p>{score}</p>
-    </div>
+      <div className={style.iconName}>
+        <Image
+          src={`/images/game/userIcon/${user.turn}.png`}
+          width={50}
+          height={50}
+        />
+        <div>
+          <p>{user.nickname}</p>
+          <p>score：{user.score}</p>
+        </div>
+      </div>
+      { hands.length &&
+      <div className={style.handInfo}>
+        <CardWithCount
+          card={hands}
+          numStyle='bottom'
+        />
+      </div>
+    }
   </div>
   )
 }
+
+export default userInfo

@@ -13,4 +13,5 @@ export type GameUserInfo = {
   nickname: string
   image?: string
   score: number
+  turn: number
 }

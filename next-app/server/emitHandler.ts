@@ -127,11 +127,42 @@ const emitHandler = (io: Socket, socket: any) => {
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             board: {
-              hands
+              hands,
+              otherHands: [
+                {
+                  userId: 4,
+                  hands: ['z', 'z', 'c13o']
+                },
+                {
+                  userId: 6,
+                  hands: ['d10o', 'z', 'z']
+                },
+                {
+                  userId: 8,
+                  hands: ['z', 'h2o', 'z']
+                }
+              ]
             }
           }
         }
         io.in(socket.id).emit('updateStateSpecify', reducerPayload)
+        break
+      }
+      case 'drawcard': {
+        const deckKey = `room:${roomId}:deck`
+        const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
+        const newCard = await adapterPubClient.spop(deckKey, 1)
+        adapterPubClient.sadd(userHandsKey, newCard)
+        const hands = await adapterPubClient.smembers(userHandsKey)
+        // 送信者に手札を1枚追加した結果を返す
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              hands
+            }
+          }
+        }
+        socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
         break
       }
       case 'chat': {

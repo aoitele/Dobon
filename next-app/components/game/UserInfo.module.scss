@@ -1,3 +1,12 @@
 .wrap {
+  display: flex;
+  flex-flow: column;
+  .iconName {
     display: flex;
+  }
+  .handInfo {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
 }

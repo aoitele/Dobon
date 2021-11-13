@@ -43,7 +43,8 @@ module.exports = {
     'max-statements-per-line': 'off',
     'no-undefined': 'off',
     'no-alert': 'off',
-    'arrow-body-style': 'off'
+    'arrow-body-style': 'off',
+    'prefer-named-capture-group': 'off'
   },
   settings: {
     react: {

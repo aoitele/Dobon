@@ -1,6 +1,6 @@
 import React from 'react'
 import { GameSet } from '../GameSet'
-import { UserInfo } from '../UserInfo'
+import UserInfo from '../UserInfo'
 import { SingleCard } from '../SingleCard'
 import CardWithCount from '../CardWithCount'
 import CardEffect from '../CardEffect'
@@ -19,18 +19,24 @@ interface Props {
 
 const board = (data: Props) => {
   const { room, state, authUser } = data
+  const boardState = state.game?.board
+  const users = boardState?.users
+
   return (
     <>
       <div className={style.roomInfo}>
         <h1 className={style.title}>{room.title}</h1>
         <GameSet gameSet={state.game?.id ? state.game.id : 1} setCount={room.set_count} />
       </div>
-      { 
-      state.game?.board.users.map(
-        user => authUser?.id !== user.id && 
-        <UserInfo nickname={user.nickname} score={user.score} />
-      )
-      }
+      <div className={style.userInfoWrap}>
+        {
+          boardState && users &&
+          users.map(
+            user => authUser?.id !== user.id &&
+            <UserInfo key={user.turn} user={user} otherHands={boardState.otherHands}/>
+          )
+        }
+      </div>
       <SingleCard suit="c" num={1} isOpen={true} />
       <SingleCard suit="c" num={2} isOpen={false} />
       <SingleCard suit="x" num={0} isOpen={true} />
@@ -41,26 +47,6 @@ const board = (data: Props) => {
           d="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"
         />
       </svg>
-      <CardWithCount
-        card={[
-          {
-            suit: 'd',
-            num: 1,
-            isOpen: false
-          },
-          {
-            suit: 'h',
-            num: 2,
-            isOpen: false
-          },
-          {
-            suit: 's',
-            num: 4,
-            isOpen: false
-          }
-        ]}
-        numStyle="right"
-      />
       <CardWithCount
         card={[
           {
