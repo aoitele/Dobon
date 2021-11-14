@@ -10,7 +10,9 @@ type Event = LiteralUnion<
   | 'join'
   | 'gamestart'
   | 'gameend'
-  | 'gethand',
+  | 'gethand'
+  | 'getparticipants'
+  | 'getusers',
   string
 > | null
 
@@ -21,7 +23,7 @@ export type EmitCard = {
 
 export type EmitAction = {
   type: 'action'
-  data: Action | Order
+  data: Action | Order | OwnerAction
 }
 
 export type EmitChat = {

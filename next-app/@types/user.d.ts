@@ -10,8 +10,8 @@ export type User = {
 }
 
 export type GameUserInfo = {
+  id: number
   nickname: string
-  image?: string
   score: number
   turn: number
 }

@@ -42,7 +42,7 @@ const usersMeApiCall = async (req: NextApiRequest, res: NextApiResponse) => {
     MOGE.expired_date,
     MOGE.last_login,
     MOGE.create_room_id,
-    array_agg(P.room_id) AS participate_room_id
+    array_remove(array_agg(P.room_id), NULL) AS participate_room_id
   FROM (
     SELECT
       U.id,
@@ -50,26 +50,25 @@ const usersMeApiCall = async (req: NextApiRequest, res: NextApiResponse) => {
       U.status,
       U.expired_date,
       U.last_login,
-      array_agg(R.id) AS create_room_id
+      array_remove(array_agg(R.id), NULL) AS create_room_id
     FROM
-      users U,
-      rooms R
-    WHERE U.id = R.create_user_id
-    AND U.id = ${user.id}
+      users U
+      LEFT OUTER JOIN rooms R
+      ON U.id = R.create_user_id
   GROUP BY U.id
-  ) AS MOGE, participants P
-  WHERE MOGE.id = P.user_id
+  ) AS MOGE
+    LEFT OUTER JOIN participants P
+    ON MOGE.id = P.user_id
+  WHERE MOGE.id = ${user.id}
   GROUP BY
     MOGE.id,
     MOGE.nickname,
     MOGE.status,
     MOGE.expired_date,
     MOGE.last_login,
-    MOGE.create_room_id,
-    P.id
+    MOGE.create_room_id
   `
   const addInfouser = await prisma.$queryRaw(sql)
-
   return typeof addInfouser[0] === 'undefined' ? res.json(user) : res.json(addInfouser[0])
 }
 

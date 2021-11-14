@@ -50,7 +50,7 @@ const Room: React.FC<Props> = ({ room }) => {
 
   useWsConnectHooks(router, state, dispatch)
   useStateHooks(router, state, handleEmit, authUser, room)
-  useEventHooks(state, handleEmit)
+  useEventHooks(state, handleEmit, authUser)
 
   // Before fetch authUser from context
   if (!authUser) {

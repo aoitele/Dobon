@@ -16,7 +16,7 @@ const emitHandler = (io: Socket, socket: any) => {
     const room = `room${payload.roomId}`
 
     switch (event) {
-      case 'getUsers': {
+      case 'getparticipants': {
         const usersKey = `room:${roomId}:users`
         const users = await adapterPubClient.smembers(usersKey)
         const userData = []
@@ -32,6 +32,9 @@ const emitHandler = (io: Socket, socket: any) => {
           }
         }
         socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
+        break;
+      }
+      case 'getusers': {
         break;
       }
       case 'join': {
@@ -67,8 +70,8 @@ const emitHandler = (io: Socket, socket: any) => {
           game: {
             board: {
               users: participants
-            },
-            event: 'gamestart'
+            }
+            // Event: 'gamestart'
           }
         }
         socket.broadcast.to(room).emit('updateStateSpecify', reducerPayload) // 送信者以外を更新
@@ -98,13 +101,16 @@ const emitHandler = (io: Socket, socket: any) => {
         const deckKey = `room:${roomId}:deck`
         await adapterPubClient.sunionstore(deckKey, 'deck') // Redis copy deck for room
 
-        // Assign userID to participants
-        const socketList = await io.in(room).allSockets()
-        const userCount = socketList.size
-
+        // Get participants data
+        const participants:Player[] = await prisma.$queryRaw(rowQuery({
+            model: 'Participant',
+            method: 'GameBoardUsersInit',
+            params: { roomId }
+          })
+        )
         // Redis sadd hands for users
-        for (let i = 1; i <= userCount; i += 1) {
-          const userHandsKey = `room:${payload.roomId}:user:${i}:hands`
+        for (let i=0; i<participants.length; i+=1) {
+          const userHandsKey = `room:${payload.roomId}:user:${participants[i].id}:hands`
           console.log(userHandsKey, 'userHandsKey add')
           await adapterPubClient.del(userHandsKey) // eslint-disable-line no-await-in-loop
           const hands = await adapterPubClient.spop(deckKey, 5) // eslint-disable-line no-await-in-loop
@@ -113,6 +119,7 @@ const emitHandler = (io: Socket, socket: any) => {
 
         const reducerPayload: reducerPayloadSpecify = {
           game: {
+            id: 1,
             status: 'playing',
             event: 'gamestart'
           }

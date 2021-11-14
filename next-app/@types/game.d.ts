@@ -1,5 +1,6 @@
 import { Event } from './socket'
 import { HandCards } from './card'
+import { GameUserInfo } from './user'
 
 export type Room = {
   id: number
@@ -49,5 +50,6 @@ export type Board = {
   otherHands: OtherHands[]
 }
 
+export type OwnerAction = { participants: GameUserInfo[] }
 export type Action = 'avoidEffect' | 'notAvoidEffect'
 export type Order = 'skip' | 'draw' | 'wild' | 'elevenback' | 'opencard' | null

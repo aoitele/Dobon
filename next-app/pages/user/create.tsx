@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useRouter } from 'next/router'
 import axiosInstance from '../../utils/api/axiosInstance'
 import nookies from 'nookies'
 
@@ -11,6 +12,7 @@ const initialValue = {
 
 const createRoom: React.FC = () => {
   const [form, setForm] = useState(initialValue)
+  const router = useRouter()
 
   const handleChange = (event: { target: { name: any; value: any } }) => {
     setForm({ ...form, [event.target.name]: event.target.value })
@@ -25,9 +27,12 @@ const createRoom: React.FC = () => {
           maxAge: 30 * 24 * 60 * 60, // 30day
           path: '/'
         })
+        alert(`ユーザー「${data.nickname}」を登録しました`)
+        router.push('/')
       }
     } catch (e: any) {
       console.log(e, 'error')
+      alert(e)
       // Const { error, messages } = e.response.data
       setForm({ ...form })
     }

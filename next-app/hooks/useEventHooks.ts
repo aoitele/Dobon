@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 import { HandleEmitFn, Emit } from '../@types/socket'
 import { gameInitialState } from '../utils/game/roomStateReducer'
+import { AuthState } from '../context/authProvider'
 
-const useEventHooks = (state: gameInitialState, handleEmit: HandleEmitFn) => {
+const useEventHooks = (state: gameInitialState, handleEmit: HandleEmitFn, authUser:AuthState['authUser']) => {
   const { roomId, game } = state
-
+  console.log(authUser, 'authUser')
   useEffect(() => {
-    if (!state || !game?.event) {
+    if (!state || !game?.event || !authUser) {
       return
     }
 
@@ -18,16 +19,16 @@ const useEventHooks = (state: gameInitialState, handleEmit: HandleEmitFn) => {
         }
         case 'gamestart': {
           console.log('ゲームを開始します')
-          // Get users hands
           if (game.status === 'playing' && roomId) {
             const data: Emit = {
               roomId,
               gameId: game.id || null,
-              userId: 1,
+              userId: authUser.id,
               event: 'gethand'
             }
-            const hands = handleEmit(data)
-            console.log(hands, 'hands')
+            handleEmit(data)
+            data.event = 'getusers'
+            handleEmit(data)
           }
           break
         }

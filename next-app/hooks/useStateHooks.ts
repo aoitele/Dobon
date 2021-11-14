@@ -14,18 +14,18 @@ const useStateHooks = (
   room: RoomAPIResponse.RoomInfo) => {
     // If you are joined room or room owner, join event hooks run
     useEffect(() => {
-      if (!state.connected || !state.roomId || !authUser) return
+      if (!state.connected || !state.roomId || !authUser || typeof authUser === 'undefined') return
       if (authUser.id === room.create_user_id || hasProperty(authUser, 'participate_room_id') && authUser.participate_room_id.includes(room.id)) {
         handleEmit({ roomId:room.id, userId:authUser.id, nickname:authUser.nickname, event: 'join' })
       }
   },[authUser])
 
-   // GetUsers when WebSocket connection has established  
+   // Getusers when WebSocket connection has established
    useEffect(() => {
     if (state.connected) {
       const data: Emit = {
         roomId: Number(router.query.id),
-        event: 'getUsers'
+        event: 'getparticipants'
       }
       handleEmit(data)
     }
