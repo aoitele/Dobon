@@ -5,20 +5,20 @@ import style from './UserInfo.module.scss'
 import CardWithCount from './CardWithCount'
 import spreadCardState from '../../utils/game/spreadCardState'
 import { HaveAllPropertyCard } from '../../@types/card'
+import hasProperty from '../../utils/function/hasProperty'
 
 interface Props {
   user: Player
-  otherHands: OtherHands[]
+  otherHands?: OtherHands[]
 }
 
 const userInfo: React.FC<Props> = ({ user, otherHands }) => {
-  const hand = otherHands.filter(_ => _.userId === user.id)[0]
+  const hand = otherHands ? otherHands.filter(_ => _.userId === user.id)[0] : []
   let hands: HaveAllPropertyCard[] = []
 
-  if (hand?.hands) {
+  if (hasProperty(hand,'hands')) {
     hands = spreadCardState(hand.hands)
   }
-
   return (
     <div className={style.wrap}>
       <div className={style.iconName}>
@@ -32,11 +32,11 @@ const userInfo: React.FC<Props> = ({ user, otherHands }) => {
           <p>score：{user.score}</p>
         </div>
       </div>
-      { hands.length &&
+      { hands.length > 0 &&
       <div className={style.handInfo}>
         <CardWithCount
           card={hands}
-          numStyle='bottom'
+          numStyle={'bottom'}
         />
       </div>
     }

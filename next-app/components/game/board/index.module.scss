@@ -1,14 +1,27 @@
-.roomInfo {
-  display: flex;
-  justify-content: center;
-  position: relative;
-  line-height: 50px;
-  font-size: 22px;
-}
-.userInfoWrap {
-  display: flex;
-  padding: 10px 0px;
-  margin-bottom: 10px;
-  border-top: 1px solid lightgrey;
-  border-bottom: 1px solid lightgrey;
+.wrap {
+  height: 100vh;
+
+  .roomInfo {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    line-height: 50px;
+    font-size: 22px;
+  }
+  .userInfoWrap {
+    display: flex;
+    padding: 10px 0px;
+    margin-bottom: 10px;
+    border-top: 1px solid lightgrey;
+    border-bottom: 1px solid lightgrey;
+  }
+  .myInfo {
+    display: flex;
+    justify-content: center;
+  }
+  .actionBtnWrap {
+    display: flex;
+    justify-content: space-evenly;
+    text-align: center;
+  }
 }
