@@ -9,6 +9,8 @@ import { HandleEmitFn } from '../../../@types/socket'
 import style from './index.module.scss'
 import { gameInitialState } from '../../../utils/game/roomStateReducer'
 import { AuthState } from '../../../context/authProvider'
+import Hands from '../Hands'
+import spreadCardState from '../../../utils/game/spreadCardState'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -21,6 +23,7 @@ const board = (data: Props) => {
   const { room, state, authUser } = data
   const boardState = state.game?.board
   const users = boardState?.users
+  console.log(state, 'state')
 
   return (
     <>
@@ -74,6 +77,7 @@ const board = (data: Props) => {
       />
       <CardEffect order={'draw'} value={2} />
       <CardEffect order={'opencard'} value={13} />
+      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} /> }
     </>
   )
 }

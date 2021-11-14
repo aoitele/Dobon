@@ -44,7 +44,7 @@ export type OtherHands = {
 export type Board = {
   users: Player[]
   deck: string[]
-  hands: string[]
+  hands: HandCards[]
   trash: string[]
   otherHands: OtherHands[]
 }

@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import Image from 'next/image'
-import type { Card } from '../../@types/card'
+import { Card } from '../../@types/card'
+import styles from './SingleCard.module.scss'
 
-export const SingleCard: React.FC<Card> = ({ suit, num, isOpen }) => {
-  const [isOpened, setIsOpened] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+type Props = Card & { style?: { width: number, height: number }}
 
-  useEffect(() => {
-    setIsOpened(typeof isOpen !== 'undefined' && isOpen)
-    setIsLoading(false)
-  }, [isOpen])
-
-  return isLoading ? (
-    <></>
-  ) : isOpened ? (
-    <Image src={`/images/cards/${suit}${num}.png`} width={40} height={60} />
-  ) : (
-    <Image src="/images/cards/z.png" width={40} height={60} />
+export const SingleCard: React.FC<Props> = ({ suit, num, isOpen, style }) => {
+  const width = style?.width || 40
+  const height = style?.height || 60
+  return (
+    <div className={styles.imageWrap}>
+      { isOpen
+      ? <Image src={`/images/cards/${suit}${num}.png`} width={width} height={height} />
+      : <Image src="/images/cards/z.png" width={width} height={height} />
+      }
+    </div>
   )
 }
