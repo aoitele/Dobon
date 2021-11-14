@@ -8,13 +8,18 @@ interface Cards {
 }
 
 const hands: React.FC<Cards> = ({ cards }) => {
-  console.log(cards, 'test')
-  const showMoreBtn = cards.length > 4
+  const showScrollBtn = cards.length > 4
   return (
   <div className={style.wrap}>
-    { showMoreBtn ? <span className={style.scrollBtn}> ◀️ </span> : <></>}
-    { cards && cards.map(_ => <SingleCard key={`${_.suit}${_.num}`} suit={_.suit} num={_.num} isOpen={_.isOpen} style={{ width:60, height:90 }}/>) }
-    { showMoreBtn ? <span className={style.scrollBtn}> ▶︎ </span> : <></>}
+    { showScrollBtn ? <span className={style.scrollBtn}> ◀️ </span> : <></>}
+    <div className={style.slides}>
+      { cards && cards.map(_ =>
+      <div key={`${_.suit}${_.num}_slide`} className={style.slide}>
+        <SingleCard key={`${_.suit}${_.num}`} suit={_.suit} num={_.num} isOpen={_.isOpen} style={{ width:150, height:225 }}/>
+      </div>
+        ) }
+    </div>
+    { showScrollBtn ? <span className={style.scrollBtn}> ▶︎ </span> : <></>}
   </div>
   )
 }
