@@ -10,7 +10,7 @@
 
 import { AllowCardStringType, HandCards } from '../../@types/card'
 
-const spreadCardState = (cards: HandCards[], isMyCard?: boolean): AllowCardStringType[] => {
+const spreadCardState = (cards: string[] | HandCards[], isMyCard?: boolean): AllowCardStringType[] => {
   const res:AllowCardStringType[] = []
   const re = isMyCard ? /(h|s|c|d)([0-9]+)/u : /(h|s|c|d)([0-9]+)(o)/u
   
