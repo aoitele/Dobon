@@ -129,26 +129,31 @@ const emitHandler = (io: Socket, socket: any) => {
       }
       case 'gethand': {
         const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
+        const allUserHandsKey = await adapterPubClient.keys(`room:${payload.roomId}:user:*`)
+        const otherHandsKey = allUserHandsKey.filter(_=>_ !== userHandsKey)
+        const re = /user:([0-9]+)/gu
+        const re2 = /[a-z][0-9]+o/gu
+        const otherHands = []
+
+        for (let i=0; i < otherHandsKey.length; i+=1) {
+          let search = null
+          search = re.exec(otherHandsKey[i])
+          re.lastIndex = 0;  // Reset pointer index
+          const uid = search ? search[1] : null
+          if (uid) {
+            let otherHand = await adapterPubClient.smembers(`room:${payload.roomId}:user:${uid}:hands`) // eslint-disable-line no-await-in-loop
+            otherHand = otherHand.map(_ => re2.test(_) ? _ : 'z') // If not open card, OverWrite suit 'z'
+            const data = { userId: Number(uid), hands: otherHand }
+            otherHands.push(data)
+          }
+        }
+
         const hands = await adapterPubClient.smembers(userHandsKey)
-        console.log(hands, 'hands')
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             board: {
               hands,
-              otherHands: [
-                {
-                  userId: 4,
-                  hands: ['z', 'z', 'c13o']
-                },
-                {
-                  userId: 6,
-                  hands: ['d10o', 'z', 'z']
-                },
-                {
-                  userId: 8,
-                  hands: ['z', 'h2o', 'z']
-                }
-              ]
+              otherHands
             }
           }
         }

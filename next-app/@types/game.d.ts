@@ -39,7 +39,7 @@ export type Player = {
 }
 export type OtherHands = {
   userId: number
-  hands: HandCards[]
+  hands: string[] | HandCards[]
 }
 
 export type Board = {

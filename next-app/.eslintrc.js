@@ -44,7 +44,8 @@ module.exports = {
     'no-undefined': 'off',
     'no-alert': 'off',
     'arrow-body-style': 'off',
-    'prefer-named-capture-group': 'off'
+    'prefer-named-capture-group': 'off',
+    'complexity': 'off'
   },
   settings: {
     react: {
