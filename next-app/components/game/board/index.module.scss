@@ -1,5 +1,6 @@
 .wrap {
   height: 100vh;
+  height: -webkit-fill-available;
 
   .roomInfo {
     display: flex;
@@ -15,6 +16,19 @@
     border-top: 1px solid lightgrey;
     border-bottom: 1px solid lightgrey;
   }
+  .boardInfo {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 15px 0;
+    .turnTxt {
+      font-size: 22px;
+      margin: 20px 10px;
+    }
+    .deckCount {
+      font-size: 14px;
+      text-align: center;
+    }
+  }
   .myInfo {
     display: flex;
     justify-content: center;
@@ -23,5 +37,7 @@
     display: flex;
     justify-content: space-evenly;
     text-align: center;
+    height: 80px;
+    align-items: center;
   }
 }

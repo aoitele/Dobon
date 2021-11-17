@@ -9,6 +9,9 @@ import { AuthState } from '../../../context/authProvider'
 import Hands from '../Hands'
 import spreadCardState from '../../../utils/game/spreadCardState'
 import ActionBtn from '../ActionBtn'
+import { SingleCard } from '../SingleCard'
+import CardEffect from '../CardEffect'
+import Image from 'next/image'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -38,13 +41,33 @@ const board = (data: Props) => {
           )
         }
       </div>
-      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} /> }
+      <div className={style.boardInfo}>
+        { boardState?.trash.length &&
+          <SingleCard
+            card = {
+              Object.assign(
+                spreadCardState(boardState.trash.slice(-1))[0],
+                { style: { width:80, height: 120} }
+              )
+            }
+          />
+        }
+        <div>
+          <p className={style.turnTxt}><span>たろう</span> のターン</p>
+          <CardEffect order={'draw'} value={2}/>
+        </div>
+        <div>
+          <Image src={`/images/cards/deck.png`} width={70} height={105} />
+          <p className={style.deckCount}>x {boardState?.deck.length}</p>
+        </div>
+      </div>
       {
         boardState && me && 
         <div className={style.myInfo}>
           <UserInfo key={me.turn} user={me} />
         </div>
       }
+      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} /> }
       <div className={style.actionBtnWrap}>
         <ActionBtn text={'アクション'} styleClass='action'/>
         <ActionBtn text={'どぼん！'} styleClass='dobon'/>

@@ -48,6 +48,7 @@ export type Board = {
   hands: string[] | HandCards[]
   trash: string[]
   otherHands: OtherHands[]
+  turn: number | null
 }
 
 export type OwnerAction = { participants: GameUserInfo[] }

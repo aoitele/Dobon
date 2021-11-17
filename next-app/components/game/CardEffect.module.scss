@@ -1,10 +1,11 @@
 @import "../../styles/scss/foundation/variables.module.scss";
 
 .wrap {
-    width: 35%;
+    width: 100%;
 }
 .effectText {
     border: 1px solid $orange;
+    border-radius: 8px;
     text-align: center;
 }
 .avoidBtn {

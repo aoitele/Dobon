@@ -153,7 +153,8 @@ const emitHandler = (io: Socket, socket: any) => {
           game: {
             board: {
               hands,
-              otherHands
+              otherHands,
+              trash: ['s1o']
             }
           }
         }

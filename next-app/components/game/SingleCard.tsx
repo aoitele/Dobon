@@ -1,11 +1,19 @@
 import React from 'react'
 import Image from 'next/image'
-import { Card } from '../../@types/card'
+import { HaveAllPropertyCard } from '../../@types/card'
 import styles from './SingleCard.module.scss'
 
-type Props = Card & { style?: { width: number, height: number }}
+type Props = {
+  card: HaveAllPropertyCard & {
+      style?: {
+        width: number,
+        height: number
+    }
+  }
+}
 
-export const SingleCard: React.FC<Props> = ({ suit, num, isOpen, style }) => {
+export const SingleCard: React.FC<Props> = ({ card }) => {
+  const { style, isOpen, suit, num } = card
   const width = style?.width || 40
   const height = style?.height || 60
   return (

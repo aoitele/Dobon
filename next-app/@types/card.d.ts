@@ -37,12 +37,12 @@ export type DevidedCardWithStatus = {
 }
 
 export type Rank = {
-  0: 'JockerFree'
-  1: 'Skip'
-  2: '+DrawTwo'
-  8: 'SelectSuit'
-  11: 'ElevenBack'
-  13: 'OpenCard'
+  0: 'ジョーカー(ワイルド、23でドボン可能)',
+  1: 'スキップ',
+  2: 'ドローカード+2',
+  8: 'ワイルド',
+  11: 'イレブンバック',
+  13: '手札公開'
 }
 export type RankCardNum = keyof Rank
 export type RankCardText = Rank[keyof Rank]

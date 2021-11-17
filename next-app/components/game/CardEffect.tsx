@@ -18,19 +18,14 @@ const CardEffect: React.FC<Props> = ({ order, value }) => {
     Number(process.env.NEXT_PUBLIC_RANK_CARD_DRAWTWO)
   )
   const rankCards: Rank = {
-    0: 'JockerFree',
-    1: 'Skip',
-    2: '+DrawTwo',
-    8: 'SelectSuit',
-    11: 'ElevenBack',
-    13: 'OpenCard'
+    0: 'ジョーカー(ワイルド、23でドボン可能)',
+    1: 'スキップ',
+    2: 'ドローカード+2',
+    8: 'ワイルド',
+    11: 'イレブンバック',
+    13: '手札公開'
   }
   const effectText: RankCardText = rankCards[value]
-  const avoidableCards = [
-    Number(process.env.NEXT_PUBLIC_RANK_CARD_DRAWTWO),
-    Number(process.env.NEXT_PUBLIC_RANK_CARD_OPENCARD)
-  ]
-  const showAvoidBtn = value && avoidableCards.includes(value)
 
   useEffect(() => {
     if (untreatEffect.order && order === 'draw') {
@@ -41,11 +36,6 @@ const CardEffect: React.FC<Props> = ({ order, value }) => {
   return (
     <div className={styles.wrap}>
       <div className={styles.effectText}>{effectText}</div>
-      {showAvoidBtn && (
-        <div className={styles.avoidBtn}>
-          <span>AvoidEffect</span>
-        </div>
-      )}
     </div>
   )
 }

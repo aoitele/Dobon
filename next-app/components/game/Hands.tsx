@@ -15,7 +15,17 @@ const hands: React.FC<Cards> = ({ cards }) => {
     <div className={style.slides}>
       { cards && cards.map(_ =>
       <div key={`${_.suit}${_.num}_slide`} className={style.slide}>
-        <SingleCard key={`${_.suit}${_.num}`} suit={_.suit} num={_.num} isOpen={_.isOpen} style={{ width:150, height:225 }}/>
+        <SingleCard 
+          key={`${_.suit}${_.num}`}
+          card={{
+            suit: _.suit,
+            num: _.num,
+            isOpen: _.isOpen,
+            style: {
+              width:150,
+              height:225
+            }
+          }}/>
       </div>
         ) }
     </div>
