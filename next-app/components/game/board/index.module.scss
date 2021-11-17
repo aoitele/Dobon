@@ -1,7 +1,8 @@
 .wrap {
   height: 100vh;
   height: -webkit-fill-available;
-
+  background-image:  url(/images/game/backGround/bg1.png);
+  background-repeat: repeat;
   .roomInfo {
     display: flex;
     justify-content: center;
