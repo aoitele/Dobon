@@ -8,10 +8,8 @@ interface Cards {
 }
 
 const hands: React.FC<Cards> = ({ cards }) => {
-  const showScrollBtn = cards.length > 4
   return (
   <div className={style.wrap}>
-    { showScrollBtn ? <span className={style.scrollBtn}> ◀️ </span> : <></>}
     <div className={style.slides}>
       { cards && cards.map(_ =>
       <div key={`${_.suit}${_.num}_slide`} className={style.slide}>
@@ -22,14 +20,13 @@ const hands: React.FC<Cards> = ({ cards }) => {
             num: _.num,
             isOpen: _.isOpen,
             style: {
-              width:150,
-              height:225
+              width:160,
+              height:240
             }
           }}/>
       </div>
         ) }
     </div>
-    { showScrollBtn ? <span className={style.scrollBtn}> ▶︎ </span> : <></>}
   </div>
   )
 }
