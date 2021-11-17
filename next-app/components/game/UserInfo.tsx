@@ -29,7 +29,7 @@ const userInfo: React.FC<Props> = ({ user, otherHands }) => {
         />
         <div>
           <p>{user.nickname}</p>
-          <p>score：{user.score}</p>
+          <p><span className={style.star}>⭐️</span>{user.score}</p>
         </div>
       </div>
       { hands.length > 0 &&
