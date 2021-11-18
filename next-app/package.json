@@ -37,6 +37,7 @@
     "fastify-socket.io": "^2.0.0",
     "ioredis": "^4.27.9",
     "next": "^11.1.0",
+    "next-pwa": "^5.4.0",
     "nookies": "^2.5.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
