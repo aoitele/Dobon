@@ -15,7 +15,6 @@
        ...initialProps,
      }
    }
-   
    static render() {
      return (
       <Html lang="ja">
