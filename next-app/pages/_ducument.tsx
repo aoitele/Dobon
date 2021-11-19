@@ -5,18 +5,18 @@
  * <Main />に入るReactコンポーネントはブラウザで初期化されないため、
  * 全コンポーネントで共通する処理は_app.tsxに記述する。
  */
- import Document, { DocumentContext, Html, Head, Main, NextScript, DocumentInitialProps } from 'next/document'
- import React from 'react'
- 
- export default class MyDocument extends Document {
-   static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
-     const initialProps = await Document.getInitialProps(ctx)
-     return {
-       ...initialProps,
-     }
-   }
-   static render() {
-     return (
+import Document, { DocumentContext, Html, Head, Main, NextScript, DocumentInitialProps } from 'next/document'
+import React from 'react'
+
+export default class MyDocument extends Document {
+  static async getInitialProps(ctx: DocumentContext): Promise<DocumentInitialProps> {
+    const initialProps = await Document.getInitialProps(ctx)
+    return { ...initialProps }
+  }
+  
+  // eslint-disable-next-line
+  render() {
+    return (
       <Html lang="ja">
         <Head>
           <meta name='application-name' content='PWA App' />

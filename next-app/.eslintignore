@@ -40,3 +40,10 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+#pwa
+sw.js
+sw.js.map
+
+#static resources
+/public
