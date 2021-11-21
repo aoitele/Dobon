@@ -5,7 +5,8 @@
   "background_color": "#e4e4be",
   "display": "standalone",
   "orientation": "portrait",
-  "start_url": "/",  
+  "start_url": "/",
+  "scope": "/",
   "description": "Dobon is ultimate trump game",
     "icons": [
       {
