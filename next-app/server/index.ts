@@ -3,8 +3,6 @@ import { createAdapter } from 'socket.io-redis'
 import { fastifyWithSocketIO } from './fastifyWithSocketIO'
 import { pubClient, subClient, initData } from './redisClient'
 import emitHandler from './emitHandler'
-import { join } from 'path'
-const url = require('url');
 
 const port = process.env.PORT || 3000
 const host = '0.0.0.0'
@@ -16,13 +14,6 @@ const handle = app.getRequestHandler()
 app.prepare().then(async () => {
   const fastify = await fastifyWithSocketIO()
   const io = fastify.io
-  
-  // For PWA Static Resources
-  fastify.get('/sw.js' || /^\/(workbox|worker|fallback)-\w+\.js$/u, (req: any, res: any) => {
-    const { pathname } = url.parse(req.url, true)
-    const filePath = join(__dirname, '.next', pathname)
-    app.serveStatic(req, res, filePath)
-  })
   
   fastify.all('*', (req: any, res: any) => handle(req.raw, res.raw))
   fastify.io.on('connection', (socket: any) => {
