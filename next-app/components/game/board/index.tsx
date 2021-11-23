@@ -25,6 +25,7 @@ const board = (data: Props) => {
   const boardState = state.game?.board
   const users = boardState?.users
   const me = users?.filter(_=>_.id === authUser?.id)[0]
+  const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
 
   return (
     <div className={style.wrap}>
@@ -37,7 +38,7 @@ const board = (data: Props) => {
           boardState && users &&
           users.map(
             user => authUser?.id !== user.id &&
-            <UserInfo key={user.turn} user={user} otherHands={boardState.otherHands}/>
+            <UserInfo key={user.turn} user={user} otherHands={boardState.otherHands} turnUser={turnUser} />
           )
         }
       </div>
@@ -53,8 +54,12 @@ const board = (data: Props) => {
           />
         }
         <div>
-          <p className={style.turnTxt}><span>たろう</span> のターン</p>
-          <CardEffect order={'draw'} value={2}/>
+          { turnUser && 
+              <p className={style.turnTxt}>
+                <span>{turnUser?.nickname}</span> のターン
+              </p>
+          }
+          { boardState?.effect && <CardEffect order={boardState.effect.type} value={2}/> }
         </div>
         <div>
           <Image src={`/images/cards/deck.png`} width={70} height={105} />
@@ -64,7 +69,7 @@ const board = (data: Props) => {
       {
         boardState && me && 
         <div className={style.myInfo}>
-          <UserInfo key={me.turn} user={me} />
+          <UserInfo key={me.turn} user={me} turnUser={turnUser}/>
         </div>
       }
       { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} /> }

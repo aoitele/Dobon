@@ -23,7 +23,8 @@ const initialState: gameInitialState = {
       hands: [],
       trash: [],
       otherHands: [],
-      turn: null
+      turn: null,
+      effect: null
     }
   },
   connected: false,

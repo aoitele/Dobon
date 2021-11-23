@@ -31,7 +31,8 @@ describe('gameState TestCases', () => {
           hands: [],
           trash: [],
           otherHands: [],
-          turn: null
+          turn: null,
+          effect: null
         }
       },
       connected: false,
@@ -70,7 +71,8 @@ describe('gameState TestCases', () => {
           hands: [],
           trash: [],
           otherHands: [],
-          turn: null
+          turn: null,
+          effect: null
         }
       },
       connected: false,

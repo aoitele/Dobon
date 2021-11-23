@@ -10,18 +10,20 @@ import hasProperty from '../../utils/function/hasProperty'
 interface Props {
   user: Player
   otherHands?: OtherHands[]
+  turnUser: Player | null
 }
 
-const userInfo: React.FC<Props> = ({ user, otherHands }) => {
+const userInfo: React.FC<Props> = ({ user, otherHands, turnUser }) => {
   const hand = otherHands ? otherHands.filter(_ => _.userId === user.id)[0] : []
   let hands: HaveAllPropertyCard[] = []
+  const isTurnUser = user && turnUser ? user.turn === turnUser.turn : false
 
   if (hasProperty(hand,'hands')) {
     hands = spreadCardState(hand.hands)
   }
   return (
     <div className={style.wrap}>
-      <div className={style.iconName}>
+      <div className={isTurnUser ? style.iconNameOnTurn :style.iconName }>
         <Image
           src={`/images/game/userIcon/${user.turn}.png`}
           width={50}

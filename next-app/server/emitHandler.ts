@@ -121,7 +121,11 @@ const emitHandler = (io: Socket, socket: any) => {
           game: {
             id: 1,
             status: 'playing',
-            event: 'gamestart'
+            event: 'gamestart',
+            board: {
+              turn: 1,
+              effect: { type:'draw', value: 4 }
+            }
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員のステータスを更新

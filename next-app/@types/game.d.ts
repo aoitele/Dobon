@@ -49,6 +49,7 @@ export type Board = {
   trash: string[]
   otherHands: OtherHands[]
   turn: number | null
+  effect: { type: Order; value: number | null } | null
 }
 
 export type OwnerAction = { participants: GameUserInfo[] }
