@@ -4,10 +4,12 @@
  * 2か13が出された場合は3秒間ユーザーの入力を待ち、その間に同数値のカードを出すか/出さないかを選択できる
  * 入力がない場合は効果を受け入れると処理し、ゲームが続行する
  */
+import { HandCards } from '../../@types/card'
 import {
   isPutOut2or13,
   hasSameCard,
-  chkAvoidCardEffect
+  chkAvoidCardEffect,
+  cardsICanPutOut
 } from '../../utils/game/checkHand'
 
 describe('checkHand TestCases', () => {
@@ -47,5 +49,29 @@ describe('checkHand TestCases', () => {
     expect.assertions(1)
     const result = chkAvoidCardEffect('notAvoidEffect')
     expect(result).toBe(false)
+  })
+  it('柄か数字が同じカードが存在する場合、そのカードは出す事ができる', async () => {
+    const trash = ['s4o']
+
+    const hands1:HandCards[] = ['s1', 'h2', 'c3']
+    const result1 = cardsICanPutOut(hands1, trash)
+    const expected1 = ['s1']
+
+    const hands2:HandCards[] = ['x0', 'h2', 'c4']
+    const result2 = cardsICanPutOut(hands2, trash)
+    const expected2 = ['c4']
+
+    const hands3:HandCards[] = ['s2', 'h2', 'c4']
+    const result3 = cardsICanPutOut(hands3, trash)
+    const expected3 = ['s2', 'c4']
+
+    const hands4:HandCards[] = ['h2', 'h3', 'c1']
+    const result4 = cardsICanPutOut(hands4, trash)
+    const expected4:any[] = []
+
+    expect(result1).toEqual(expected1)
+    expect(result2).toEqual(expected2)
+    expect(result3).toEqual(expected3)
+    expect(result4).toEqual(expected4)
   })
 })

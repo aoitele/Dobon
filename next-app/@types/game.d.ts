@@ -46,7 +46,7 @@ export type Board = {
   users: Player[]
   deck: string[]
   hands: string[] | HandCards[]
-  trash: string[]
+  trash: string[] | HandCards[]
   otherHands: OtherHands[]
   turn: number | null
   effect: { type: Order; value: number | null } | null

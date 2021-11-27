@@ -12,7 +12,7 @@ import { AllowCardStringType, HandCards } from '../../@types/card'
 
 const spreadCardState = (cards: string[] | HandCards[], isMyCard?: boolean): AllowCardStringType[] => {
   const res:AllowCardStringType[] = []
-  const re = isMyCard ? /(h|s|c|d)([0-9]+)/u : /(h|s|c|d)([0-9]+)(o)/u
+  const re = isMyCard ? /(h|s|c|d|x)([0-9]+)/u : /(h|s|c|d|x)([0-9]+)(o)/u
   
   for (let i=0; i<cards.length; i+=1 ){
     const mat = cards[i].match(re)

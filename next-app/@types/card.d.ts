@@ -29,7 +29,7 @@ export type HandCards =
 's1o' | 's2o' |  's3o' | 's4o' |'s5o' | 's6o' |'s7o' | 's8o' |'s9o' | 's10o' |'s11o' | 's12o' |'s13o' |
 'c1o' | 'c2o' |  'c3o' | 'c4o' |'c5o' | 'c6o' |'c7o' | 'c8o' |'c9o' | 'c10o' |'c11o' | 'c12o' |'c13o' |
 'd1o' | 'd2o' |  'd3o' | 'd4o' |'d5o' | 'd6o' |'d7o' | 'd8o' |'d9o' | 'd10o' |'d11o' | 'd12o' |'d13o' |
-'z' | 'zo'
+'x0' |'x0o' | 'z' | 'zo'
 
 export type DevidedCardWithStatus = {
   open: HaveAllPropertyCard[]
