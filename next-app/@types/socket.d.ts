@@ -1,5 +1,5 @@
 import { Card } from './card'
-import { Action, Order } from './game'
+import { Action, Order, Board } from './game'
 import { LiteralUnion } from 'type-fest'
 
 type Event = LiteralUnion<
@@ -12,7 +12,8 @@ type Event = LiteralUnion<
   | 'gameend'
   | 'gethand'
   | 'getparticipants'
-  | 'getusers',
+  | 'getusers'
+  | 'turnchange',
   string
 > | null
 
@@ -31,13 +32,18 @@ export type EmitChat = {
   message: string
 }
 
+export type EmitBoard = {
+  type: 'board'
+  data: Board
+}
+
 export type Emit = {
   roomId: number
   gameId?: number | null
   userId?: number
   nickname?: string
   event: Event
-  data?: EmitCard | EmitAction | EmitChat
+  data?: EmitCard | EmitAction | EmitChat | EmitBoard
 }
 
 export type HandleEmitFn = (data: Emit) => void // eslint-disable-line no-unused-vars

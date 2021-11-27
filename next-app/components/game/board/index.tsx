@@ -2,7 +2,7 @@ import React from 'react'
 import { GameSet } from '../GameSet'
 import UserInfo from '../UserInfo'
 import { RoomAPIResponse } from '../../../@types/api/roomAPI'
-import { HandleEmitFn } from '../../../@types/socket'
+import { HandleEmitFn, Emit } from '../../../@types/socket'
 import style from './index.module.scss'
 import { gameInitialState } from '../../../utils/game/roomStateReducer'
 import { AuthState } from '../../../context/authProvider'
@@ -21,12 +21,23 @@ interface Props {
 }
 
 const board = (data: Props) => {
-  const { room, state, authUser } = data
+  const { room, handleEmit, state, authUser } = data
   const boardState = state.game?.board
   const users = boardState?.users
   const me = users?.filter(_=>_.id === authUser?.id)[0]
   const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
 
+  const turnChange = () => {
+    if (!boardState) return
+    console.log('turnChange fire')
+    const emitData:Emit = {
+      roomId: room.id,
+      event: 'turnchange',
+      data: { type: 'board', data: boardState }
+    }
+    handleEmit(emitData)
+    console.log('turnChange end')
+  }
   return (
     <div className={style.wrap}>
       <div className={style.roomInfo}>
@@ -61,6 +72,7 @@ const board = (data: Props) => {
           }
           { boardState?.effect && <CardEffect order={boardState.effect.type} value={2}/> }
         </div>
+        <span onClick={()=>turnChange()}>turn change!</span>
         <div>
           <Image src={`/images/cards/deck.png`} width={70} height={105} />
           <p className={style.deckCount}>x {boardState?.deck.length}</p>

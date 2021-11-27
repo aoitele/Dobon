@@ -182,6 +182,26 @@ const emitHandler = (io: Socket, socket: any) => {
         socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
         break
       }
+      case 'turnchange': {
+        const { data } = payload
+        if (data?.type === 'board') {
+          const board = data.data
+          const { users, turn } = board
+          if (turn) {
+            let nextTurn = turn + 1
+            nextTurn = (nextTurn <= users.length) ? nextTurn : 1
+            const reducerPayload: reducerPayloadSpecify = {
+              game: {
+                board: {
+                  turn: nextTurn,
+                }
+              }
+            }
+            io.in(room).emit('updateStateSpecify', reducerPayload) // Roomのターンを更新
+          }
+        }
+        break
+      }
       case 'chat': {
         const { data } = payload
         let message = ''
