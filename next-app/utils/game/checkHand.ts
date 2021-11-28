@@ -13,11 +13,11 @@ const chkAvoidCardEffect = (action: Action) => action === 'avoidEffect'
 const sepalateSuitNum = (cards: Board['hands'] | Board['trash']) => {
   const res = []
   for (let i=0; i<cards.length; i+=1 ){
-    const re = /(h|s|c|d|x)([0-9]+)(o|)/u
+    const re = /(h|s|c|d|x)([0-9]+)(op|o|p|)/u
     const mat = cards[i].match(re)
     if (mat) {
       if (mat[3]) {
-        res.push({ suit: mat[1], num: mat[2], isOpen:true })
+        res.push({ suit: mat[1], num: mat[2], isOpen: mat[3] === ('op' || 'o'), isPutable: mat[3] === ('op' || 'p') })
       } else {
         res.push({ suit: mat[1], num: mat[2] })
       }
@@ -26,7 +26,7 @@ const sepalateSuitNum = (cards: Board['hands'] | Board['trash']) => {
   return res
 }
 
-const cardsICanPutOut = (hands:HandCards[], trash:Board['trash']) => {
+const cardsICanPutOut = (hands:string[] | HandCards[], trash:Board['trash']) => {
   const handsSep = sepalateSuitNum(hands)
   const trashSep = sepalateSuitNum(trash)
   const { suit, num } = trashSep[0]

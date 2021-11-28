@@ -34,9 +34,6 @@ const emitHandler = (io: Socket, socket: any) => {
         socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
         break;
       }
-      case 'getusers': {
-        break;
-      }
       case 'join': {
         if (!roomId || !userId || !nickname) return {}
         const userKey = `room:${roomId}:user:${userId}`
@@ -96,8 +93,7 @@ const emitHandler = (io: Socket, socket: any) => {
         }
         break
       }
-      case 'gamestart': {
-        console.log('gamestart')
+      case 'prepare': {
         const deckKey = `room:${roomId}:deck`
         await adapterPubClient.sunionstore(deckKey, 'deck') // Redis copy deck for room
 
@@ -120,12 +116,7 @@ const emitHandler = (io: Socket, socket: any) => {
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             id: 1,
-            status: 'playing',
-            event: 'gamestart',
-            board: {
-              turn: 1,
-              effect: { type:'draw', value: 4 }
-            }
+            event: 'prepare',
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員のステータスを更新
@@ -165,6 +156,18 @@ const emitHandler = (io: Socket, socket: any) => {
         io.in(socket.id).emit('updateStateSpecify', reducerPayload)
         break
       }
+      case 'gamestart': {
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            status: 'playing',
+            board: {
+              turn: 1
+            }
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload) // ゲーム開始、Room全員のステータスを更新
+        break
+      }
       case 'drawcard': {
         const deckKey = `room:${roomId}:deck`
         const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
@@ -187,7 +190,7 @@ const emitHandler = (io: Socket, socket: any) => {
         if (data?.type === 'board') {
           const board = data.data
           const { users, turn } = board
-          if (turn) {
+          if (users && turn) {
             let nextTurn = turn + 1
             nextTurn = (nextTurn <= users.length) ? nextTurn : 1
             const reducerPayload: reducerPayloadSpecify = {

@@ -13,17 +13,22 @@ const hands: React.FC<Cards> = ({ cards }) => {
     <div className={style.slides}>
       { cards && cards.map(_ =>
       <div key={`${_.suit}${_.num}_slide`} className={style.slide}>
-        <SingleCard 
-          key={`${_.suit}${_.num}`}
-          card={{
-            suit: _.suit,
-            num: _.num,
-            isOpen: _.isOpen,
-            style: {
-              width:160,
-              height:240
-            }
-          }}/>
+        {
+        <div className={_.isPutable ? '' : style.cantPut}>
+          <SingleCard
+            key={`${_.suit}${_.num}`}
+            card={{
+              suit: _.suit,
+              num: _.num,
+              isOpen: true,
+              isPutable: _.isPutable,
+              style: {
+                width:160,
+                height:240
+              }
+            }}/>
+          </div>
+        }
       </div>
         ) }
     </div>

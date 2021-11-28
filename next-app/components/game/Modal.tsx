@@ -111,7 +111,7 @@ const modalInner = (handleEmit: HandleEmitFn, authUser: AuthAPIResponse.UserMe |
               <a
                 href="#"
                 className={joinedAbove2User ? style.startBtn : style.startBtnDisabled}
-                onClick={() =>joinedAbove2User && handleEmit({ roomId: room.id, event: 'gamestart' })}
+                onClick={() =>joinedAbove2User && handleEmit({ roomId: room.id, event: 'prepare' })}
               >
                 ゲームスタート
               </a>

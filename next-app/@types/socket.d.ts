@@ -1,6 +1,7 @@
 import { Card } from './card'
 import { Action, Order, Board } from './game'
 import { LiteralUnion } from 'type-fest'
+import { NestedPartial } from '../@types/utility'
 
 type Event = LiteralUnion<
   | 'drawcard'
@@ -8,6 +9,7 @@ type Event = LiteralUnion<
   | 'call'
   | 'chat'
   | 'join'
+  | 'prepare'
   | 'gamestart'
   | 'gameend'
   | 'gethand'
@@ -34,7 +36,7 @@ export type EmitChat = {
 
 export type EmitBoard = {
   type: 'board'
-  data: Board
+  data: NestedPartial<Board>
 }
 
 export type Emit = {

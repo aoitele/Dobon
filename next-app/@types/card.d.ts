@@ -5,6 +5,7 @@ export type Deck = {
     suit?: 'h' | 's' | 'c' | 'd' | 'x' | 'z' | null
     num?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | null
     isOpen?: boolean
+    isPutable?: boolean
   }[]
 }
 
@@ -17,6 +18,7 @@ export type AllowCardStringType = {
   suit: LiteralUnion<'h' | 's' | 'c' | 'd' | 'x' | 'z' | string> | null
   num: LiteralUnion<0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | string> | null
   isOpen: boolean
+  isPutable: boolean
 }
 
 // h1(裏向き), h1o(オープン状態)

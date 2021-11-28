@@ -29,14 +29,12 @@ const board = (data: Props) => {
 
   const turnChange = () => {
     if (!boardState) return
-    console.log('turnChange fire')
     const emitData:Emit = {
       roomId: room.id,
       event: 'turnchange',
       data: { type: 'board', data: boardState }
     }
     handleEmit(emitData)
-    console.log('turnChange end')
   }
   return (
     <div className={style.wrap}>
