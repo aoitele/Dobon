@@ -7,6 +7,8 @@
   .slides {
     display: flex;
     overflow-x: scroll;
+    text-align: center;
+    padding: 8px;
     div {
       min-width: 20%;
     }
@@ -14,9 +16,23 @@
       background-color: lightgray;
       opacity: 0.6;
     }
+    .selected {
+      position: relative;
+      bottom: 3px;
+      animation: move-y .5s infinite alternate ease-in-out;
+    }
   }
   .scrollBtn {
     font-size: 20px;
     opacity: 0.7;
+  }
+}
+
+@keyframes move-y {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-5px);
   }
 }
