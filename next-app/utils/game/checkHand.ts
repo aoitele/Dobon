@@ -27,6 +27,7 @@ const sepalateSuitNum = (cards: Board['hands'] | Board['trash']) => {
 }
 
 const cardsICanPutOut = (hands:string[] | HandCards[], trash:Board['trash']) => {
+  if (!trash.length) return []
   const handsSep = sepalateSuitNum(hands)
   const trashSep = sepalateSuitNum(trash)
   const { suit, num } = trashSep[0]

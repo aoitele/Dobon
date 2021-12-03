@@ -148,8 +148,7 @@ const emitHandler = (io: Socket, socket: any) => {
           game: {
             board: {
               hands,
-              otherHands,
-              trash: ['s1o']
+              otherHands
             }
           }
         }
@@ -157,11 +156,15 @@ const emitHandler = (io: Socket, socket: any) => {
         break
       }
       case 'gamestart': {
+        const deckKey = `room:${roomId}:deck`
+        let initialTrash = await adapterPubClient.spop(deckKey, 1)
+        initialTrash = [`${initialTrash[0]  }o`] // Open状態に
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             status: 'playing',
             board: {
-              turn: 1
+              turn: 1,
+              trash: initialTrash
             }
           }
         }
@@ -203,6 +206,33 @@ const emitHandler = (io: Socket, socket: any) => {
             io.in(room).emit('updateStateSpecify', reducerPayload) // Roomのターンを更新
           }
         }
+        break
+      }
+      case 'playcard': {
+        const { data } = payload
+        if (data?.type !== 'board' || typeof data.data.trash === 'undefined') break
+        const { trash } = data.data
+        console.log(trash, 'trash')
+        let reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: { 
+              trash
+            }
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
+
+        // `${suit}${num}o`でデータがくるため、redisでoあり/なしでsrem
+        const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
+        await adapterPubClient.srem(userHandsKey, trash[0], trash[0].slice(0, -1))
+
+        // ルームメンバーに手札更新指令
+        reducerPayload = {
+          game: {
+            event: 'gethand'
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload)
         break
       }
       case 'chat': {

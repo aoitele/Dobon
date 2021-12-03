@@ -36,6 +36,17 @@ const board = (data: Props) => {
     }
     handleEmit(emitData)
   }
+
+  const putOut = (card: string) => {
+    if (!boardState || !me?.id) return
+    const emitData:Emit = {
+      roomId: room.id,
+      userId: me.id,
+      event: 'playcard',
+      data: { type: 'board', data: { trash: [card] }}
+    }
+    handleEmit(emitData)
+  }
   return (
     <div className={style.wrap}>
       <div className={style.roomInfo}>
@@ -56,7 +67,7 @@ const board = (data: Props) => {
           <SingleCard
             card = {
               Object.assign(
-                spreadCardState(boardState.trash.slice(-1))[0],
+                spreadCardState(boardState.trash)[0],
                 { style: { width:80, height: 120} }
               )
             }
@@ -82,7 +93,7 @@ const board = (data: Props) => {
           <UserInfo key={me.turn} user={me} turnUser={turnUser}/>
         </div>
       }
-      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} /> }
+      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} /> }
       <div className={style.actionBtnWrap}>
         <ActionBtn text={'アクション'} styleClass='action'/>
         <ActionBtn text={'どぼん！'} styleClass='dobon'/>

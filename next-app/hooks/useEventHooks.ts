@@ -26,6 +26,18 @@ const useEventHooks = (state: gameInitialState, handleEmit: HandleEmitFn, authUs
           }
           break
         }
+        case 'gethand': {
+          if (roomId) {
+            const data: Emit = {
+              roomId,
+              gameId: game.id || null,
+              userId: authUser.id,
+              event: 'gethand'
+            }
+            handleEmit(data)
+          }
+          break
+        }
         default:
           break
       }

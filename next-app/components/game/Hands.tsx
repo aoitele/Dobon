@@ -5,10 +5,11 @@ import style from './Hands.module.scss'
 
 interface Cards {
   cards: HaveAllPropertyCard[]
+  putOut: any
 }
 const initialState: string = ''
   
-const hands: React.FC<Cards> = ({ cards }) => {
+const hands: React.FC<Cards> = ({ cards, putOut }) => {
   const [ selectedCard, setSelectedCard ] = useState(initialState)
   return (
   <div className={style.wrap}>
@@ -16,7 +17,10 @@ const hands: React.FC<Cards> = ({ cards }) => {
       { cards && cards.map(_ =>
       <div key={`${_.suit}${_.num}_slide`} className={style.slide}>
         {
-        <div className={`${_.isPutable ? '' : style.cantPut} ${selectedCard === `${_.suit}${_.num}` ? style.selected : '' }`}>
+        <div
+        className={`${_.isPutable ? '' : style.cantPut} ${selectedCard === `${_.suit}${_.num}` ? style.selected : '' }`}
+        onClick={ selectedCard === `${_.suit}${_.num}` ? () => putOut(`${_.suit}${_.num}o`) : undefined }
+        >
           <SingleCard
             key={`${_.suit}${_.num}`}
             card={{
