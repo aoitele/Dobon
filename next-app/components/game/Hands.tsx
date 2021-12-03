@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { SingleCard } from './SingleCard'
 import { HaveAllPropertyCard } from '../../@types/card'
 import style from './Hands.module.scss'
@@ -6,11 +6,11 @@ import style from './Hands.module.scss'
 interface Cards {
   cards: HaveAllPropertyCard[]
   putOut: any
+  selectedCard: string
+  setSelectedCard: React.Dispatch<React.SetStateAction<string>>
 }
-const initialState: string = ''
   
-const hands: React.FC<Cards> = ({ cards, putOut }) => {
-  const [ selectedCard, setSelectedCard ] = useState(initialState)
+const hands: React.FC<Cards> = ({ cards, putOut, selectedCard, setSelectedCard }) => {
   return (
   <div className={style.wrap}>
     <div className={style.slides}>
@@ -18,8 +18,8 @@ const hands: React.FC<Cards> = ({ cards, putOut }) => {
       <div key={`${_.suit}${_.num}_slide`} className={style.slide}>
         {
         <div
-        className={`${_.isPutable ? '' : style.cantPut} ${selectedCard === `${_.suit}${_.num}` ? style.selected : '' }`}
-        onClick={ selectedCard === `${_.suit}${_.num}` ? () => putOut(`${_.suit}${_.num}o`) : undefined }
+        className={`${style.card} ${_.isPutable ? '' : style.cantPut} ${selectedCard === `${_.suit}${_.num}` ? style.selected : '' }`}
+        onClick={ selectedCard === `${_.suit}${_.num}` ? () => putOut(`${_.suit}${_.num}`) : undefined }
         >
           <SingleCard
             key={`${_.suit}${_.num}`}

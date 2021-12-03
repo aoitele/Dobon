@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { GameSet } from '../GameSet'
 import UserInfo from '../UserInfo'
 import { RoomAPIResponse } from '../../../@types/api/roomAPI'
@@ -12,6 +12,7 @@ import ActionBtn from '../ActionBtn'
 import { SingleCard } from '../SingleCard'
 import CardEffect from '../CardEffect'
 import Image from 'next/image'
+import turnChange from '../../../utils/game/turnChange'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -20,32 +21,29 @@ interface Props {
   authUser: AuthState['authUser']
 }
 
+const initialState: string = ''
+
 const board = (data: Props) => {
+  const [ selectedCard, setSelectedCard ] = useState(initialState)
   const { room, handleEmit, state, authUser } = data
   const boardState = state.game?.board
   const users = boardState?.users
   const me = users?.filter(_=>_.id === authUser?.id)[0]
   const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
 
-  const turnChange = () => {
-    if (!boardState) return
-    const emitData:Emit = {
-      roomId: room.id,
-      event: 'turnchange',
-      data: { type: 'board', data: boardState }
-    }
-    handleEmit(emitData)
-  }
-
   const putOut = (card: string) => {
     if (!boardState || !me?.id) return
+    setSelectedCard(initialState)
     const emitData:Emit = {
       roomId: room.id,
       userId: me.id,
       event: 'playcard',
-      data: { type: 'board', data: { trash: [card] }}
+      data: { type: 'board', data: { trash: [`${card  }o`] }} // Trashで見せるためopenフラグをつけて送る
     }
     handleEmit(emitData)
+    const newHands = boardState.hands.filter(_ => _.replace(/(o|p|op|po)/u, '') !== card)
+    boardState.hands = newHands
+    turnChange(boardState, room, handleEmit)
   }
   return (
     <div className={style.wrap}>
@@ -81,7 +79,7 @@ const board = (data: Props) => {
           }
           { boardState?.effect && <CardEffect order={boardState.effect.type} value={2}/> }
         </div>
-        <span onClick={()=>turnChange()}>turn change!</span>
+        <span onClick={() => boardState ? turnChange(boardState, room, handleEmit) : undefined }>turn change!</span>
         <div>
           <Image src={`/images/cards/deck.png`} width={70} height={105} />
           <p className={style.deckCount}>x {boardState?.deck.length}</p>
@@ -93,7 +91,7 @@ const board = (data: Props) => {
           <UserInfo key={me.turn} user={me} turnUser={turnUser}/>
         </div>
       }
-      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} /> }
+      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={selectedCard} setSelectedCard={setSelectedCard} /> }
       <div className={style.actionBtnWrap}>
         <ActionBtn text={'アクション'} styleClass='action'/>
         <ActionBtn text={'どぼん！'} styleClass='dobon'/>
