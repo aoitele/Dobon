@@ -12,7 +12,7 @@ import ActionBtn from '../ActionBtn'
 import { SingleCard } from '../SingleCard'
 import CardEffect from '../CardEffect'
 import Image from 'next/image'
-import turnChange from '../../../utils/game/turnChange'
+import emit from '../../../utils/game/emit'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -21,10 +21,17 @@ interface Props {
   authUser: AuthState['authUser']
 }
 
-const initialState: string = ''
+export type initialStateType = {
+  selectedCard: string
+  isBtnActive: boolean
+}
+export const initialState: initialStateType = {
+  selectedCard: '',
+  isBtnActive: false
+}
 
 const board = (data: Props) => {
-  const [ selectedCard, setSelectedCard ] = useState(initialState)
+  const [ values, setValues ] = useState(initialState)
   const { room, handleEmit, state, authUser } = data
   const boardState = state.game?.board
   const users = boardState?.users
@@ -33,7 +40,7 @@ const board = (data: Props) => {
 
   const putOut = (card: string) => {
     if (!boardState || !me?.id) return
-    setSelectedCard(initialState)
+    setValues(initialState)
     const emitData:Emit = {
       roomId: room.id,
       userId: me.id,
@@ -43,7 +50,7 @@ const board = (data: Props) => {
     handleEmit(emitData)
     const newHands = boardState.hands.filter(_ => _.replace(/(o|p|op|po)/u, '') !== card)
     boardState.hands = newHands
-    turnChange(boardState, room, handleEmit)
+    emit({boardState, room, event: 'turnchange', handleEmit})
   }
   return (
     <div className={style.wrap}>
@@ -79,7 +86,14 @@ const board = (data: Props) => {
           }
           { boardState?.effect && <CardEffect order={boardState.effect.type} value={2}/> }
         </div>
-        <span onClick={() => boardState ? turnChange(boardState, room, handleEmit) : undefined }>turn change!</span>
+        <span onClick={
+          () => boardState ? emit({
+            boardState,
+            room,
+            event: 'turnchange',
+            handleEmit
+          }) : undefined
+        }>turn change!</span>
         <div>
           <Image src={`/images/cards/deck.png`} width={70} height={105} />
           <p className={style.deckCount}>x {boardState?.deck.length}</p>
@@ -91,10 +105,10 @@ const board = (data: Props) => {
           <UserInfo key={me.turn} user={me} turnUser={turnUser}/>
         </div>
       }
-      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={selectedCard} setSelectedCard={setSelectedCard} /> }
+      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setSelectedCard={setValues} /> }
       <div className={style.actionBtnWrap}>
-        <ActionBtn text={'アクション'} styleClass='action'/>
-        <ActionBtn text={'どぼん！'} styleClass='dobon'/>
+        <ActionBtn text={'アクション'} styleClass='action' isBtnActive={values.isBtnActive} setValues={setValues}/>
+        <ActionBtn text={'どぼん！'} styleClass='dobon' isBtnActive={values.isBtnActive} setValues={setValues} />
       </div>
     </div>
   )

@@ -1,3 +1,32 @@
+.menu {
+  position: absolute;
+  bottom: 100px;
+  display: inline-block;
+  .menuBtn {
+    padding: 25px;
+    margin: 10px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #d1f589;
+    animation: move-y 5s infinite alternate ease-in-out;
+  }
+}
+
+@keyframes move-y {
+  from {
+    scale: 0;
+    transform: translateY(0);
+  }
+  to {
+    scale: 100;
+    transform: translateY(-50px);
+  }
+}
+
+.active {
+  background-color: lightcyan;
+}
 .action {
   width: 45%;
   height: 60%;
