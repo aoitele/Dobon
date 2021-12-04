@@ -57,7 +57,7 @@ describe('checkHand TestCases', () => {
     const result1 = cardsICanPutOut(hands1, trash)
     const expected1 = ['s1']
 
-    const hands2:HandCards[] = ['x0', 'h2', 'c4']
+    const hands2:HandCards[] = ['h2', 'c4']
     const result2 = cardsICanPutOut(hands2, trash)
     const expected2 = ['c4']
 
@@ -73,5 +73,18 @@ describe('checkHand TestCases', () => {
     expect(result2).toEqual(expected2)
     expect(result3).toEqual(expected3)
     expect(result4).toEqual(expected4)
+  })
+  it('jokerが出された場合、すべてのカードを出す事ができる', async () => {
+    const trash = ['x0o']
+    const hands:HandCards[] = ['s1', 'h2', 'c3']
+    const result = cardsICanPutOut(hands, trash)
+    expect(result).toEqual(hands)
+  })
+  it('手札の8やjokerは、無条件で出すことができる', async () => {
+    const trash = ['s1o']
+    const hands:HandCards[] = ['s2', 'c2', 'h8', 'x0']
+    const result = cardsICanPutOut(hands, trash)
+    const expected = ['s2', 'h8', 'x0']
+    expect(result).toEqual(expected)
   })
 })

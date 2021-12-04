@@ -31,7 +31,8 @@ const cardsICanPutOut = (hands:string[] | HandCards[], trash:Board['trash']) => 
   const handsSep = sepalateSuitNum(hands)
   const trashSep = sepalateSuitNum(trash)
   const { suit, num } = trashSep[0]
-  const filteredHands = handsSep.filter(_ => _.suit === suit || _.num === num)
+  if (suit === 'x') return hands // Trash - joker is all card allow put
+  const filteredHands = handsSep.filter(_ => _.suit === suit || _.suit === 'x' || _.num === num || _.num === '8')
   return filteredHands.map(_=>`${_.suit}${_.num}`)
 }
 
