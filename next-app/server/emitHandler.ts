@@ -175,17 +175,15 @@ const emitHandler = (io: Socket, socket: any) => {
         const deckKey = `room:${roomId}:deck`
         const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
         const newCard = await adapterPubClient.spop(deckKey, 1)
+        console.log(newCard, 'newCard')
         adapterPubClient.sadd(userHandsKey, newCard)
-        const hands = await adapterPubClient.smembers(userHandsKey)
-        // 送信者に手札を1枚追加した結果を返す
+        // ルームメンバーに手札更新指令
         const reducerPayload: reducerPayloadSpecify = {
           game: {
-            board: {
-              hands
-            }
+            event: 'gethand'
           }
         }
-        socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
+        io.in(room).emit('updateStateSpecify', reducerPayload)
         break
       }
       case 'turnchange': {

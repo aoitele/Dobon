@@ -12,7 +12,7 @@ import ActionBtn from '../ActionBtn'
 import { SingleCard } from '../SingleCard'
 import CardEffect from '../CardEffect'
 import Image from 'next/image'
-import emit from '../../../utils/game/emit'
+import { emit, createEmitFnArgs } from '../../../utils/game/emit'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -50,7 +50,7 @@ const board = (data: Props) => {
     handleEmit(emitData)
     const newHands = boardState.hands.filter(_ => _.replace(/(o|p|op|po)/u, '') !== card)
     boardState.hands = newHands
-    emit({boardState, room, event: 'turnchange', handleEmit})
+    emit(createEmitFnArgs({ boardState, room, userId: me.id, event: 'turnchange', handleEmit }))
   }
   return (
     <div className={style.wrap}>
@@ -87,12 +87,9 @@ const board = (data: Props) => {
           { boardState?.effect && <CardEffect order={boardState.effect.type} value={2}/> }
         </div>
         <span onClick={
-          () => boardState ? emit({
-            boardState,
-            room,
-            event: 'turnchange',
-            handleEmit
-          }) : undefined
+          () => boardState
+          ? emit(createEmitFnArgs({ boardState, room, userId: me?.id, event: 'turnchange', handleEmit }))
+          : undefined
         }>turn change!</span>
         <div>
           <Image src={`/images/cards/deck.png`} width={70} height={105} />
@@ -107,7 +104,7 @@ const board = (data: Props) => {
       }
       { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setSelectedCard={setValues} /> }
       <div className={style.actionBtnWrap}>
-        <ActionBtn text={'アクション'} styleClass='action' isBtnActive={values.isBtnActive} setValues={setValues}/>
+        <ActionBtn text={'アクション'} styleClass='action' isBtnActive={values.isBtnActive} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, event: 'drawcard', handleEmit }): undefined}/>
         <ActionBtn text={'どぼん！'} styleClass='dobon' isBtnActive={values.isBtnActive} setValues={setValues} />
       </div>
     </div>

@@ -1,10 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, Dispatch } from 'react'
 import { HandleEmitFn, Emit } from '../@types/socket'
-import { gameInitialState } from '../utils/game/roomStateReducer'
+import { gameInitialState, Action } from '../utils/game/roomStateReducer'
 import { AuthState } from '../context/authProvider'
 import sleep from '../utils/game/sleep'
+import { useUpdateStateFn } from '../utils/game/state'
 
-const useEventHooks = (state: gameInitialState, handleEmit: HandleEmitFn, authUser:AuthState['authUser']) => {
+const useEventHooks = (
+  state: gameInitialState,
+  handleEmit: HandleEmitFn,
+  authUser:AuthState['authUser'],
+  dispatch: Dispatch<Action>
+) => {
   const { roomId, game } = state
   useEffect(() => {
     if (!state || !game?.event || !authUser) return
@@ -42,7 +48,13 @@ const useEventHooks = (state: gameInitialState, handleEmit: HandleEmitFn, authUs
           break
       }
     }
-    handler()
+    handler().then(
+      () => {
+        const data = { game: { event: null } }
+        const newState = useUpdateStateFn(state, data)
+        dispatch({ type: 'updateStateSpecify', payload: newState })
+      }
+    )
   }, [game?.event])
 }
 

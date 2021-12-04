@@ -2,27 +2,45 @@ import { HandleEmitFn, Emit } from "../../@types/socket"
 import { Board } from "../../@types/game"
 import { RoomAPIResponse } from '../../@types/api/roomAPI'
 
-interface Props {
-  boardState: Board
-  room: RoomAPIResponse.RoomInfo
-  event: string
-  handleEmit: HandleEmitFn
+export interface Props {
+  emitData: {
+    boardState: Board
+    room: RoomAPIResponse.RoomInfo
+    userId?: number
+    event: string
+    handleEmit: HandleEmitFn
+  }
 }
 
-const emit = ({ boardState, room, event, handleEmit } : Props) => {
+const emit = ({ emitData } : Props) => {
+  const { boardState, room, userId, event, handleEmit } = emitData
   if (!boardState || !room || !event || !handleEmit) return
   switch (event) {
+    case 'drawcard': {
+      const data:Emit = {
+        roomId: room.id,
+        userId,
+        event: 'drawcard',
+        data: { type: 'board', data: boardState }
+      }
+      handleEmit(data)
+      break
+    }
     case 'turnchange': {
-      const emitData:Emit = {
+      const data:Emit = {
         roomId: room.id,
         event: 'turnchange',
         data: { type: 'board', data: boardState }
       }
-      handleEmit(emitData)
+      handleEmit(data)
       break
     }
     default : 
   }
 }
 
-export default emit
+const createEmitFnArgs = ({ boardState, room, userId, event, handleEmit}: Props['emitData']) => {
+  return { emitData: { boardState, room, userId, event, handleEmit }}
+}
+
+export { emit, createEmitFnArgs}
