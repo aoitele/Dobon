@@ -13,6 +13,7 @@ import { RoomAPIResponse } from '../../@types/api/roomAPI'
 import hasProperty from '../../utils/function/hasProperty'
 import { AuthStateContext } from '../../context/authProvider'
 import Board from '../../components/game/board'
+import sleep from '../../utils/game/sleep'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -47,15 +48,16 @@ const Room: React.FC<Props> = ({ room }) => {
   const { authUser, fetched } = useContext(AuthStateContext)
   const router = useRouter()
 
-  const handleEmit: HandleEmitFn = (data: Emit) => {
-    if (hasProperty(state, 'wsClient') && state.wsClient?.socket !== null) {
-      state.wsClient?.socket.emit('emit', data)
+  const handleEmit: HandleEmitFn = async (data: Emit) => {
+    if (hasProperty(state, 'wsClient') && state.wsClient?._socket !== null ) {
+      await state.wsClient?.emit(data)
+      await sleep(500) // State更新処理を待たせるため0.5秒のsleepを噛ませる
     }
   }
 
   useWsConnectHooks(router, state, dispatch)
   useStateHooks(router, state, handleEmit, authUser, room, dispatch)
-  useEventHooks(state, handleEmit, authUser, dispatch)
+  useEventHooks(state, handleEmit, authUser, room, dispatch)
 
   // Before fetch authUser from context
   if (!authUser) {

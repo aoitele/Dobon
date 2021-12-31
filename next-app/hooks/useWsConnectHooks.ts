@@ -17,13 +17,16 @@ const useWsConnectHooks = (
         const roomId = router.query.id
 
         if (!state.connected && roomId) {
+          const wsClient = await resSocketClient()
+          if (!wsClient) return
           const rid = typeof roomId === 'string' ? roomId : roomId[0] // 同じクエリパラメータから取得する値が複数あると配列が返るため
-          const wsClient = await resSocketClient(rid)
-          if (wsClient) {
-            wsClient.socket.on('close', () => {
+          wsClient.connect(rid)
+          if (wsClient._socket) {
+            wsClient._socket.on('close', () => {
+              wsClient._reset()
               console.log('Socket is closed.')
             })
-            wsClient.socket.on('updateStateSpecify', (data) => {
+            wsClient._socket.on('updateStateSpecify', (data) => {
               const newState = useUpdateStateFn(state, data)
               dispatch({ type: 'updateStateSpecify', payload: newState })
             })

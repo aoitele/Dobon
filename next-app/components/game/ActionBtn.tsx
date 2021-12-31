@@ -12,13 +12,17 @@ interface Args {
 }
 
 const actionBtn: React.FC<Args> = ({ text, styleClass, isBtnActive, setValues, emitArgs }) => {
+  const addEmitArgEvent = (args: Props, event: string) => {
+    args.emitData.event = event
+    return args
+  }
 
   return (
     <>
     { text === 'アクション' && isBtnActive &&
       <div className={style.menu}>
-        <span className={style.menuBtn} onClick={() => emitArgs ? emit(emitArgs) : undefined}>ドロー</span>
-        <span className={style.menuBtn}>⚫︎</span>
+        <span className={style.menuBtn} onClick={() => emitArgs ? emit(addEmitArgEvent(emitArgs, 'drawcard')) : undefined}>ドロー</span>
+        <span className={style.menuBtn} onClick={() => emitArgs ? emit(addEmitArgEvent(emitArgs, 'turnchange')) : undefined}>スキップ</span>
       </div>
     }
       <div

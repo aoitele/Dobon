@@ -31,7 +31,7 @@ const initialState: gameInitialState = {
   wsClient: null
 }
 
-interface AnotateState extends gameInitialState {
+export interface AnotateState extends gameInitialState {
   [key: string]: any
 }
 

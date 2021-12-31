@@ -7,12 +7,12 @@ export interface Props {
     boardState: Board
     room: RoomAPIResponse.RoomInfo
     userId?: number
-    event: string
+    event?: string
     handleEmit: HandleEmitFn
   }
 }
 
-const emit = ({ emitData } : Props) => {
+const emit = async({ emitData } : Props) => {
   const { boardState, room, userId, event, handleEmit } = emitData
   if (!boardState || !room || !event || !handleEmit) return
   switch (event) {
@@ -23,7 +23,7 @@ const emit = ({ emitData } : Props) => {
         event: 'drawcard',
         data: { type: 'board', data: boardState }
       }
-      handleEmit(data)
+      await handleEmit(data)
       break
     }
     case 'turnchange': {
@@ -32,7 +32,7 @@ const emit = ({ emitData } : Props) => {
         event: 'turnchange',
         data: { type: 'board', data: boardState }
       }
-      handleEmit(data)
+      await handleEmit(data)
       break
     }
     default : 

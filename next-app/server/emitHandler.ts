@@ -104,6 +104,8 @@ const emitHandler = (io: Socket, socket: any) => {
             params: { roomId }
           })
         )
+        if (!participants.length) break
+        
         // Redis sadd hands for users
         for (let i=0; i<participants.length; i+=1) {
           const userHandsKey = `room:${payload.roomId}:user:${participants[i].id}:hands`
@@ -116,7 +118,7 @@ const emitHandler = (io: Socket, socket: any) => {
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             id: 1,
-            event: 'prepare',
+            event: 'preparecomplete',
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員のステータスを更新
@@ -152,23 +154,25 @@ const emitHandler = (io: Socket, socket: any) => {
             }
           }
         }
-        io.in(socket.id).emit('updateStateSpecify', reducerPayload)
+        io.in(socket.id).emit('updateStateSpecify', reducerPayload) // 送信者のステータスを更新
         break
       }
       case 'gamestart': {
+        console.log('gamestart')
         const deckKey = `room:${roomId}:deck`
         let initialTrash = await adapterPubClient.spop(deckKey, 1)
-        initialTrash = [`${initialTrash[0]  }o`] // Open状態に
-        const reducerPayload: reducerPayloadSpecify = {
+        initialTrash = [`${initialTrash[0]}o`] // Open状態に
+        let reducerPayload: reducerPayloadSpecify = {
           game: {
             status: 'playing',
             board: {
-              turn: 1,
               trash: initialTrash
             }
           }
         }
-        io.in(room).emit('updateStateSpecify', reducerPayload) // ゲーム開始、Room全員のステータスを更新
+        io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員のステータス、初期捨て札を更新
+        reducerPayload = { game: { board: { turn: 1 } } }
+        io.in(room).emit('updateStateSpecify', reducerPayload) // ゲーム開始(初期手札のputable判定が発動しないため、turn更新を別に実行している)
         break
       }
       case 'drawcard': {
@@ -210,7 +214,6 @@ const emitHandler = (io: Socket, socket: any) => {
         const { data } = payload
         if (data?.type !== 'board' || typeof data.data.trash === 'undefined') break
         const { trash } = data.data
-        console.log(trash, 'trash')
         let reducerPayload: reducerPayloadSpecify = {
           game: {
             board: { 

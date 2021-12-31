@@ -7,7 +7,7 @@ const pubClient = dev
   : new Redis(process.env.REDIS_URL)
 const subClient = pubClient.duplicate()
 
-const initData = () => {
+const initData = async() => {
   const args = [
     'c1',
     'c2',
@@ -64,7 +64,8 @@ const initData = () => {
     'x0',
     'x1'
   ]
-  pubClient.sadd('deck', args)
+  await pubClient.del('deck')
+  await pubClient.sadd('deck', args)
 }
 
 export { pubClient, subClient, initData }

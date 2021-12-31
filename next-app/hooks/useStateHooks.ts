@@ -5,8 +5,7 @@ import { gameInitialState, Action } from '../utils/game/roomStateReducer'
 import { AuthState } from '../context/authProvider'
 import { RoomAPIResponse } from '../@types/api/roomAPI'
 import hasProperty from '../utils/function/hasProperty'
-import { cardsICanPutOut } from '../utils/game/checkHand'
-import { useUpdateStateFn } from '../utils/game/state'
+import { updateMyHandsStatus, resetMyHandsStatus } from '../utils/game/checkHand'
 
 const useStateHooks = (
   router:NextRouter,
@@ -21,39 +20,39 @@ const useStateHooks = (
       if (authUser.id === room.create_user_id || hasProperty(authUser, 'participate_room_id') && authUser.participate_room_id.includes(room.id)) {
         handleEmit({ roomId:room.id, userId:authUser.id, nickname:authUser.nickname, event: 'join' })
       }
-  },[authUser])
-
-   // Getusers when WebSocket connection has established
-   useEffect(() => {
-    if (state.connected) {
-      const data: Emit = {
-        roomId: Number(router.query.id),
-        event: 'getparticipants'
-      }
-      handleEmit(data)
-    }
-  },[state.connected])
-  useEffect(() => {
-    if (!state.game?.board) return
-    const { users, turn, hands, trash } = state.game.board
-    if (!users || !turn || !hands || !authUser) return
-    // 自ターンになった場合に実行する処理
-    const me = users.filter(_ => _.id === authUser.id)[0]
-    if (me && me.turn === turn) {
-      // 場に出せる手札を判定、isPutable=trueにする(['${suit}${num}p', ...])
-      const putableCards = cardsICanPutOut(hands,trash)
-      const newHands = hands.map(_ => putableCards.includes(_) ? `${_}p`: `${_}`)
-      const data = {
-        game: {
-          board: {
-            hands: newHands
-          }
+    },[authUser])
+    
+    // Getusers when WebSocket connection has established
+    useEffect(() => {
+      if (state.connected) {
+        const data: Emit = {
+          roomId: Number(router.query.id),
+          event: 'getparticipants'
         }
+        handleEmit(data)
       }
-      const newState = useUpdateStateFn(state, data)
-      dispatch({ type: 'updateStateSpecify', payload: newState })
-    }
-  },[state.game?.board.turn])
+    },[state.connected])
+
+    // Hooks with turn changed
+    useEffect(() => {
+      if (!state.game?.board.turn) return
+      updateHandsFn(state, authUser, dispatch)
+    },[state.game?.board.turn])
+}
+
+const updateHandsFn = (
+  state:gameInitialState,
+  authUser:AuthState['authUser'],
+  dispatch:Dispatch<Action>) => {
+  if (!hasProperty(state.game, 'board') || !authUser) return
+  const { users, turn, hands, trash } = state.game.board
+  if (!users || !turn || !hands) return
+
+  const me = state.game?.board.users.filter(_ => _.id === authUser.id)[0]
+  const isMyTurn = (me && me.turn === turn)
+  isMyTurn
+  ? updateMyHandsStatus({state, hands, trash, dispatch})
+  : resetMyHandsStatus({state, hands, dispatch})
 }
 
 export default useStateHooks

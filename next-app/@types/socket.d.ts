@@ -10,6 +10,7 @@ type Event = LiteralUnion<
   | 'chat'
   | 'join'
   | 'prepare'
+  | 'preparecomplete'
   | 'gamestart'
   | 'gameend'
   | 'gethand'
@@ -48,4 +49,4 @@ export type Emit = {
   data?: EmitCard | EmitAction | EmitChat | EmitBoard
 }
 
-export type HandleEmitFn = (data: Emit) => void // eslint-disable-line no-unused-vars
+export type HandleEmitFn = (data: Emit) => Promise<any> // eslint-disable-line no-unused-vars

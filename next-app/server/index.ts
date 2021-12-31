@@ -37,5 +37,5 @@ app.prepare().then(async () => {
     if (err) throw err
     console.log(`Server listening at ${address}`)
   })
-  initData()
+  await initData()
 })

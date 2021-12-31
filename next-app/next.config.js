@@ -6,6 +6,7 @@ module.exports = withPWA({
     disable: process.env.NODE_ENV === 'development',
     dest: 'public'
   },
+  reactStrictMode: true,
   productionBrowserSourceMaps: true,
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')]

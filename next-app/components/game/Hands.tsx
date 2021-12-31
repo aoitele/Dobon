@@ -23,7 +23,7 @@ const hands: React.FC<Cards> = ({ cards, putOut, selectedCard, setSelectedCard }
         onClick={ selectedCard === `${_.suit}${_.num}` ? () => putOut(`${_.suit}${_.num}`) : undefined }
         >
           <SingleCard
-            key={`${_.suit}${_.num}`}
+            key={`hands-${_.suit}${_.num}`}
             card={{
               suit: _.suit,
               num: _.num,

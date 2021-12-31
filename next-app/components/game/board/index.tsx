@@ -38,19 +38,24 @@ const board = (data: Props) => {
   const me = users?.filter(_=>_.id === authUser?.id)[0]
   const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
 
-  const putOut = (card: string) => {
+  const putOut = async(card: string) => {
     if (!boardState || !me?.id) return
     setValues(initialState)
-    const emitData:Emit = {
+    let emitData:Emit = {
       roomId: room.id,
       userId: me.id,
       event: 'playcard',
-      data: { type: 'board', data: { trash: [`${card  }o`] }} // Trashで見せるためopenフラグをつけて送る
+      data: { type: 'board', data: { trash: [`${card}o`] }} // Trashで見せるためopenフラグをつけて送る
     }
-    handleEmit(emitData)
-    const newHands = boardState.hands.filter(_ => _.replace(/(o|p|op|po)/u, '') !== card)
-    boardState.hands = newHands
-    emit(createEmitFnArgs({ boardState, room, userId: me.id, event: 'turnchange', handleEmit }))
+    await handleEmit(emitData)
+
+    emitData = {
+      roomId: room.id,
+      userId: me.id,
+      event: 'turnchange',
+      data: { type:'board', data: { users, turn: boardState.turn }}
+    }
+    await handleEmit(emitData)
   }
   return (
     <div className={style.wrap}>
@@ -63,13 +68,14 @@ const board = (data: Props) => {
           boardState && users &&
           users.map(
             user => authUser?.id !== user.id &&
-            <UserInfo key={user.turn} user={user} otherHands={boardState.otherHands} turnUser={turnUser} />
+            <UserInfo key={`user_${user.id}_info`} user={user} otherHands={boardState.otherHands} turnUser={turnUser} />
           )
         }
       </div>
       <div className={style.boardInfo}>
         { boardState?.trash.length &&
           <SingleCard
+            key='trash'
             card = {
               Object.assign(
                 spreadCardState(boardState.trash)[0],
@@ -99,12 +105,12 @@ const board = (data: Props) => {
       {
         boardState && me && 
         <div className={style.myInfo}>
-          <UserInfo key={me.turn} user={me} turnUser={turnUser}/>
+          <UserInfo key='my_info' user={me} turnUser={turnUser}/>
         </div>
       }
       { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setSelectedCard={setValues} /> }
       <div className={style.actionBtnWrap}>
-        <ActionBtn text={'アクション'} styleClass='action' isBtnActive={values.isBtnActive} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, event: 'drawcard', handleEmit }): undefined}/>
+        <ActionBtn text={'アクション'} styleClass='action' isBtnActive={values.isBtnActive} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, handleEmit }): undefined}/>
         <ActionBtn text={'どぼん！'} styleClass='dobon' isBtnActive={values.isBtnActive} setValues={setValues} />
       </div>
     </div>

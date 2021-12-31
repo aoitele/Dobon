@@ -2,13 +2,15 @@ import { useEffect, Dispatch } from 'react'
 import { HandleEmitFn, Emit } from '../@types/socket'
 import { gameInitialState, Action } from '../utils/game/roomStateReducer'
 import { AuthState } from '../context/authProvider'
-import sleep from '../utils/game/sleep'
+import { RoomAPIResponse } from '../@types/api/roomAPI'
 import { useUpdateStateFn } from '../utils/game/state'
+import { updateHandsFn } from '../utils/game/checkHand'
 
 const useEventHooks = (
   state: gameInitialState,
   handleEmit: HandleEmitFn,
   authUser:AuthState['authUser'],
+  room: RoomAPIResponse.RoomInfo,
   dispatch: Dispatch<Action>
 ) => {
   const { roomId, game } = state
@@ -17,7 +19,7 @@ const useEventHooks = (
 
     const handler = async() => {
       switch (game.event) {
-        case 'prepare': {
+        case 'preparecomplete': {
           if (roomId) {
             const data: Emit = {
               roomId,
@@ -25,10 +27,11 @@ const useEventHooks = (
               userId: authUser.id,
               event: 'gethand'
             }
-            handleEmit(data)
-            await sleep(3000)
-            data.event = 'gamestart'
-            handleEmit(data)
+            await handleEmit(data)
+            if (room.create_user_id === authUser.id) {
+              data.event = 'gamestart'
+              await handleEmit(data)
+            }
           }
           break
         }
@@ -40,7 +43,8 @@ const useEventHooks = (
               userId: authUser.id,
               event: 'gethand'
             }
-            handleEmit(data)
+            await handleEmit(data)
+            updateHandsFn({state, authUser, dispatch})
           }
           break
         }
@@ -50,6 +54,7 @@ const useEventHooks = (
     }
     handler().then(
       () => {
+        // State > eventをnullに戻す
         const data = { game: { event: null } }
         const newState = useUpdateStateFn(state, data)
         dispatch({ type: 'updateStateSpecify', payload: newState })

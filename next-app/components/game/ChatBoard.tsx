@@ -15,7 +15,7 @@ const chatBoard: React.FC<Props> = ({ roomId, posts, handleEmit }) => {
   const [inputNewPost] = useState(false)
   const [message, setMessage] = useState('')
 
-  const submit = () => {
+  const submit = async () => {
     const data: Emit = {
       roomId,
       gameId: 1,
@@ -27,7 +27,7 @@ const chatBoard: React.FC<Props> = ({ roomId, posts, handleEmit }) => {
         message
       }
     }
-    handleEmit(data)
+    await handleEmit(data)
   }
   return (
     <div className={style.wrap}>
