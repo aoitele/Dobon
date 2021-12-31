@@ -25,24 +25,17 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
     title,
     status,
     invitation_code,
-    max_seat,
-    set_count,
-    rate,
+    max_seat: Number(max_seat),
+    set_count: Number(set_count),
+    rate: Number(rate),
     create_user_id
   }
-
-  try {
-    const result = await prisma?.room.create({ data: payload })
-    res.json({
-      result: true,
-      data: result
-    })
-  } catch (e) {
-    res.json({
-      result: false,
-      error: e
-    })
-  }
+  
+  const result = await prisma?.room.create({ data: payload })
+  res.json({
+    result: true,
+    data: result
+  })
 }
 
 export default handle

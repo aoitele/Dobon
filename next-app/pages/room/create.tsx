@@ -59,26 +59,26 @@ const createRoom: React.FC = () => {
         <div>
           <label htmlFor="max_seat">👤参加人数</label>
           <select {...register('max_seat',{required: '参加人数は必須です' })}>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
+            <option value={2}>2</option>
+            <option value={3}>3</option>
+            <option value={4}>4</option>
           </select>
         </div>
         <div>
           <label htmlFor="set_count">🃏ゲーム数：</label>
           <select {...register('set_count',{required: 'ゲーム数は必須です' })}>
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="30">30</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={30}>30</option>
           </select>
         </div>
         <div>
           <label htmlFor="rate">🎖スコアレート：</label>
           <select {...register('rate')}>
-            <option value="1">x1</option>
-            <option value="3">x3</option>
-            <option value="5">x5</option>
-            <option value="10">x10</option>
+            <option value={1}>x1</option>
+            <option value={3}>x3</option>
+            <option value={5}>x5</option>
+            <option value={10}>x10</option>
           </select>
         </div>
         <div>
