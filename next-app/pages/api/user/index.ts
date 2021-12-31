@@ -20,11 +20,14 @@ const handle = (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const handleGET = async (id: string | string[], res: NextApiResponse) => {
+  if (prisma === null) { return res.status(500).json({ error: 'PrismaClientInitializationError'})}
   const response = await prisma.user.findMany()
   return res.json({ users: response })
 }
 
 const handlePOST = async (data: any, res: NextApiResponse) => {
+  if (prisma === null) { return res.status(500).json({ error: 'PrismaClientInitializationError'})}
+
   // トークンを発行してクライアント側でcookieにセット
   const { nickname, password } = data
   const token = createAccessToken(nickname, password)

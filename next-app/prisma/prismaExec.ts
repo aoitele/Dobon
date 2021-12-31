@@ -1,3 +1,4 @@
+import { NextApiResponse } from 'next'
 import { prisma, Prisma } from '.'
 import index from './model/participant'
 
@@ -9,7 +10,9 @@ export interface QueryMethod {
   params?: any[string]
 }
 
-const prismaExec = (req: QueryMethod, data: any): any => {
+const prismaExec = (req: QueryMethod, res:NextApiResponse, data: any): any => {
+  if (prisma === null) { return res.status(500).json({ error: 'PrismaClientInitializationError'})}
+
   try {
     switch(req.model) {
       case 'Participant':

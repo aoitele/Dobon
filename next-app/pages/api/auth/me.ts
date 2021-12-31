@@ -2,6 +2,8 @@ import { prisma } from '../../../prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 const usersMeApiCall = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (prisma === null) { return res.status(500).json({ error: 'PrismaClientInitializationError'})}
+  
   const { accesstoken } = req.body
   if (!accesstoken) {
     return res.status(500).json({

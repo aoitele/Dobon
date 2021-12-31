@@ -15,7 +15,8 @@ const handle = (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const handleGET = async (id: string | string[], res: NextApiResponse) => {
-  const room = await prisma.room.findUnique({
+
+  const room = await prisma?.room.findUnique({
     where: {
       id: Number(id)
     },

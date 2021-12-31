@@ -13,8 +13,8 @@ const handle = (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const handleGET = async (res: NextApiResponse) => {
-  const rooms = await prisma.room.findMany()
-  res.json({ rooms })
+  const rooms = await prisma?.room.findMany()
+  res.json({ rooms })  
 }
 
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -32,7 +32,7 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const result = await prisma.room.create({ data: payload })
+    const result = await prisma?.room.create({ data: payload })
     res.json({
       result: true,
       data: result
