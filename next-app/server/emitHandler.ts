@@ -9,8 +9,9 @@ import { Player } from '../@types/game'
 
 const emitHandler = (io: Socket, socket: any) => {
   const adapterPubClient: Redis = socket.adapter.pubClient
-
+  
   socket.on('emit', async (payload: Emit) => {
+    if (prisma === null) { return {} }  
     console.log(payload, 'payload')
     const { event, roomId, userId, nickname } = payload
     const room = `room${payload.roomId}`

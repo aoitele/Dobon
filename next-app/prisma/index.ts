@@ -6,7 +6,7 @@ import { Prisma, PrismaClient } from '@prisma/client'
  * 開発モードではprismaをglobalにセットして単一インスタンスで扱う
  */
 
-let prisma: PrismaClient | Partial<PrismaClient> = {};
+let prisma: PrismaClient | null = null;
 
 if (process.env.NODE_ENV === "production") {
   prisma = new PrismaClient({ log: ['query', 'error', 'info', 'warn'] })
