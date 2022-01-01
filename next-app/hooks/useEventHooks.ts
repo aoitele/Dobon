@@ -28,13 +28,10 @@ const useEventHooks = (
               event: 'gethand'
             }
             await handleEmit(data)
-            /*
-             * テスト中のみコメントアウトしておく
-             * if (room.create_user_id === authUser.id) {
-             */
+            if (room.create_user_id === authUser.id) {
               data.event = 'gamestart'
               await handleEmit(data)
-            // }
+            }
           }
           break
         }

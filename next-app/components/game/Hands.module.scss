@@ -4,6 +4,7 @@
   justify-content: center;
   align-items: center;
   margin: 20px 0px;
+  z-index: 1500;
   .slides {
     display: flex;
     overflow-x: scroll;
@@ -14,6 +15,7 @@
     }
     div {
       min-width: 20%;
+      z-index: 1600;
     }
     .cantPut {
       background-color: lightgray;

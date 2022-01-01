@@ -1,6 +1,5 @@
 .wrap {
   height: 100vh;
-  height: -webkit-fill-available;
   background-image:  url(/images/game/backGround/bg1.png);
   background-repeat: repeat;
   .roomInfo {
@@ -38,7 +37,28 @@
     display: flex;
     justify-content: space-evenly;
     text-align: center;
+    width: 100%;
     height: 80px;
     align-items: center;
+    position: fixed;
+    bottom: 15px;
+    z-index: 2100;
+  }
+  .stateResetArea {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+    transition: 0.6s ease-in-out;
+  }
+  .bg_black {
+    z-index: 2000;
+    background: black;
+  }
+  .bg_transparent {
+    background: transparent;
   }
 }

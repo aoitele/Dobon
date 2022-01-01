@@ -12,7 +12,7 @@ import ActionBtn from '../ActionBtn'
 import { SingleCard } from '../SingleCard'
 import CardEffect from '../CardEffect'
 import Image from 'next/image'
-import { emit, createEmitFnArgs } from '../../../utils/game/emit'
+import { createEmitFnArgs } from '../../../utils/game/emit'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -37,6 +37,8 @@ const board = (data: Props) => {
   const users = boardState?.users
   const me = users?.filter(_=>_.id === authUser?.id)[0]
   const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
+  const isCardSelecting = values.selectedCard !== ''
+  const isBtnActive = values.isBtnActive
 
   const putOut = async(card: string) => {
     if (!boardState || !me?.id) return
@@ -92,11 +94,6 @@ const board = (data: Props) => {
           }
           { boardState?.effect && <CardEffect order={boardState.effect.type} value={2}/> }
         </div>
-        <span onClick={
-          () => boardState
-          ? emit(createEmitFnArgs({ boardState, room, userId: me?.id, event: 'turnchange', handleEmit }))
-          : undefined
-        }>turn change!</span>
         <div>
           <Image src={`/images/cards/deck.png`} width={70} height={105} />
           <p className={style.deckCount}>x {boardState?.deck.length}</p>
@@ -113,6 +110,12 @@ const board = (data: Props) => {
         <ActionBtn text={'アクション'} styleClass='action' isBtnActive={values.isBtnActive} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, handleEmit }): undefined}/>
         <ActionBtn text={'どぼん！'} styleClass='dobon' isBtnActive={values.isBtnActive} setValues={setValues} />
       </div>
+      { (isCardSelecting || isBtnActive) &&
+        <div
+          className={`${style.stateResetArea} ${isCardSelecting ? style.bg_transparent : style.bg_black}`}
+          onClick={() => setValues(initialState)}
+        />
+      }
     </div>
   )
 }
