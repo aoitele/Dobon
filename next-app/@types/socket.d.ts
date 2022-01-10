@@ -16,7 +16,8 @@ type Event = LiteralUnion<
   | 'gethand'
   | 'getparticipants'
   | 'getusers'
-  | 'turnchange',
+  | 'turnchange'
+  | 'effect',
   string
 > | null
 

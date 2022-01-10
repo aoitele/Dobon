@@ -1,4 +1,5 @@
 import React from 'react'
+import Image from 'next/image'
 import { SingleCard } from './SingleCard'
 import { HaveAllPropertyCard } from '../../@types/card'
 import { initialStateType } from './board/index'
@@ -17,27 +18,28 @@ const hands: React.FC<Cards> = ({ cards, putOut, selectedCard, setSelectedCard }
     <div className={style.slides}>
       { cards && cards.map(_ =>
       <div key={`${_.suit}${_.num}_slide`} className={style.slide}>
-        {
-        <div
-        className={`${style.card} ${_.isPutable ? '' : style.cantPut} ${selectedCard === `${_.suit}${_.num}` ? style.selected : '' }`}
-        onClick={ selectedCard === `${_.suit}${_.num}` ? () => putOut(`${_.suit}${_.num}`) : undefined }
-        >
-          <SingleCard
-            key={`hands-${_.suit}${_.num}`}
-            card={{
-              suit: _.suit,
-              num: _.num,
-              isOpen: true,
-              isPutable: _.isPutable,
-              style: {
-                width:160,
-                height:240
-              }
-            }}
-            setSelectedCard={setSelectedCard}
+        <>
+        { _.isOpen && <Image src={`/images/game/effect/eye.png`} width={15} height={15} /> }
+          <div
+            className={`${style.card} ${_.isPutable ? '' : style.cantPut} ${selectedCard === `${_.suit}${_.num}` ? style.selected : '' }`}
+            onClick={ selectedCard === `${_.suit}${_.num}` ? () => putOut(`${_.suit}${_.num}`) : undefined }
+          >
+            <SingleCard
+              key={`hands-${_.suit}${_.num}`}
+              card={{
+                suit: _.suit,
+                num: _.num,
+                isOpen: true,
+                isPutable: _.isPutable,
+                style: {
+                  width:160,
+                  height:240
+                }
+              }}
+              setSelectedCard={setSelectedCard}
             />
           </div>
-        }
+        </>
         { selectedCard === `${_.suit}${_.num}` && <span>⚫︎</span>}
       </div>
         ) }

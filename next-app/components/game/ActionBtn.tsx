@@ -29,7 +29,8 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, isBtnActive, setValues, e
       className={`${style[styleClass]} ${isBtnActive && 'active'}`}
       onClick={(e) => setValues({ 
         selectedCard:'',
-        isBtnActive: e.currentTarget.innerText === 'アクション' && !isBtnActive
+        isBtnActive: e.currentTarget.innerText === 'アクション' && !isBtnActive,
+        isModalActive: e.currentTarget.innerText === 'どぼん！'
       })}
       >{text}</div>
     </>
