@@ -1,0 +1,58 @@
+.wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 80%;
+  height: 80%;
+  z-index: 2500;
+  .imageWrap {
+    position: relative;  /*波紋の基点とするためrelativeを指定*/
+    width: 100%;
+    top: 100px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    z-index: 2800;
+    &:before {
+      content: '';
+      position: absolute;
+      top:0;
+      border: 2px solid #333;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      opacity:1; /*はじめは不透明*/
+      animation-delay: .0.2s;
+      animation:circleanime 1s infinite;
+    }
+  }
+  .imageBg {
+    position: absolute;
+    top:100px;
+    width: 100%;
+    height: 50%;
+    background: #E0E0E0;
+    background-image: linear-gradient(45deg, #9E9E9E 25%, transparent 0),
+    linear-gradient(45deg, transparent 75%, #9E9E9E 0),
+    linear-gradient(45deg, #9E9E9E 25%, transparent 0),
+    linear-gradient(45deg, transparent 75%, #9E9E9E 0);
+    background-size: 30px 30px;
+    background-position: 0 0, 15px 15px, 15px 15px, 30px 30px;
+    opacity: 0.9;
+  }
+}
+
+/*波形が広がるアニメーション*/
+@keyframes circleanime {
+	0%{
+	  transform: scale(0);
+	}
+	100%{
+		transform:scale(1.1);
+		opacity: 0;
+	}
+}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { GameSet } from '../GameSet'
 import UserInfo from '../UserInfo'
 import { RoomAPIResponse } from '../../../@types/api/roomAPI'
@@ -13,6 +13,7 @@ import { SingleCard } from '../SingleCard'
 import CardEffect from '../CardEffect'
 import Image from 'next/image'
 import { createEmitFnArgs } from '../../../utils/game/emit'
+import EffectAnimation from '../EffectAnimation'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -24,10 +25,12 @@ interface Props {
 export type initialStateType = {
   selectedCard: string
   isBtnActive: boolean
+  isModalActive: boolean
 }
 export const initialState: initialStateType = {
   selectedCard: '',
-  isBtnActive: false
+  isBtnActive: false,
+  isModalActive: false
 }
 
 const board = (data: Props) => {
@@ -39,6 +42,16 @@ const board = (data: Props) => {
   const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
   const isCardSelecting = values.selectedCard !== ''
   const isBtnActive = values.isBtnActive
+  const isModalActive = values.isModalActive
+
+  useEffect(() => {
+    // エフェクトモーダルは2秒のみ表示する
+    if (values.isModalActive) {
+      setTimeout(() => {
+        setValues({ ...initialState, isModalActive:false })
+      }, 2000)
+    }
+  }, [values])
 
   const putOut = async(card: string) => {
     if (!boardState || !me?.id) return
@@ -60,63 +73,71 @@ const board = (data: Props) => {
     await handleEmit(emitData)
   }
   return (
-    <div className={style.wrap}>
-      <div className={style.roomInfo}>
-        <h1 className={style.title}>{room.title}</h1>
-        <GameSet gameSet={state.game?.id ? state.game.id : 1} setCount={room.set_count} />
-      </div>
-      <div className={style.userInfoWrap}>
-        {
-          boardState && users &&
-          users.map(
-            user => authUser?.id !== user.id &&
-            <UserInfo key={`user_${user.id}_info`} user={user} otherHands={boardState.otherHands} turnUser={turnUser} />
-          )
-        }
-      </div>
-      <div className={style.boardInfo}>
-        { boardState?.trash.length &&
-          <SingleCard
-            key='trash'
-            card = {
-              Object.assign(
-                spreadCardState(boardState.trash)[0],
-                { style: { width:80, height: 120} }
-              )
+    <>
+      <div className={style.wrap}>
+        <div className={style.roomInfo}>
+          <h1 className={style.title}>{room.title}</h1>
+          <GameSet gameSet={state.game?.id ? state.game.id : 1} setCount={room.set_count} />
+        </div>
+        <div className={style.userInfoWrap}>
+          {
+            boardState && users &&
+            users.map(
+              user => authUser?.id !== user.id &&
+              <UserInfo key={`user_${user.id}_info`} user={user} otherHands={boardState.otherHands} turnUser={turnUser} />
+            )
+          }
+        </div>
+        <div className={style.boardInfo}>
+          { boardState?.trash.length &&
+            <SingleCard
+              key='trash'
+              card = {
+                Object.assign(
+                  spreadCardState(boardState.trash)[0],
+                  { style: { width:80, height: 120} }
+                )
+              }
+            />
+          }
+          <div>
+            { turnUser &&
+                <p className={style.turnTxt}>
+                  <span>{turnUser?.nickname}</span> のターン
+                </p>
             }
+            { boardState?.effect && <CardEffect order={boardState.effect.type} value={2}/> }
+          </div>
+          <div>
+            <Image src={`/images/cards/deck.png`} width={70} height={105} />
+            <p className={style.deckCount}>x {boardState?.deck.length}</p>
+          </div>
+        </div>
+        {
+          boardState && me &&
+          <div className={style.myInfo}>
+            <UserInfo key='my_info' user={me} turnUser={turnUser}/>
+          </div>
+        }
+        { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setSelectedCard={setValues} /> }
+        <div className={style.actionBtnWrap}>
+          <ActionBtn text={'アクション'} styleClass='action' isBtnActive={values.isBtnActive} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, handleEmit }): undefined}/>
+          <ActionBtn text={'どぼん！'} styleClass='dobon' isBtnActive={values.isBtnActive} setValues={setValues} />
+        </div>
+        { (isCardSelecting || isBtnActive) &&
+          <div
+            className={`${style.stateResetArea} ${isCardSelecting ? style.bg_transparent : style.bg_black}`}
+            onClick={() => setValues(initialState)}
           />
         }
-        <div>
-          { turnUser && 
-              <p className={style.turnTxt}>
-                <span>{turnUser?.nickname}</span> のターン
-              </p>
-          }
-          { boardState?.effect && <CardEffect order={boardState.effect.type} value={2}/> }
-        </div>
-        <div>
-          <Image src={`/images/cards/deck.png`} width={70} height={105} />
-          <p className={style.deckCount}>x {boardState?.deck.length}</p>
-        </div>
       </div>
-      {
-        boardState && me && 
-        <div className={style.myInfo}>
-          <UserInfo key='my_info' user={me} turnUser={turnUser}/>
-        </div>
-      }
-      { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setSelectedCard={setValues} /> }
-      <div className={style.actionBtnWrap}>
-        <ActionBtn text={'アクション'} styleClass='action' isBtnActive={values.isBtnActive} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, handleEmit }): undefined}/>
-        <ActionBtn text={'どぼん！'} styleClass='dobon' isBtnActive={values.isBtnActive} setValues={setValues} />
-      </div>
-      { (isCardSelecting || isBtnActive) &&
-        <div
-          className={`${style.stateResetArea} ${isCardSelecting ? style.bg_transparent : style.bg_black}`}
-          onClick={() => setValues(initialState)}
-        />
-      }
-    </div>
+      { isModalActive &&
+        <>
+          <div className={style.modalBack} />
+          <EffectAnimation/>
+        </>
+        }
+    </>
   )
 }
 export default board

@@ -21,7 +21,7 @@ export const SingleCard: React.FC<Props> = ({ card, setSelectedCard }) => {
   return (
     <div className={styles.imageWrap} onClick={ 
       setSelectedCard && isPutable
-      ? () => setSelectedCard({ selectedCard: `${suit}${num}`, isBtnActive: false })
+      ? () => setSelectedCard({ selectedCard: `${suit}${num}`, isBtnActive: false, isModalActive: false })
       : undefined
     }>
       { isOpen
