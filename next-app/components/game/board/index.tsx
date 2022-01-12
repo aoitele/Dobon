@@ -24,13 +24,27 @@ interface Props {
 
 export type initialStateType = {
   selectedCard: string
-  isBtnActive: boolean
   isModalActive: boolean
+  isBtnActive: {
+    action: boolean
+    dobon: boolean
+  }
+  ICan: {
+    action: boolean
+    dobon: boolean
+  }
 }
 export const initialState: initialStateType = {
   selectedCard: '',
-  isBtnActive: false,
-  isModalActive: false
+  isModalActive: false,
+  isBtnActive: {
+    action: false,
+    dobon: false
+  },
+  ICan: {
+    action: false,
+    dobon: false
+  }
 }
 
 const board = (data: Props) => {
@@ -40,9 +54,9 @@ const board = (data: Props) => {
   const users = boardState?.users
   const me = users?.filter(_=>_.id === authUser?.id)[0]
   const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
+  const isMyTurn = me?.turn === turnUser?.turn
   const isCardSelecting = values.selectedCard !== ''
-  const isBtnActive = values.isBtnActive
-  const isModalActive = values.isModalActive
+  const { isBtnActive, isModalActive }  = values
 
   useEffect(() => {
     // エフェクトモーダルは2秒のみ表示する
@@ -52,6 +66,10 @@ const board = (data: Props) => {
       }, 2000)
     }
   }, [values])
+
+  useEffect(() => {
+    setValues({ ...initialState, ICan: { action: isMyTurn, dobon: !isMyTurn } })
+  }, [isMyTurn])
 
   const putOut = async(card: string) => {
     if (!boardState || !me?.id) return
@@ -121,10 +139,10 @@ const board = (data: Props) => {
         }
         { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setSelectedCard={setValues} /> }
         <div className={style.actionBtnWrap}>
-          <ActionBtn text={'アクション'} styleClass='action' isBtnActive={values.isBtnActive} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, handleEmit }): undefined}/>
-          <ActionBtn text={'どぼん！'} styleClass='dobon' isBtnActive={values.isBtnActive} setValues={setValues} />
+          <ActionBtn text='アクション' styleClass='action' values={values} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, handleEmit }): undefined}/>
+          <ActionBtn text='どぼん！' styleClass='dobon' values={values} setValues={setValues} isMyturn={isMyTurn}/>
         </div>
-        { (isCardSelecting || isBtnActive) &&
+        { (isCardSelecting || isBtnActive.action) &&
           <div
             className={`${style.stateResetArea} ${isCardSelecting ? style.bg_transparent : style.bg_black}`}
             onClick={() => setValues(initialState)}

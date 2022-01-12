@@ -24,9 +24,6 @@
   }
 }
 
-.active {
-  background-color: lightcyan;
-}
 .action {
   width: 45%;
   height: 60%;
@@ -36,6 +33,12 @@
   box-shadow: 0 4px 0 #aaaaaa;
   transition: 0.3s;
   font-weight: bold;
+  &:active {
+    background-color: gray;
+  }
+  &:disabled {
+    background-color: gray;
+  }
 }
 .dobon {
   width: 45%;
@@ -46,4 +49,10 @@
   box-shadow: 0 4px 0 #aaaaaa;
   transition: 0.3s;
   font-weight: bold;
+  &:active {
+    background-color: gray;
+  }
+  &:disabled {
+    background-color: gray;
+  }
 }

@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction } from 'react'
 import Image from 'next/image'
 import { HaveAllPropertyCard } from '../../@types/card'
-import { initialStateType } from './board/index'
+import { initialState, initialStateType } from './board/index'
 import styles from './SingleCard.module.scss'
 
 type Props = {
@@ -21,7 +21,7 @@ export const SingleCard: React.FC<Props> = ({ card, setSelectedCard }) => {
   return (
     <div className={styles.imageWrap} onClick={ 
       setSelectedCard && isPutable
-      ? () => setSelectedCard({ selectedCard: `${suit}${num}`, isBtnActive: false, isModalActive: false })
+      ? () => setSelectedCard({ ...initialState, selectedCard: `${suit}${num}` })
       : undefined
     }>
       { isOpen
