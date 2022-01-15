@@ -13,6 +13,7 @@ import { SingleCard } from '../SingleCard'
 import CardEffect from '../CardEffect'
 import Image from 'next/image'
 import { createEmitFnArgs } from '../../../utils/game/emit'
+import { isMyTurnFn, isNextUserTurnFn } from '../../../utils/game/turnInfo'
 import EffectAnimation from '../EffectAnimation'
 
 interface Props {
@@ -54,11 +55,12 @@ const board = (data: Props) => {
   const users = boardState?.users
   const me = users?.filter(_=>_.id === authUser?.id)[0]
   const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
-  const isMyTurn = me?.turn === turnUser?.turn
+  const isMyTurn = me && turnUser ? isMyTurnFn(me, turnUser) : false
+  const isNextUserTurn = me && turnUser && users ? isNextUserTurnFn(me, turnUser, users) : false
   const isCardSelecting = values.selectedCard !== ''
   const { isBtnActive, isModalActive }  = values
   const actionBtnStyle = isMyTurn ? isBtnActive.action ? 'active' : 'action' : 'disabled'
-  const dobonBtnStyle = isMyTurn ? 'disabled' : isBtnActive.dobon ? 'active':'dobon'
+  const dobonBtnStyle = isNextUserTurn ? 'disabled' : isBtnActive.dobon ? 'active':'dobon'
 
   useEffect(() => {
     // エフェクトモーダルは2秒のみ表示する
