@@ -57,6 +57,8 @@ const board = (data: Props) => {
   const isMyTurn = me?.turn === turnUser?.turn
   const isCardSelecting = values.selectedCard !== ''
   const { isBtnActive, isModalActive }  = values
+  const actionBtnStyle = isMyTurn ? isBtnActive.action ? 'active' : 'action' : 'disabled'
+  const dobonBtnStyle = isMyTurn ? 'disabled' : isBtnActive.dobon ? 'active':'dobon'
 
   useEffect(() => {
     // エフェクトモーダルは2秒のみ表示する
@@ -139,8 +141,8 @@ const board = (data: Props) => {
         }
         { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setSelectedCard={setValues} /> }
         <div className={style.actionBtnWrap}>
-          <ActionBtn text='アクション' styleClass='action' values={values} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, handleEmit }): undefined}/>
-          <ActionBtn text='どぼん！' styleClass='dobon' values={values} setValues={setValues} isMyturn={isMyTurn}/>
+          <ActionBtn text='アクション' styleClass={actionBtnStyle} values={values} setValues={setValues} emitArgs={boardState ? createEmitFnArgs({ boardState, room, userId: me?.id, handleEmit }): undefined } />
+          <ActionBtn text='どぼん！' styleClass={dobonBtnStyle} values={values} setValues={setValues} />
         </div>
         { (isCardSelecting || isBtnActive.action) &&
           <div

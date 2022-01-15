@@ -24,35 +24,29 @@
   }
 }
 
-.action {
+.btn {
   width: 45%;
   height: 60%;
   padding: 10px;
   border-radius: 10px;
-  background-color: lightgreen;
   box-shadow: 0 4px 0 #aaaaaa;
   transition: 0.3s;
   font-weight: bold;
-  &:active {
-    background-color: gray;
-  }
-  &:disabled {
-    background-color: gray;
-  }
+}
+
+.action {
+  @extend .btn;
+  background-color: lightgreen;
 }
 .dobon {
-  width: 45%;
-  height: 60%;
-  padding: 10px;
-  border-radius: 10px;
+  @extend .btn;
   background-color: orange;
-  box-shadow: 0 4px 0 #aaaaaa;
-  transition: 0.3s;
-  font-weight: bold;
-  &:active {
-    background-color: gray;
-  }
-  &:disabled {
-    background-color: gray;
-  }
+}
+.active {
+  @extend .btn;
+  background-color: honeydew;
+}
+.disabled {
+  @extend .btn;
+  background-color: gray;
 }
