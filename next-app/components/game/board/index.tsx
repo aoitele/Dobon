@@ -15,6 +15,7 @@ import Image from 'next/image'
 import { createEmitFnArgs } from '../../../utils/game/emit'
 import { isMyTurnFn, isNextUserTurnFn } from '../../../utils/game/turnInfo'
 import EffectAnimation from '../EffectAnimation'
+import { createMsg } from '../../../utils/game/message'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -153,12 +154,12 @@ const board = (data: Props) => {
           />
         }
       </div>
-      { isModalActive &&
+      { isModalActive && me && boardState?.trash &&
         <>
           <div className={style.modalBack} />
-          <EffectAnimation/>
+          <EffectAnimation user={me} action={'wild'} message={createMsg({user:me, action: 'reverse', card: boardState.trash[0]})}/>
         </>
-        }
+      }
     </>
   )
 }

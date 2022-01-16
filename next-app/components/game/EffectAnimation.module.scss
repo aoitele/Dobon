@@ -46,6 +46,24 @@
   }
 }
 
+.userInfo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100px;
+  margin: auto;
+  display: flex;
+  background-color: honeydew;
+  width: 95%;
+  height: 100px;
+  border-radius: 20px;
+  padding: 10px;
+  z-index: 2500;
+  .nickName {
+    font-size: 20px;
+  }
+}
+
 /*波形が広がるアニメーション*/
 @keyframes circleanime {
 	0%{

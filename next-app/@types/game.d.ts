@@ -54,4 +54,11 @@ export type Board = {
 
 export type OwnerAction = { participants: GameUserInfo[] }
 export type Action = 'avoidEffect' | 'notAvoidEffect'
-export type Order = 'skip' | 'draw' | 'wild' | 'elevenback' | 'opencard' | null
+export type Order = 'skip' | 'draw'| 'draw2'| 'draw4'| 'draw6'| 'draw8' | 'wild' | 'reverse' | 'opencard' | 'dobon' | null
+
+export type AllActionType = Action | Order
+export type ModalEffect = {
+  user: Player
+  action: AllActionType
+  message: string
+}

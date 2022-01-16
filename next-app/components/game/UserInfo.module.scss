@@ -6,7 +6,7 @@
   }
   .iconNameOnTurn {
     display: flex;
-    animation: flash 1s linear infinite;
+    animation: move-y .5s infinite alternate ease-in-out;
   }
   .star {
     font-size: 10px;
@@ -18,12 +18,13 @@
   }
 }
 
-@keyframes flash {
-  0%,100% {
+@keyframes move-y {
+  from {
+    transform: translateY(0);
     opacity: 1;
   }
-
-  50% {
+  to {
+    transform: translateY(-5px);
     opacity: 0.6;
   }
 }
