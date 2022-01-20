@@ -12,17 +12,17 @@ type Props = {
         height: number
     }
   }
-  setSelectedCard?: Dispatch<SetStateAction<InitialBoardState>>
+  setValues?: Dispatch<SetStateAction<InitialBoardState>>
 }
 
-export const SingleCard: React.FC<Props> = ({ card, setSelectedCard }) => {
+export const SingleCard: React.FC<Props> = ({ card, setValues }) => {
   const { style, isOpen, suit, num, isPutable } = card
   const width = style?.width || 40
   const height = style?.height || 60
   return (
     <div className={styles.imageWrap} onClick={ 
-      setSelectedCard && isPutable
-      ? () => setSelectedCard({ ...initialState, selectedCard: `${suit}${num}` })
+      setValues && isPutable
+      ? () => setValues({ ...initialState, selectedCard: `${suit}${num}`, actionBtnStyle: 'action', dobonBtnStyle: 'dobon' })
       : undefined
     }>
       { isOpen

@@ -6,14 +6,14 @@ import style from './ActionBtn.module.scss'
 
 interface Args {
   text: 'アクション' | 'どぼん！'
-  styleClass: 'action' | 'dobon' | 'active' | 'disabled' 
+  styleClass: 'action' | 'dobon' | 'active' | 'disabled'
   values: InitialBoardState
   setValues: React.Dispatch<React.SetStateAction<InitialBoardState>>
   isMyTurn: boolean
   emitArgs?: Props
 }
 
-const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, isMyTurn, emitArgs }) => {
+const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitArgs }) => {
   const addEmitArgEvent = (args: Props, event: string) => {
     args.emitData.event = event
     return args
@@ -28,10 +28,8 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, isMyTu
         action: false,
         dobon: false
       },
-      ICan: {
-        action: isMyTurn,
-        dobon: isMyTurn
-      }
+      actionBtnStyle: 'action',
+      dobonBtnStyle: 'dobon'
     })
   }
 
@@ -41,32 +39,23 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, isMyTu
   }
 
   const btnFn = async () => {
-    if (!emitArgs) return
-    // ActionBtn onならoffにするのみ
-    if (values.isBtnActive.action) {
-      setValues({
-        ...initialState,
-        isBtnActive: { ...values.isBtnActive, action: false }
-      });
+    if (!emitArgs || styleClass === 'disabled') return
+
+    if (styleClass === 'dobon') {
+      await emit(addEmitArgEvent(emitArgs, 'dobon'))
       return
     }
-
-    // StyleClassのままだと特定プロパティのリテラルと認識されないため型を当てる
-    const key = styleClass === 'action' ? 'action' : 'dobon'
-    key === 'dobon'
-    ? await emit(addEmitArgEvent(emitArgs, 'dobon'))
-    : setValues({
-        ...initialState,
-        selectedCard:'',
-        isBtnActive: {
-          ...values.isBtnActive,
-          [key]: !values.isBtnActive[key]
-        },
-        ICan: {
-          ...values.ICan,
-        }
-      });
-    }
+    // ActionBtnならon/off 切替えのみ
+    const toggleClass = values.actionBtnStyle === 'action' ? 'active' : 'action'
+    setValues({
+      ...initialState,
+      actionBtnStyle: toggleClass,
+      isBtnActive: {
+        ...values.isBtnActive,
+        action: !values.isBtnActive.action
+      }
+    })
+  }
   return (
     <>
       { text === 'アクション' && values.isBtnActive.action &&

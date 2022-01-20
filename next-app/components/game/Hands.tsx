@@ -9,10 +9,10 @@ interface Cards {
   cards: HaveAllPropertyCard[]
   putOut: any
   selectedCard: string
-  setSelectedCard: React.Dispatch<React.SetStateAction<InitialBoardState>>
+  setValues: React.Dispatch<React.SetStateAction<InitialBoardState>>
 }
   
-const hands: React.FC<Cards> = ({ cards, putOut, selectedCard, setSelectedCard }) => {
+const hands: React.FC<Cards> = ({ cards, putOut, selectedCard, setValues }) => {
   return (
   <div className={style.wrap}>
     <div className={style.slides}>
@@ -36,7 +36,7 @@ const hands: React.FC<Cards> = ({ cards, putOut, selectedCard, setSelectedCard }
                   height:240
                 }
               }}
-              setSelectedCard={setSelectedCard}
+              setValues={setValues}
             />
           </div>
         </>

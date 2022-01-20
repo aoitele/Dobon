@@ -58,10 +58,11 @@ export type InitialBoardState = {
     action: boolean
     dobon: boolean
   }
-  ICan: {
-    action: boolean
-    dobon: boolean
-  }
+  isMyTurn: boolean
+  isNextUserTurn: boolean
+  actionBtnStyle: 'disabled' | 'active' | 'action'
+  dobonBtnStyle: 'disabled' | 'active' | 'dobon'
+  isModalActive: boolean
 }
 
 export type OwnerAction = { participants: GameUserInfo[] }

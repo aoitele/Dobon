@@ -14,7 +14,6 @@ import { SingleCard } from '../SingleCard'
 import CardEffect from '../CardEffect'
 import Image from 'next/image'
 import { createEmitFnArgs } from '../../../utils/game/emit'
-import { isMyTurnFn, isNextUserTurnFn } from '../../../utils/game/turnInfo'
 import EffectAnimation from '../EffectAnimation'
 import { createMsg } from '../../../utils/game/message'
 import useBoardHooks from '../../../hooks/useBoardHooks'
@@ -28,11 +27,12 @@ export interface Props {
 
 export const initialState: InitialBoardState = {
   selectedCard: '',
+  isMyTurn: false,
+  isNextUserTurn: false,
+  actionBtnStyle: 'disabled',
+  dobonBtnStyle: 'disabled',
+  isModalActive: false,
   isBtnActive: {
-    action: false,
-    dobon: false
-  },
-  ICan: {
     action: false,
     dobon: false
   }
@@ -45,20 +45,13 @@ const board = (data: Props) => {
   const users = boardState?.users
   const me = users?.filter(_=>_.id === authUser?.id)[0]
   const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
-  const isMyTurn = me && turnUser ? isMyTurnFn(me, turnUser) : false
-  const isNextUserTurn = me && turnUser && users ? isNextUserTurnFn(me, turnUser, users) : false
   const isCardSelecting = values.selectedCard !== ''
-  const { isBtnActive }  = values
-  const actionBtnStyle = isMyTurn ? isBtnActive.action ? 'active' : 'action' : 'disabled'
-  const dobonBtnStyle = isNextUserTurn ? 'disabled' : isBtnActive.dobon ? 'active':'dobon'
-  const isModalActiveEvent = state.game?.event.action === 'dobon'
   const eventUser = state.game?.event.user
 
-  useBoardHooks({values, setValues, initialState, isMyTurn})
+  useBoardHooks({state, values, setValues, initialState, me})
 
   const putOut = async(card: string) => {
     if (!boardState || !me?.id) return
-    setValues(initialState)
     let emitData:Emit = {
       roomId: room.id,
       userId: me.id,
@@ -74,6 +67,7 @@ const board = (data: Props) => {
       data: { type:'board', data: { users, turn: boardState.turn }}
     }
     await handleEmit(emitData)
+    setValues({ ...initialState, isNextUserTurn: true })
   }
   return (
     <>
@@ -122,21 +116,21 @@ const board = (data: Props) => {
             <UserInfo key='my_info' user={me} turnUser={turnUser}/>
           </div>
         }
-        { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setSelectedCard={setValues} /> }
+        { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setValues={setValues} /> }
         { me &&
           <div className={style.actionBtnWrap}>
-            <ActionBtn text='アクション' styleClass={actionBtnStyle} values={values} setValues={setValues} isMyTurn={isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
-            <ActionBtn text='どぼん！' styleClass={dobonBtnStyle} values={values} setValues={setValues} isMyTurn={isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
+            <ActionBtn text='アクション' styleClass={values.actionBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
+            <ActionBtn text='どぼん！' styleClass={values.dobonBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
           </div>
         }
-        { (isCardSelecting || isBtnActive.action) &&
+        { (isCardSelecting || values.isBtnActive.action) &&
           <div
             className={`${style.stateResetArea} ${isCardSelecting ? style.bg_transparent : style.bg_black}`}
-            onClick={() => setValues({...initialState,ICan: { action: isMyTurn, dobon: isMyTurn}})}
+            onClick={() => setValues({...initialState, actionBtnStyle: 'action', dobonBtnStyle: 'dobon', isBtnActive: { action: false, dobon: false}})}
           />
         }
       </div>
-      { boardState?.trash && eventUser && isModalActiveEvent &&
+      { boardState?.trash && eventUser && values.isModalActive &&
         <>
           <div className={style.modalBack} />
           <EffectAnimation user={eventUser} action={'dobon'} message={createMsg({action: 'dobon', card: boardState.trash[0]})}/>

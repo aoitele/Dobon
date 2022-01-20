@@ -88,6 +88,11 @@ const useEventHooks = (
     handler().then(
       () => {
         // Write next emit/dispatch if you need
+        const data: reducerPayloadSpecify = {
+          game: { event: { action: null } }
+        }
+        const newState = useUpdateStateFn(state, data)
+        dispatch({ type: 'updateStateSpecify', payload: newState })
       }
     )
   }, [state.game?.event.action])
