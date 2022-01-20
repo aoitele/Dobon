@@ -1,6 +1,12 @@
+/**
+ * State.game.event.actionへのHooks
+ * サーバーへのemitやローカルステートの更新を行う
+ * ローカルステートのevent更新は/server/emitHandler.tsが担う
+ */
+
 import { useEffect, Dispatch } from 'react'
 import { HandleEmitFn, Emit } from '../@types/socket'
-import { gameInitialState, Action } from '../utils/game/roomStateReducer'
+import { gameInitialState, Action, reducerPayloadSpecify } from '../utils/game/roomStateReducer'
 import { AuthState } from '../context/authProvider'
 import { RoomAPIResponse } from '../@types/api/roomAPI'
 import { useUpdateStateFn } from '../utils/game/state'
@@ -13,12 +19,14 @@ const useEventHooks = (
   room: RoomAPIResponse.RoomInfo,
   dispatch: Dispatch<Action>
 ) => {
-  const { roomId, game } = state
+
   useEffect(() => {
-    if (!state || !game?.event || !authUser) return
+    if (!state.roomId || !state.game || !state.game.event?.action || !authUser) return
+    const { game, roomId } = state
+    const { event } = state.game
 
     const handler = async() => {
-      switch (game.event) {
+      switch (event.action) {
         case 'preparecomplete': {
           if (roomId) {
             const data: Emit = {
@@ -48,19 +56,41 @@ const useEventHooks = (
           }
           break
         }
+        case 'dobon': {
+          const data: reducerPayloadSpecify = {
+            game: {
+              event: {
+                user: { nickname: event.user.nickname, turn: event.user.turn },
+                action: 'dobon',
+                message: 'ドボン発生!'
+              }
+            }
+          }
+          const newState = useUpdateStateFn(state, data)
+          console.log('state update start -- dobon')
+          dispatch({ type: 'updateStateSpecify', payload: newState })
+          console.log('state update end -- dobon')
+
+          break
+        }
+        case 'dobonsuccess': {
+          console.log('dobonsuccess')
+          break
+        }
+        case 'dobonfailure': {
+          console.log('dobonfailure')
+          break
+        }
         default:
           break
       }
     }
     handler().then(
       () => {
-        // State > eventをnullに戻す
-        const data = { game: { event: null } }
-        const newState = useUpdateStateFn(state, data)
-        dispatch({ type: 'updateStateSpecify', payload: newState })
+        // Write next emit/dispatch if you need
       }
     )
-  }, [game?.event])
+  }, [state.game?.event.action])
 }
 
 export default useEventHooks

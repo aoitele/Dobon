@@ -1,5 +1,5 @@
 import { HandCards } from "../../@types/card"
-import { Player, AllActionType } from "../../@types/game"
+import { AllActionType } from "../../@types/game"
 import DobonConst from '../../constant'
 import spreadCardState from './spreadCardState'
 
@@ -19,7 +19,6 @@ const suitNameTo__Ja = (card: HandCards | string): { suit: string, num: number} 
 }
 
 interface Props {
-  user: Player
   action: AllActionType
   card: HandCards | string
 }

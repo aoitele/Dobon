@@ -6,7 +6,6 @@ const reducer = (
   state: DevidedCardWithStatus,
   action: ActionType
 ): DevidedCardWithStatus => {
-  console.log(state, 'state')
   switch (action.type) {
     case 'toggleOpen':
       return {

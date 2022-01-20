@@ -1,7 +1,8 @@
 import React, { Dispatch, SetStateAction } from 'react'
 import Image from 'next/image'
 import { HaveAllPropertyCard } from '../../@types/card'
-import { initialState, initialStateType } from './board/index'
+import { InitialBoardState } from '../../@types/game'
+import { initialState } from './board/index'
 import styles from './SingleCard.module.scss'
 
 type Props = {
@@ -11,7 +12,7 @@ type Props = {
         height: number
     }
   }
-  setSelectedCard?: Dispatch<SetStateAction<initialStateType>>
+  setSelectedCard?: Dispatch<SetStateAction<InitialBoardState>>
 }
 
 export const SingleCard: React.FC<Props> = ({ card, setSelectedCard }) => {

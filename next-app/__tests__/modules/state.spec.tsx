@@ -14,7 +14,9 @@ describe('gameState TestCases', () => {
   it('Stateを1つだけ更新する', () => {
     const payload: reducerPayloadSpecify = {
       game: {
-        event: 'gamestart'
+        event: {
+          action: 'gamestart'
+        }
       }
     }
     const result = useUpdateStateFn(initialState, payload)
@@ -24,7 +26,7 @@ describe('gameState TestCases', () => {
       game: {
         id: null,
         status: 'join',
-        event: 'gamestart',
+        event: { user: { nickname:'', turn:0 }, action: 'gamestart', message: null},
         board: {
           users: [],
           deck: [],
@@ -32,7 +34,7 @@ describe('gameState TestCases', () => {
           trash: [],
           otherHands: [],
           turn: null,
-          effect: null
+          effect: { type:null, value:null }
         }
       },
       connected: false,
@@ -51,7 +53,7 @@ describe('gameState TestCases', () => {
 
     const payload: reducerPayloadSpecify = {
       game: {
-        event: 'gamestart',
+        event: { action: 'gamestart' },
         board: {
           users: [user]
         }
@@ -64,7 +66,7 @@ describe('gameState TestCases', () => {
       game: {
         id: null,
         status: 'join',
-        event: 'gamestart',
+        event: { user:{ nickname:'', turn:0 }, action: 'gamestart', message: null },
         board: {
           users: [user],
           deck: [],
@@ -72,7 +74,7 @@ describe('gameState TestCases', () => {
           trash: [],
           otherHands: [],
           turn: null,
-          effect: null
+          effect: { type:null, value:null }
         }
       },
       connected: false,

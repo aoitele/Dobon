@@ -6,6 +6,8 @@ import { isEmitChat } from '../utils/function/useEmitDataType'
 import { rowQuery } from '../prisma/prismaExec'
 import { prisma, Prisma } from '../prisma'
 import { Player } from '../@types/game'
+import { dobonJudge } from '../utils/game/dobonJudge'
+import sleep from '../utils/game/sleep'
 
 const emitHandler = (io: Socket, socket: any) => {
   const adapterPubClient: Redis = socket.adapter.pubClient
@@ -13,7 +15,7 @@ const emitHandler = (io: Socket, socket: any) => {
   socket.on('emit', async (payload: Emit) => {
     if (prisma === null) { return {} }  
     console.log(payload, 'payload')
-    const { event, roomId, userId, nickname } = payload
+    const { event, roomId, user, userId, nickname } = payload
     const room = `room${payload.roomId}`
 
     switch (event) {
@@ -21,7 +23,6 @@ const emitHandler = (io: Socket, socket: any) => {
         const usersKey = `room:${roomId}:users`
         const users = await adapterPubClient.smembers(usersKey)
         const userData = []
-        console.log(users, 'test')
         for (let i = 0; i < users.length; i += 1) {
           userData.push({ id: 0, nickname: users[i] || 'no user', turn: 0, score: 0 })
         }
@@ -62,7 +63,6 @@ const emitHandler = (io: Socket, socket: any) => {
             params: { roomId }
           })
         )
-        console.log(participants, 'participants')
         // Game.board.usersにユーザーを追加
         let reducerPayload: reducerPayloadSpecify = {
           game: {
@@ -108,7 +108,6 @@ const emitHandler = (io: Socket, socket: any) => {
         // Redis sadd hands for users
         for (let i=0; i<participants.length; i+=1) {
           const userHandsKey = `room:${payload.roomId}:user:${participants[i].id}:hands`
-          console.log(userHandsKey, 'userHandsKey add')
           await adapterPubClient.del(userHandsKey) // eslint-disable-line no-await-in-loop
           const hands = await adapterPubClient.spop(deckKey, 5) // eslint-disable-line no-await-in-loop
           adapterPubClient.sadd(userHandsKey, hands)
@@ -117,7 +116,9 @@ const emitHandler = (io: Socket, socket: any) => {
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             id: 1,
-            event: 'preparecomplete',
+            event: {
+              action: 'preparecomplete'
+            },
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員のステータスを更新
@@ -176,12 +177,13 @@ const emitHandler = (io: Socket, socket: any) => {
         const deckKey = `room:${roomId}:deck`
         const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
         const newCard = await adapterPubClient.spop(deckKey, 1)
-        console.log(newCard, 'newCard')
         adapterPubClient.sadd(userHandsKey, newCard)
         // ルームメンバーに手札更新指令
         const reducerPayload: reducerPayloadSpecify = {
           game: {
-            event: 'gethand'
+            event: {
+              action: 'gethand'
+            }
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)
@@ -211,7 +213,6 @@ const emitHandler = (io: Socket, socket: any) => {
         const { data } = payload
         if (data?.type !== 'board' || typeof data.data.trash === 'undefined') break
         const { trash } = data.data
-        console.log(trash, 'trash')
         let reducerPayload: reducerPayloadSpecify = {
           game: {
             board: { 
@@ -228,7 +229,42 @@ const emitHandler = (io: Socket, socket: any) => {
         // ルームメンバーに手札更新指令
         reducerPayload = {
           game: {
-            event: 'gethand'
+            event: {
+              action: 'gethand'
+            }
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload)
+        break
+      }
+      case 'dobon': {
+        const { data } = payload
+        if (data?.type !== 'board') break
+        if (typeof data.data.trash === 'undefined' || typeof data.data.hands === 'undefined') break
+        // 全ユーザーにドボン発生を通知
+        let reducerPayload: reducerPayloadSpecify = {
+          game: {
+            event: {
+              user,
+              action: 'dobon'
+            }
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload)
+        await sleep(3000)
+
+        // 数字のみ抜き取り計算に利用する
+        const re = /[0-9]+/gui
+        const trash = data.data.trash.map(_ => Number(_.match(re)))[0]
+        const hand = data.data.hands.flatMap(_ => Number(_.match(re)))
+        const judge = dobonJudge(trash, hand)
+
+        // ドボン結果を通知
+        reducerPayload = {
+          game: {
+            event: {
+              action: judge ? 'dobonsuccess' : 'dobonfailure'
+            }
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)

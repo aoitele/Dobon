@@ -25,7 +25,7 @@ export type Game = {
     | 'loading'
     | 'connection loss'
     | undefined
-  event: Event
+  event: ModalEffect
   board: Board
 }
 export type GameStatus = Game['status']
@@ -49,7 +49,19 @@ export type Board = {
   trash: string[] | HandCards[]
   otherHands: OtherHands[]
   turn: number | null
-  effect: { type: Order; value: number | null } | null
+  effect: { type: Order; value: number | null } // 継続中のカード効果を表す
+}
+
+export type InitialBoardState = {
+  selectedCard: string
+  isBtnActive: {
+    action: boolean
+    dobon: boolean
+  }
+  ICan: {
+    action: boolean
+    dobon: boolean
+  }
 }
 
 export type OwnerAction = { participants: GameUserInfo[] }
@@ -58,7 +70,7 @@ export type Order = 'skip' | 'draw'| 'draw2'| 'draw4'| 'draw6'| 'draw8' | 'wild'
 
 export type AllActionType = Action | Order
 export type ModalEffect = {
-  user: Player
-  action: AllActionType
-  message: string
+  user: Pick<Player, 'nickname' | 'turn'>
+  action: Event  | null
+  message: string  | null
 }

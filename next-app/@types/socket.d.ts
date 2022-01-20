@@ -1,5 +1,5 @@
 import { Card } from './card'
-import { Action, Order, Board } from './game'
+import { Action, Order, Board, Player } from './game'
 import { LiteralUnion } from 'type-fest'
 import { NestedPartial } from '../@types/utility'
 
@@ -17,7 +17,21 @@ type Event = LiteralUnion<
   | 'getparticipants'
   | 'getusers'
   | 'turnchange'
-  | 'effect',
+  | 'effect'
+  | 'dobon'
+  | 'dobonsuccess'
+  | 'dobonfailure'
+  | 'avoidEffect'
+  | 'notAvoidEffect'
+  | 'skip'
+  | 'draw'
+  | 'draw2'
+  | 'draw4'
+  | 'draw6'
+  | 'draw8'
+  | 'wild'
+  | 'reverse'
+  | 'opencard',
   string
 > | null
 
@@ -45,6 +59,7 @@ export type Emit = {
   roomId: number
   gameId?: number | null
   userId?: number
+  user?: Player
   nickname?: string
   event: Event
   data?: EmitCard | EmitAction | EmitChat | EmitBoard

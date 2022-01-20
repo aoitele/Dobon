@@ -16,7 +16,11 @@ const initialState: gameInitialState = {
   game: {
     id: null,
     status: 'join',
-    event: null,
+    event: {
+      user: { nickname:'', turn:0 },
+      action: null,
+      message: null
+    },
     board: {
       users: [],
       deck: [],
@@ -24,7 +28,10 @@ const initialState: gameInitialState = {
       trash: [],
       otherHands: [],
       turn: null,
-      effect: null
+      effect: {
+        type: null,
+        value: null
+      }
     }
   },
   connected: false,

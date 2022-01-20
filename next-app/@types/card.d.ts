@@ -43,7 +43,7 @@ export type Rank = {
   1: 'スキップ',
   2: 'ドローカード+2',
   8: 'ワイルド',
-  11: 'イレブンバック',
+  11: 'リバース',
   13: '手札公開'
 }
 export type RankCardNum = keyof Rank

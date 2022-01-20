@@ -9,7 +9,7 @@ interface Props {
 }
 
 interface UnTreatEffect {
-  order: Extract<Order, 'draw' | 'opencard' | null>
+  order: Extract<Order, 'draw2' | 'draw4' | 'draw6' | 'draw8' | 'opencard' | null>
 }
 
 const CardEffect: React.FC<Props> = ({ order, value }) => {
@@ -22,7 +22,7 @@ const CardEffect: React.FC<Props> = ({ order, value }) => {
     1: 'スキップ',
     2: 'ドローカード+2',
     8: 'ワイルド',
-    11: 'イレブンバック',
+    11: 'リバース',
     13: '手札公開'
   }
   const effectText: RankCardText = rankCards[value]

@@ -2,14 +2,14 @@ import React from 'react'
 import Image from 'next/image'
 import { SingleCard } from './SingleCard'
 import { HaveAllPropertyCard } from '../../@types/card'
-import { initialStateType } from './board/index'
+import { InitialBoardState } from '../../@types/game'
 import style from './Hands.module.scss'
 
 interface Cards {
   cards: HaveAllPropertyCard[]
   putOut: any
   selectedCard: string
-  setSelectedCard: React.Dispatch<React.SetStateAction<initialStateType>>
+  setSelectedCard: React.Dispatch<React.SetStateAction<InitialBoardState>>
 }
   
 const hands: React.FC<Cards> = ({ cards, putOut, selectedCard, setSelectedCard }) => {

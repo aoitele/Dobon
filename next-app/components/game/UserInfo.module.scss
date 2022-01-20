@@ -8,6 +8,10 @@
     display: flex;
     animation: move-y .5s infinite alternate ease-in-out;
   }
+  .onTurnMark {
+    color: red;
+    font-size: 12px;
+  }
   .star {
     font-size: 10px;
   }

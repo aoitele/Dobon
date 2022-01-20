@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === "production") {
   prisma = new PrismaClient({ log: ['query', 'error', 'info', 'warn'] })
 } else {
   if (!global.prismaClient) {
-    global.prismaClient = new PrismaClient({ log: ['query', 'error', 'info', 'warn'] })
+    global.prismaClient = new PrismaClient({ log: ['error', 'info', 'warn'] })
   }
   prisma = global.prismaClient
 }

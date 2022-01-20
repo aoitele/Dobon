@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { Emit, HandleEmitFn } from '../../@types/socket'
 import Modal from '../../components/game/Modal'
-import { reducer, gameInitialState } from '../../utils/game/roomStateReducer'
+import { reducer } from '../../utils/game/roomStateReducer'
 import useWsConnectHooks from '../../hooks/useWsConnectHooks'
 import useStateHooks from '../../hooks/useStateHooks'
 import useEventHooks from '../../hooks/useEventHooks'
@@ -14,33 +14,10 @@ import hasProperty from '../../utils/function/hasProperty'
 import { AuthStateContext } from '../../context/authProvider'
 import Board from '../../components/game/board'
 import sleep from '../../utils/game/sleep'
+import { initialState } from '../../utils/game/state'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
-}
-
-const initialState: gameInitialState = {
-  roomId: null,
-  userId: null,
-  game: {
-    id: null,
-    status: 'join',
-    event: null,
-    board: {
-      users: [],
-      deck: [],
-      hands: [],
-      trash: [],
-      otherHands: [],
-      turn: null,
-      effect: {
-        type: null,
-        value: null
-      }
-    }
-  },
-  connected: false,
-  wsClient: null
 }
 
 const Room: React.FC<Props> = ({ room }) => {
