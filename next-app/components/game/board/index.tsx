@@ -29,6 +29,7 @@ export const initialState: InitialBoardState = {
   selectedCard: '',
   isMyTurn: false,
   isNextUserTurn: false,
+  isDrawnCard: false,
   actionBtnStyle: 'disabled',
   dobonBtnStyle: 'disabled',
   isModalActive: false,
@@ -116,17 +117,23 @@ const board = (data: Props) => {
             <UserInfo key='my_info' user={me} turnUser={turnUser}/>
           </div>
         }
-        { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} setValues={setValues} /> }
+        { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} values={values} setValues={setValues} /> }
         { me &&
           <div className={style.actionBtnWrap}>
-            <ActionBtn text='アクション' styleClass={values.actionBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
+            <ActionBtn text={values.isDrawnCard ? 'スキップ' : 'ドロー'} styleClass={values.actionBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />            
             <ActionBtn text='どぼん！' styleClass={values.dobonBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
           </div>
         }
         { (isCardSelecting || values.isBtnActive.action) &&
           <div
             className={`${style.stateResetArea} ${isCardSelecting ? style.bg_transparent : style.bg_black}`}
-            onClick={() => setValues({...initialState, actionBtnStyle: 'action', dobonBtnStyle: 'dobon', isBtnActive: { action: false, dobon: false}})}
+            onClick={() => setValues({
+              ...values,
+              selectedCard: '',
+              actionBtnStyle: values.actionBtnStyle === 'skip' ? 'skip' : 'action',
+              dobonBtnStyle: values.actionBtnStyle === 'skip' ? 'disabled' : 'dobon',
+              isBtnActive: { action:false, dobon: false }})
+            }
           />
         }
       </div>

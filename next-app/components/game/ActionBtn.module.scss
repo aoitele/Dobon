@@ -42,6 +42,14 @@
   @extend .btn;
   background-color: orange;
 }
+.skip {
+  @extend .btn;
+  background-color:lightsalmon;
+}
+.draw {
+  @extend .btn;
+  background-color:lightgreen;
+}
 .active {
   @extend .btn;
   background-color:lawngreen;

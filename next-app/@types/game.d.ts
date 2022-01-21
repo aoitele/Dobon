@@ -60,7 +60,8 @@ export type InitialBoardState = {
   }
   isMyTurn: boolean
   isNextUserTurn: boolean
-  actionBtnStyle: 'disabled' | 'active' | 'action'
+  isDrawnCard: boolean
+  actionBtnStyle: 'disabled' | 'active' | 'action' | 'skip' | 'draw'
   dobonBtnStyle: 'disabled' | 'active' | 'dobon'
   isModalActive: boolean
 }

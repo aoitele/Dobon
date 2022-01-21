@@ -20,11 +20,17 @@ const useBoardHooks = ({ state, values, setValues, initialState, me } : Props) =
   const users = state.game?.board.users
   const turnUser = state.game?.board && users ? users.filter(_ => _.turn === state.game?.board.turn)[0] : null
 
+  const resActionBtnStyle = (isMyTurn:boolean) => {
+    if (!isMyTurn) return 'disabled'
+    if (values.isDrawnCard) return 'skip'
+    return values.isBtnActive.action ? 'active' : 'draw'
+  }
+
   useEffect(() => {
     if (!users || !turnUser || !me) return
     const isMyTurn = isMyTurnFn(me, turnUser)
     const isNextUserTurn = isNextUserTurnFn(me, turnUser, users)
-    const actionBtnStyle = isMyTurn ? values.isBtnActive.action ? 'active' : 'action' : 'disabled'
+    const actionBtnStyle = resActionBtnStyle(isMyTurn)
     const dobonBtnStyle = isNextUserTurn ? 'disabled' : values.isBtnActive.dobon ? 'active': 'dobon'
 
     // ターン変更orアクションボタン作動時 → 自ターンとアクションボタンのステートを変更
