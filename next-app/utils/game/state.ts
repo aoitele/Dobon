@@ -23,7 +23,7 @@ const initialState: gameInitialState = {
     },
     board: {
       users: [],
-      deck: [],
+      deckCount: 0,
       hands: [],
       trash: [],
       otherHands: [],

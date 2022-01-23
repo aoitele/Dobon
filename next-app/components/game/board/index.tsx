@@ -108,7 +108,7 @@ const board = (data: Props) => {
           </div>
           <div>
             <Image src={`/images/cards/deck.png`} width={70} height={105} />
-            <p className={style.deckCount}>x {boardState?.deck.length}</p>
+            <p className={style.deckCount}>x {boardState?.deckCount}</p>
           </div>
         </div>
         {
@@ -118,9 +118,9 @@ const board = (data: Props) => {
           </div>
         }
         { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} values={values} setValues={setValues} /> }
-        { me &&
+        { boardState && me &&
           <div className={style.actionBtnWrap}>
-            <ActionBtn text={values.isDrawnCard ? 'スキップ' : 'ドロー'} styleClass={values.actionBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />            
+            <ActionBtn text={values.isDrawnCard ? 'スキップ' : boardState.deckCount === 0 ? 'デッキセット＆ドロー' : 'ドロー'} styleClass={values.actionBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
             <ActionBtn text='どぼん！' styleClass={values.dobonBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
           </div>
         }
@@ -130,7 +130,7 @@ const board = (data: Props) => {
             onClick={() => setValues({
               ...values,
               selectedCard: '',
-              actionBtnStyle: values.actionBtnStyle === 'skip' ? 'skip' : 'action',
+              actionBtnStyle: values.actionBtnStyle === 'skip' ? 'skip' : 'draw',
               dobonBtnStyle: values.actionBtnStyle === 'skip' ? 'disabled' : 'dobon',
               isBtnActive: { action:false, dobon: false }})
             }

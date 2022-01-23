@@ -146,11 +146,15 @@ const emitHandler = (io: Socket, socket: any) => {
         }
 
         const hands = await adapterPubClient.smembers(userHandsKey)
+        const deckKey = `room:${roomId}:deck`
+        const deckCount = await adapterPubClient.scard(deckKey)
+
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             board: {
               hands,
-              otherHands
+              otherHands,
+              deckCount
             }
           }
         }
@@ -159,14 +163,21 @@ const emitHandler = (io: Socket, socket: any) => {
       }
       case 'gamestart': {
         const deckKey = `room:${roomId}:deck`
+        const trashKey = `room:${roomId}:trash`
+        await adapterPubClient.del(trashKey) // Trash初期化
+
         let initialTrash = await adapterPubClient.spop(deckKey, 1)
-        initialTrash = [`${initialTrash[0]  }o`] // Open状態に
+        await adapterPubClient.lpush(trashKey, initialTrash)
+        initialTrash = [`${initialTrash[0]}o`] // フロント返却時はOpen状態にする
+        const deckCount = await adapterPubClient.scard(deckKey)
+        // Const deckCount = 0
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             status: 'playing',
             board: {
               turn: 1,
-              trash: initialTrash
+              trash: initialTrash,
+              deckCount
             }
           }
         }
@@ -177,12 +188,45 @@ const emitHandler = (io: Socket, socket: any) => {
         const deckKey = `room:${roomId}:deck`
         const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
         const newCard = await adapterPubClient.spop(deckKey, 1)
-        adapterPubClient.sadd(userHandsKey, newCard)
+        await adapterPubClient.sadd(userHandsKey, newCard)
         // ルームメンバーに手札更新指令
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             event: {
               action: 'gethand'
+            }
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload)
+        break
+      }
+      case 'drawcard__deckset': {
+        /**
+         * デッキ残枚数0の時にこのケースに入る
+         * trashの最新1枚以外のカード情報を取得して新たな山札を生成
+         * 生成後の山札から1枚を実行ユーザーの手札に加える
+         */
+        const deckKey = `room:${roomId}:deck`
+        const trashKey = `room:${roomId}:trash`
+
+        const trashCard = await adapterPubClient.lrange(trashKey, 1, -1) // 最後の捨て札(先頭)を除くカードを取得
+        await adapterPubClient.sadd(deckKey, trashCard)
+        await adapterPubClient.ltrim(trashKey, 0, 0) // Trashは先頭だけ残す
+
+        const userHandsKey = `room:${roomId}:user:${userId}:hands`
+        const newCard = await adapterPubClient.spop(deckKey, 1)
+        await adapterPubClient.sadd(userHandsKey, newCard)
+
+        const deckCount = await adapterPubClient.scard(deckKey)
+
+        // ルームメンバーに手札更新指令、山札も更新
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            event: {
+              action: 'gethand'
+            },
+            board: {
+              deckCount
             }
           }
         }
@@ -213,6 +257,11 @@ const emitHandler = (io: Socket, socket: any) => {
         const { data } = payload
         if (data?.type !== 'board' || typeof data.data.trash === 'undefined') break
         const { trash } = data.data
+        const trashKey = `room:${roomId}:trash`
+        // `${suit}${num}o`でデータがくるため、redisはoなしでsadd
+        const _trash = [trash[0].replace('o', '')]
+        await adapterPubClient.lpush(trashKey, _trash) // 最新の捨て札を先頭に追加
+
         let reducerPayload: reducerPayloadSpecify = {
           game: {
             board: { 
@@ -222,7 +271,7 @@ const emitHandler = (io: Socket, socket: any) => {
         }
         io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
 
-        // `${suit}${num}o`でデータがくるため、redisでoあり/なしでsrem
+        // `${suit}${num}o`でデータがくるため、redisはoあり/なしでsrem
         const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
         await adapterPubClient.srem(userHandsKey, trash[0], trash[0].slice(0, -1))
 

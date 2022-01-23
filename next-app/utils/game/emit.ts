@@ -28,6 +28,17 @@ const emit = async({ emitData } : Props) => {
       await handleEmit(data)
       break
     }
+    case 'drawcard__deckset': {
+      const data:Emit = {
+        roomId: room.id,
+        user,
+        userId,
+        event: 'drawcard__deckset',
+        data: { type: 'board', data: boardState }
+      }
+      await handleEmit(data)
+      break
+    }
     case 'turnchange': {
       const data:Emit = {
         roomId: room.id,

@@ -29,7 +29,7 @@ describe('gameState TestCases', () => {
         event: { user: { nickname:'', turn:0 }, action: 'gamestart', message: null},
         board: {
           users: [],
-          deck: [],
+          deckCount: 0,
           hands: [],
           trash: [],
           otherHands: [],
@@ -69,7 +69,7 @@ describe('gameState TestCases', () => {
         event: { user:{ nickname:'', turn:0 }, action: 'gamestart', message: null },
         board: {
           users: [user],
-          deck: [],
+          deckCount: 0,
           hands: [],
           trash: [],
           otherHands: [],

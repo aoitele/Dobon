@@ -5,7 +5,7 @@ import { emit, Props } from '../../utils/game/emit'
 import style from './ActionBtn.module.scss'
 
 interface Args {
-  text: 'アクション' | 'どぼん！' | 'スキップ' | 'ドロー'
+  text: 'アクション' | 'どぼん！' | 'スキップ' | 'ドロー' | 'デッキセット＆ドロー'
   styleClass: 'action' | 'dobon' | 'active' | 'disabled' | 'skip' | 'draw'
   values: InitialBoardState
   setValues: React.Dispatch<React.SetStateAction<InitialBoardState>>
@@ -19,9 +19,12 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
     return args
   }
 
-  const draw = async () => {
+  const draw = async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     if (!emitArgs) return
-    await emit(addEmitArgEvent(emitArgs, 'drawcard'))
+    e.currentTarget.innerText === 'デッキセット＆ドロー'
+    ? await emit(addEmitArgEvent(emitArgs, 'drawcard__deckset'))
+    : await emit(addEmitArgEvent(emitArgs, 'drawcard'))
+
     setValues({
       ...initialState,
       isBtnActive: {
@@ -39,13 +42,13 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
     emit(addEmitArgEvent(emitArgs, 'turnchange'))
   }
 
-  const btnFn = async () => {
+  const btnFn = async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     if (!emitArgs || styleClass === 'disabled') return
     const toggleClass = values.actionBtnStyle === 'action' ? 'active' : 'action'
 
     switch(styleClass) {
       case 'draw':
-        draw()
+        draw(e)
         break
       case 'skip':
         turnChange()
@@ -70,7 +73,7 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
     <>
       { text === 'アクション' && values.isBtnActive.action &&
         <div className={style.menu}>
-          <span className={style.menuBtn} onClick={() => draw()}>ドロー</span>
+          <span className={style.menuBtn} onClick={(e) => draw(e)}>ドロー</span>
           { values.isDrawnCard && 
           <span className={style.menuBtn} onClick={() => turnChange()}>スキップ</span>
           }
@@ -78,7 +81,7 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
       }
       <div
         className={style[styleClass]}
-        onClick={btnFn}
+        onClick={(e) => btnFn(e)}
       >{text}</div> 
     </>
   )
