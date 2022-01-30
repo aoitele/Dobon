@@ -1,4 +1,4 @@
-import { Event } from './socket'
+import { Event, ModalEvent } from './socket'
 import { HandCards } from './card'
 import { GameUserInfo } from './user'
 
@@ -49,7 +49,7 @@ export type Board = {
   trash: string[] | HandCards[]
   otherHands: OtherHands[]
   turn: number | null
-  effect: { type: Order; value: number | null } // 継続中のカード効果を表す
+  effect: Effect[] // カードの効果名
 }
 
 export type InitialBoardState = {
@@ -68,11 +68,12 @@ export type InitialBoardState = {
 
 export type OwnerAction = { participants: GameUserInfo[] }
 export type Action = 'avoidEffect' | 'notAvoidEffect'
-export type Order = 'skip' | 'draw'| 'draw2'| 'draw4'| 'draw6'| 'draw8' | 'wild' | 'reverse' | 'opencard' | 'dobon' | null
+export type Order = 'skip' | 'draw'| 'draw2'| 'draw4'| 'draw6'| 'draw8' | 'wild' | 'reverse' | 'opencard' | 'dobon' | 'dobonsuccess' | 'dobonfailure' | null
 
 export type AllActionType = Action | Order
 export type ModalEffect = {
   user: Pick<Player, 'nickname' | 'turn'>
-  action: Event  | null
+  action: Event
   message: string  | null
 }
+export type Effect = 'draw2'| 'draw4'| 'draw6'| 'draw8' | 'skip' | 'wild' |'wildspade' | 'wildheart' | 'wildclub' | 'wilddia' | 'reverse' | 'opencard'

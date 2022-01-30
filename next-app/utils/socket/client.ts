@@ -8,10 +8,18 @@ class SocketClient {
     this._socket = null
   }
 
-  connect(roomId: string) {
+  async connect(roomId: string): Promise<void> {
+    await this.disconnect()
     this._socket = io(
       `${process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN}?roomId=${roomId}`
     )
+  }
+  
+  disconnect(): Promise<void> {
+    return new Promise((resolve) => {
+      this._socket?.close()
+      resolve()
+    })
   }
 
   emit(data: Emit): Promise<any> {

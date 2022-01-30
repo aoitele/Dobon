@@ -17,6 +17,11 @@ services:
     ports:
       - "3000:3000"
     tty: true
+    logging:
+      driver: json-file
+      options:
+        max-file: '1'
+        max-size: 3m
   redis:
     image: "redis:latest"
     container_name: dobon_redis

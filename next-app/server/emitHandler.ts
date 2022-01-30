@@ -8,6 +8,9 @@ import { prisma, Prisma } from '../prisma'
 import { Player } from '../@types/game'
 import { dobonJudge } from '../utils/game/dobonJudge'
 import sleep from '../utils/game/sleep'
+import { resEffectName } from '../utils/game/effect'
+import { culcNextUserTurn } from '../utils/game/turnInfo'
+import { initialState } from '../utils/game/state'
 
 const emitHandler = (io: Socket, socket: any) => {
   const adapterPubClient: Redis = socket.adapter.pubClient
@@ -237,10 +240,11 @@ const emitHandler = (io: Socket, socket: any) => {
         const { data } = payload
         if (data?.type === 'board') {
           const board = data.data
-          const { users, turn } = board
-          if (users && turn) {
-            let nextTurn = turn + 1
-            nextTurn = (nextTurn <= users.length) ? nextTurn : 1
+          const { users, turn, trash, effect } = board
+          if (users && turn && trash) {
+            const effectName = resEffectName(trash[0])
+            const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
+            const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed) 
             const reducerPayload: reducerPayloadSpecify = {
               game: {
                 board: {
@@ -258,8 +262,8 @@ const emitHandler = (io: Socket, socket: any) => {
         if (data?.type !== 'board' || typeof data.data.trash === 'undefined') break
         const { trash } = data.data
         const trashKey = `room:${roomId}:trash`
-        // `${suit}${num}o`でデータがくるため、redisはoなしでsadd
-        const _trash = [trash[0].replace('o', '')]
+        // `${suit}${num}o`でデータがくるため、redisはoなしでlpush
+        const _trash = trash[0].replace('o', '')
         await adapterPubClient.lpush(trashKey, _trash) // 最新の捨て札を先頭に追加
 
         let reducerPayload: reducerPayloadSpecify = {
@@ -284,6 +288,28 @@ const emitHandler = (io: Socket, socket: any) => {
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)
+        break
+      }
+      case 'effectcard': {
+        /**
+         * カード効果を全員に表示するため
+         * event.action 更新を行う
+         */
+        const { data } = payload
+        if (data?.type !== 'action' || !user) break
+        const effect = data.data
+        const { turn } = user
+        const reducerPayload:reducerPayloadSpecify = {
+          game: {
+            event: {
+              action: effect,
+              user: { nickname, turn }
+            }
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload)
+        await sleep(3000)
+        resetEvent(io, room) // モーダル表示を終了させるためにクライアント側のstateを更新
         break
       }
       case 'dobon': {
@@ -317,6 +343,8 @@ const emitHandler = (io: Socket, socket: any) => {
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)
+        await sleep(3000)
+        resetEvent(io, room)
         break
       }
       case 'chat': {
@@ -345,6 +373,15 @@ const emitHandler = (io: Socket, socket: any) => {
     }
     return {}
   })
+}
+
+const resetEvent = (io:Socket, room:string) => {
+  const reducerPayload: reducerPayloadSpecify = {
+    game: {
+      event: initialState.game?.event
+    }
+  }
+  io.in(room).emit('updateStateSpecify', reducerPayload)
 }
 
 export default emitHandler

@@ -28,10 +28,7 @@ const initialState: gameInitialState = {
       trash: [],
       otherHands: [],
       turn: null,
-      effect: {
-        type: null,
-        value: null
-      }
+      effect: []
     }
   },
   connected: false,

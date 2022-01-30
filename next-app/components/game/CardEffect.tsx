@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import type { Order } from '../../@types/game'
+import { Order } from '../../@types/game'
+import { Event } from '../../@types/socket'
 import type { Rank, RankCardNum, RankCardText } from '../../@types/card'
 import styles from './CardEffect.module.scss'
 
 interface Props {
-  order: Order
+  order: Event
   value: RankCardNum
 }
 

@@ -17,10 +17,11 @@ type Event = LiteralUnion<
   | 'getparticipants'
   | 'getusers'
   | 'turnchange'
-  | 'effect'
   | 'dobon'
   | 'dobonsuccess'
   | 'dobonfailure'
+  | 'action'
+  | 'effect'
   | 'avoidEffect'
   | 'notAvoidEffect'
   | 'skip'
@@ -34,6 +35,8 @@ type Event = LiteralUnion<
   | 'opencard',
   string
 > | null
+
+export type ModalEvent = Pick<Event,'dobon' ,'dobonsuccess' , 'dobonfailure', 'avoidEffect', 'notAvoidEffect', 'skip', 'draw', 'draw2', 'draw4', 'draw6', 'draw8', 'wild', 'reverse', 'opencard'>
 
 export type EmitCard = {
   type: 'card'

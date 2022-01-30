@@ -1,5 +1,5 @@
 import { HandCards } from "../../@types/card"
-import { AllActionType } from "../../@types/game"
+import { Event } from '../../@types/socket'
 import DobonConst from '../../constant'
 import spreadCardState from './spreadCardState'
 
@@ -19,19 +19,21 @@ const suitNameTo__Ja = (card: HandCards | string): { suit: string, num: number} 
 }
 
 interface Props {
-  action: AllActionType
+  action: Event
   card: HandCards | string
 }
 
 const createMsg = ({ action, card }:Props) => {
   const cardInfo = suitNameTo__Ja(card)
   switch (action) {
-    case 'dobon'    : return `「${cardInfo.suit}の${cardInfo.num}」でどぼん！`
-    case 'skip'     : return `「スキップ(1)」\n次のユーザーをスキップします`
-    case 'wild'     : return `「ワイルド(8)」\n選択した柄なら全て出せます`
-    case 'reverse'  : return `「リバース(11)」\nターン順を反転します`
-    case 'opencard' : return `「手札公開(13)」\n次のユーザーは手札を公開！`
-    default         : return ''
+    case 'dobon'           : return `「${cardInfo.suit}の${cardInfo.num}」でどぼん！`
+    case 'dobonsuccess'    : return `どぼん成功！`
+    case 'dobonfailure'    : return `どぼん失敗！`
+    case 'skip'            : return `「スキップ(1)」\n次のユーザーをスキップします`
+    case 'wild'            : return `「ワイルド(8)」\n選択した柄なら全て出せます`
+    case 'reverse'         : return `「リバース(11)」\nターン順を反転します`
+    case 'opencard'        : return `「手札公開(13)」\n次のユーザーは手札を公開！`
+    default                : return ''
   }
 }
 

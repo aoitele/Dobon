@@ -34,7 +34,7 @@ describe('gameState TestCases', () => {
           trash: [],
           otherHands: [],
           turn: null,
-          effect: { type:null, value:null }
+          effect: []
         }
       },
       connected: false,
@@ -74,7 +74,7 @@ describe('gameState TestCases', () => {
           trash: [],
           otherHands: [],
           turn: null,
-          effect: { type:null, value:null }
+          effect: []
         }
       },
       connected: false,

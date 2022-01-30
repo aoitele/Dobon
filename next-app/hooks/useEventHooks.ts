@@ -5,12 +5,29 @@
  */
 
 import { useEffect, Dispatch } from 'react'
-import { HandleEmitFn, Emit } from '../@types/socket'
+import { HandleEmitFn, Emit, Event } from '../@types/socket'
 import { gameInitialState, Action, reducerPayloadSpecify } from '../utils/game/roomStateReducer'
 import { AuthState } from '../context/authProvider'
 import { RoomAPIResponse } from '../@types/api/roomAPI'
 import { useUpdateStateFn } from '../utils/game/state'
 import { updateHandsFn } from '../utils/game/checkHand'
+
+const hookEventCases:Event[] = [
+  'preparecomplete',
+  'gethand',
+  'dobon',
+  'dobonsuccess',
+  'dobonfailure',
+  'skip',
+  'draw2',
+  'draw4',
+  'draw6',
+  'draw8',
+  'reverse',
+  'opencard',
+  'wild',
+]
+
 
 const useEventHooks = (
   state: gameInitialState,
@@ -19,13 +36,14 @@ const useEventHooks = (
   room: RoomAPIResponse.RoomInfo,
   dispatch: Dispatch<Action>
 ) => {
-
   useEffect(() => {
-    if (!state.roomId || !state.game || !state.game.event?.action || !authUser) return
+    const action = state.game?.event.action
+    if (!action || !hookEventCases.includes(action)) return
     const { game, roomId } = state
-    const { event } = state.game
+    if (!roomId || !game || game.event.action === '' || !authUser) return
+    const { event } = game
 
-    const handler = async() => {
+    const handler = async () => {
       switch (event.action) {
         case 'preparecomplete': {
           if (roomId) {
@@ -56,43 +74,52 @@ const useEventHooks = (
           }
           break
         }
-        case 'dobon': {
+        case 'dobon':
+        case 'dobonsuccess':
+        case 'dobonfailure':
+        case 'skip':
+        case 'draw2':
+        case 'draw4':
+        case 'draw6':
+        case 'draw8':
+        case 'reverse':
+        case 'opencard':
+        case 'wild': {
           const data: reducerPayloadSpecify = {
             game: {
               event: {
                 user: { nickname: event.user.nickname, turn: event.user.turn },
-                action: 'dobon',
-                message: 'ドボン発生!'
+                action: event.action,
               }
             }
           }
+          console.log(data, 'data')
           const newState = useUpdateStateFn(state, data)
-          console.log('state update start -- dobon')
           dispatch({ type: 'updateStateSpecify', payload: newState })
-          console.log('state update end -- dobon')
-
           break
         }
-        case 'dobonsuccess': {
-          console.log('dobonsuccess')
-          break
-        }
-        case 'dobonfailure': {
-          console.log('dobonfailure')
-          break
-        }
+      
         default:
           break
       }
     }
-    handler().then(
+    handler()
+    .then(
       () => {
-        // Write next emit/dispatch if you need
-        const data: reducerPayloadSpecify = {
-          game: { event: { action: null } }
-        }
-        const newState = useUpdateStateFn(state, data)
-        dispatch({ type: 'updateStateSpecify', payload: newState })
+        const resetEvents:Event[] = ['preparecomplete', 'gethand']
+        if (resetEvents.includes(event.action)) {
+          const data: reducerPayloadSpecify = {
+            game: {
+              event: {
+                user: { nickname:'', turn:0 },
+                action: null,
+                message: null
+              }
+            }
+          }
+          const newState = useUpdateStateFn(state, data)
+          dispatch({ type: 'updateStateSpecify', payload: newState })
+        }  
       }
     )
   }, [state.game?.event.action])

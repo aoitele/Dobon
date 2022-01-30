@@ -1,4 +1,4 @@
-import { isMyTurnFn, isNextUserTurnFn } from '../../utils/game/turnInfo'
+import { isMyTurnFn, isNextUserTurnFn, culcNextUserTurn } from '../../utils/game/turnInfo'
 import { Player } from '../../@types/game'
 
 const noInfoUser = { id: 0, nickname: '', turn: 0, score: 0 }
@@ -58,5 +58,68 @@ describe('turnInfo TestCases', () => {
     expect(result2).toBe(false)
     expect(result3).toBe(true)
     expect(result4).toBe(false)
+  })
+})
+
+const users: Player[] = [
+  { id: 1, nickname: 'taro', turn: 1, score: 0 },
+  { id: 2, nickname: 'jiro', turn: 2, score: 0 },
+  { id: 3, nickname: 'saburo', turn: 3, score: 0 },
+  { id: 4, nickname: 'siro', turn: 4, score: 0 },
+]
+
+const user2 = users.slice(0, 2)
+const user3 = users.slice(0, 3)
+const user4 = users.slice(0, 4)
+
+describe.each`
+ turn  | users    | effect       | isReversed | expected
+ ${1}  | ${user2} | ${undefined} | ${false} | ${2}
+ ${1}  | ${user2} | ${'skip'}    | ${false} | ${1}
+ ${1}  | ${user2} | ${'reverse'} | ${false} | ${2}
+ ${2}  | ${user2} | ${undefined} | ${false} | ${1}
+ ${2}  | ${user2} | ${'skip'}    | ${false} | ${2}
+ ${2}  | ${user2} | ${'reverse'} | ${false} | ${1}
+ ${1}  | ${user3} | ${undefined} | ${false} | ${2}
+ ${3}  | ${user3} | ${undefined} | ${false} | ${1}
+ ${1}  | ${user3} | ${'skip'}    | ${false} | ${3}
+ ${2}  | ${user3} | ${'skip'}    | ${false} | ${1}
+ ${1}  | ${user3} | ${'reverse'} | ${false} | ${3}
+ ${2}  | ${user3} | ${'reverse'} | ${false} | ${1}
+ ${1}  | ${user4} | ${undefined} | ${false} | ${2}
+ ${4}  | ${user4} | ${undefined} | ${false} | ${1}
+ ${1}  | ${user4} | ${'skip'}    | ${false} | ${3}
+ ${2}  | ${user4} | ${'skip'}    | ${false} | ${4}
+ ${3}  | ${user4} | ${'skip'}    | ${false} | ${1}
+ ${4}  | ${user4} | ${'skip'}    | ${false} | ${2}
+ ${1}  | ${user4} | ${'reverse'} | ${false} | ${4}
+ ${2}  | ${user4} | ${'reverse'} | ${false} | ${1}
+ ${3}  | ${user4} | ${'reverse'} | ${false} | ${2}
+ ${4}  | ${user4} | ${'reverse'} | ${false} | ${3}
+ ${1}  | ${user2} | ${undefined} | ${true}  | ${2}
+ ${1}  | ${user2} | ${'skip'}    | ${true}  | ${1}
+ ${1}  | ${user2} | ${'reverse'} | ${true}  | ${2}
+ ${2}  | ${user2} | ${undefined} | ${true}  | ${1}
+ ${2}  | ${user2} | ${'skip'}    | ${true}  | ${2}
+ ${2}  | ${user2} | ${'reverse'} | ${true}  | ${1}
+ ${1}  | ${user3} | ${undefined} | ${true}  | ${3}
+ ${3}  | ${user3} | ${undefined} | ${true}  | ${2}
+ ${1}  | ${user3} | ${'skip'}    | ${true}  | ${2}
+ ${2}  | ${user3} | ${'skip'}    | ${true}  | ${3}
+ ${1}  | ${user3} | ${'reverse'} | ${true}  | ${2}
+ ${2}  | ${user3} | ${'reverse'} | ${true}  | ${3}
+ ${1}  | ${user4} | ${undefined} | ${true}  | ${4}
+ ${4}  | ${user4} | ${undefined} | ${true}  | ${3}
+ ${1}  | ${user4} | ${'skip'}    | ${true}  | ${3}
+ ${2}  | ${user4} | ${'skip'}    | ${true}  | ${4}
+ ${3}  | ${user4} | ${'skip'}    | ${true}  | ${1}
+ ${4}  | ${user4} | ${'skip'}    | ${true}  | ${2}
+ ${1}  | ${user4} | ${'reverse'} | ${true}  | ${2}
+ ${2}  | ${user4} | ${'reverse'} | ${true}  | ${3}
+ ${3}  | ${user4} | ${'reverse'} | ${true}  | ${4}
+ ${4}  | ${user4} | ${'reverse'} | ${true}  | ${1}
+`('$turn should be', ({ turn, users, effect, isReversed, expected }) => {
+  test(`returns ${expected}`, () => {
+    expect(culcNextUserTurn(turn, users, effect, isReversed)).toBe(expected)
   })
 })
