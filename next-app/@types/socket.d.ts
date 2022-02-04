@@ -1,5 +1,5 @@
 import { Card } from './card'
-import { Action, Order, Board, Player } from './game'
+import { Action, Order, Board, Player, Effect } from './game'
 import { LiteralUnion } from 'type-fest'
 import { NestedPartial } from '../@types/utility'
 
@@ -22,6 +22,7 @@ type Event = LiteralUnion<
   | 'dobonfailure'
   | 'action'
   | 'effect'
+  | 'effectupdate'
   | 'avoidEffect'
   | 'notAvoidEffect'
   | 'skip'
@@ -45,7 +46,7 @@ export type EmitCard = {
 
 export type EmitAction = {
   type: 'action'
-  data: Action | Order | OwnerAction
+  data: Effect
 }
 
 export type EmitChat = {

@@ -16,7 +16,7 @@ import { createEmitFnArgs } from '../../../utils/game/emit'
 import EffectAnimation from '../EffectAnimation'
 import { createMsg } from '../../../utils/game/message'
 import useBoardHooks from '../../../hooks/useBoardHooks'
-import { isModalEffect, resEffectName } from '../../../utils/game/effect'
+import { isModalEffect, resEffectName, resNewEffectState } from '../../../utils/game/effect'
 
 export interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -53,32 +53,61 @@ const board = (data: Props) => {
 
   const putOut = async(card: string) => {
     if (!boardState || !me?.id) return
-    let emitData:Emit = {
+
+    // Update trash
+    let boardEmit:Emit = {
       roomId: room.id,
       userId: me.id,
       event: 'playcard',
       data: { type: 'board', data: { trash: [`${card}o`] }} // Trashで見せるためopenフラグをつけて送る
     }
-    await handleEmit(emitData)
+    await handleEmit(boardEmit)
 
+    // Effect notice
     const effectName = resEffectName(card)
     if (effectName !== '') {
-      emitData = {
+      const actionEmit: Emit = {
         roomId: room.id,
         userId: me.id,
         event: 'effectcard',
         user: me,
-        data: { type:'action', data: effectName }
+        data: { type:'action', data:effectName }
       }
-      await handleEmit(emitData)
+      await handleEmit(actionEmit)
     }
-    emitData = {
+
+
+    /**
+     * Update BoardState Effect
+     * 盤面に残っている効果と出したカードの効果を相殺し、更新版のeffectを送る
+     * 対象となる効果は「draw(2/4/6)」「wild」「reverse」「opencard」
+     */
+    const existsEffect = boardState.effect.length > 0
+    if (!existsEffect && effectName !== '') {
+      boardEmit = {
+        roomId: room.id,
+        event: 'effectupdate',
+        data: { type:'board', data: { effect: [effectName] } }
+      }
+    }
+
+    if (existsEffect) {
+      const newEffectState = resNewEffectState(boardState.effect, effectName)
+      boardEmit = {
+        roomId: room.id,
+        event: 'effectupdate',
+        data: { type:'board', data: { effect: newEffectState } }
+      }
+    }
+    await handleEmit(boardEmit)
+
+    boardEmit = {
       roomId: room.id,
       userId: me.id,
       event: 'turnchange',
       data: { type:'board', data: { users, turn: boardState.turn, trash: [`${card}o`], effect: boardState.effect }}
     }
-    await handleEmit(emitData)
+    await handleEmit(boardEmit)
     setValues({ ...initialState, isNextUserTurn: true })
   }
   return (
@@ -115,19 +144,23 @@ const board = (data: Props) => {
                   <span>{turnUser?.nickname}</span> のターン
                 </p>
             }
-            {/* ♠️♥️♣️♦️ */}
             <div className={style.effectWrap}>
               { boardState?.effect && 
               <>
-                <span className={style.reverse}>🔄</span>
-                <span className={style.wildSuit}>♠️</span>
-                <div className={style.drawCardInfo}>
-                  <div>
-                    <span className={style.icon}>🃏</span>
-                    <span className={style.count}>×2</span>
+                { boardState.effect.includes('reverse') && <span className={style.reverse}>🔄</span> }
+                { boardState.effect.includes('wildspade') && <span className={style.wildSuit}>♠️</span> }
+                { boardState.effect.includes('wildclub') && <span className={style.wildSuit}>♣️</span> }
+                { boardState.effect.includes('wilddia') && <span className={style.wildSuit}>♦️</span> }
+                { boardState.effect.includes('wildheart') && <span className={style.wildSuit}>♥️</span> }
+                { boardState.effect.includes('draw2') &&
+                  <div className={style.drawCardInfo}>
+                    <div>
+                      <span className={style.icon}>🃏</span>
+                      <span className={style.count}>×2</span>
+                    </div>
                   </div>
-                </div>
-                <span className={style.openCardIcon}>👑</span>
+                }
+                { boardState.effect.includes('opencard') && <span className={style.openCardIcon}>👑</span> }
               </>
               }
             </div>
@@ -172,6 +205,9 @@ const board = (data: Props) => {
             message={createMsg({action: state.game.event.action, card: boardState.trash[0]})}
           />
         </>
+      }
+      {
+        boardState?.effect.includes('draw2') && <div>ドロー2の効果が残っています。</div>
       }
     </>
   )

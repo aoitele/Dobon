@@ -297,19 +297,32 @@ const emitHandler = (io: Socket, socket: any) => {
          */
         const { data } = payload
         if (data?.type !== 'action' || !user) break
-        const effect = data.data
+        const action = data.data
         const { turn } = user
         const reducerPayload:reducerPayloadSpecify = {
           game: {
             event: {
-              action: effect,
-              user: { nickname, turn }
+              action,
+              user: { nickname:user.nickname, turn }
             }
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)
         await sleep(3000)
         resetEvent(io, room) // モーダル表示を終了させるためにクライアント側のstateを更新
+        break
+      }
+      case 'effectupdate': {
+        /**
+         * BoardState.effectの更新
+         */
+        const { data } = payload
+        if (data?.type !== 'board') break
+        const { effect } = data.data
+        const reducerPayload:reducerPayloadSpecify = {
+          game: { board: { effect } }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload)
         break
       }
       case 'dobon': {
