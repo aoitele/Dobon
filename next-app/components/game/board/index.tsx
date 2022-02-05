@@ -28,6 +28,7 @@ export interface Props {
 export const initialState: InitialBoardState = {
   selectedCard: '',
   isMyTurn: false,
+  isMyTurnConsecutive: false,
   isNextUserTurn: false,
   isDrawnCard: false,
   actionBtnStyle: 'disabled',
@@ -108,7 +109,12 @@ const board = (data: Props) => {
       data: { type:'board', data: { users, turn: boardState.turn, trash: [`${card}o`], effect: boardState.effect }}
     }
     await handleEmit(boardEmit)
-    setValues({ ...initialState, isNextUserTurn: true })
+    // 参加者2人でskipが出た場合は自分のターンとなる
+    const isNextUserIsMe = boardState.users.length === 2 && effectName === 'skip'
+    const newValues:InitialBoardState = isNextUserIsMe
+    ? { ...initialState, isMyTurn: true, isMyTurnConsecutive:true, actionBtnStyle: 'action' }
+    : { ...initialState, isNextUserTurn: true }
+    setValues(newValues)
   }
   return (
     <>
@@ -190,7 +196,7 @@ const board = (data: Props) => {
               ...values,
               selectedCard: '',
               actionBtnStyle: values.actionBtnStyle === 'skip' ? 'skip' : 'draw',
-              dobonBtnStyle: values.actionBtnStyle === 'skip' ? 'disabled' : 'dobon',
+              dobonBtnStyle: values.actionBtnStyle === 'skip' || values.isMyTurnConsecutive ? 'disabled' : 'dobon',
               isBtnActive: { action:false, dobon: false }})
             }
           />

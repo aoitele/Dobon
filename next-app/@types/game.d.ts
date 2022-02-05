@@ -59,6 +59,7 @@ export type InitialBoardState = {
     dobon: boolean
   }
   isMyTurn: boolean
+  isMyTurnConsecutive: boolean // 連続して自分のターンかどうか(skip使用時にtrueとなる)
   isNextUserTurn: boolean
   isDrawnCard: boolean
   actionBtnStyle: 'disabled' | 'active' | 'action' | 'skip' | 'draw'

@@ -308,7 +308,7 @@ const emitHandler = (io: Socket, socket: any) => {
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)
-        await sleep(3000)
+        await sleep(1000)
         resetEvent(io, room) // モーダル表示を終了させるためにクライアント側のstateを更新
         break
       }

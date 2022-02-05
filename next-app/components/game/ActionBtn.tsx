@@ -31,6 +31,7 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
         action: false,
         dobon: false
       },
+      isMyTurn: true,
       isDrawnCard: true,
       actionBtnStyle: 'skip',
       dobonBtnStyle: 'disabled'
