@@ -1,0 +1,56 @@
+.wrap {
+  position: relative;
+  width: calc(45%);
+  height: 200px;
+  padding: 6px;
+  margin: 10px 4px;
+  border: transparent;
+  border-radius: 14px;
+  text-align: center;
+  background:#eeedea;
+  box-shadow: 3px 3px 6px rgba(0,0,0,0.25);
+  z-index: 500;
+  &:before {
+      position: absolute;
+      top: 2px;
+      left: 3px;
+      padding: 5px;
+      content: "♦";
+      color:#DD5964;
+  }
+  &:after {
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    padding: 5px;
+    content: "♦";
+    color:#DD5964;
+  }
+  a {
+    display: block;
+    height: 100%;
+  }
+  .title {
+    font-weight: bold;
+    font-size: 18px;
+    padding: 5px;
+    padding-bottom: 8px;
+  }
+  .info {
+    padding: 5px;
+  }
+  .statusTxt {
+    padding: 4px;
+    width: 75%;
+    margin: 0 auto;
+    border-radius: 10px;
+  }
+  .txtOwner {
+    @extend .statusTxt; 
+    background-color: #98ee80;
+  }
+  .txtParticipants {
+    @extend .statusTxt; 
+    background-color: #e5ee7b;
+  }
+}

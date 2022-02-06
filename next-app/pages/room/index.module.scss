@@ -1,0 +1,16 @@
+.bg {
+  background-color:rgb(233, 181, 144);
+  z-index: 100;
+  .ul {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .ul::after {
+    display: block;
+    content:"";
+    width: calc(45%);
+  }
+}

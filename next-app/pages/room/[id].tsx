@@ -63,7 +63,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     try {
       const res = await axios.get(url)
       const { room } = res.data
-      return room ? {props: {room}} : {props: {}}
+      const title = room.title
+      return room ? {props: {room, title}} : {props: {}}
     } catch (e) {
       throw new Error('room api request failed')
     }

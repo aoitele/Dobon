@@ -13,7 +13,15 @@ const handle = (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const handleGET = async (res: NextApiResponse) => {
-  const rooms = await prisma?.room.findMany()
+  const rooms = await prisma?.room.findMany({
+    include: {
+      user: {
+        select: {
+          nickname: true
+        }
+      }
+    }
+  })
   res.json({ rooms })  
 }
 
