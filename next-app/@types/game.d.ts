@@ -64,7 +64,6 @@ export type InitialBoardState = {
   isDrawnCard: boolean
   actionBtnStyle: 'disabled' | 'active' | 'action' | 'skip' | 'draw'
   dobonBtnStyle: 'disabled' | 'active' | 'dobon'
-  isModalActive: boolean
 }
 
 export type Action = 'avoidEffect' | 'notAvoidEffect'

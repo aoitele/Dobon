@@ -93,7 +93,6 @@ const useEventHooks = (
               }
             }
           }
-          console.log(data, 'data')
           const newState = useUpdateStateFn(state, data)
           dispatch({ type: 'updateStateSpecify', payload: newState })
           break

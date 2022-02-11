@@ -17,6 +17,7 @@ import EffectAnimation from '../EffectAnimation'
 import { createMsg } from '../../../utils/game/message'
 import useBoardHooks from '../../../hooks/useBoardHooks'
 import { isModalEffect, resEffectName, resNewEffectState } from '../../../utils/game/effect'
+import ModalBack from '../../feedback/ModalBack'
 
 export interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -33,7 +34,6 @@ export const initialState: InitialBoardState = {
   isDrawnCard: false,
   actionBtnStyle: 'disabled',
   dobonBtnStyle: 'disabled',
-  isModalActive: false,
   isBtnActive: {
     action: false,
     dobon: false
@@ -204,16 +204,13 @@ const board = (data: Props) => {
       </div>
       { eventUser && state.game && isModalEffect(state.game.event.action) && boardState?.trash &&
         <>
-          <div className={style.modalBack} />
+          <ModalBack />
           <EffectAnimation
             user={eventUser}
             action={state.game.event.action}
             message={createMsg({action: state.game.event.action, card: boardState.trash[0]})}
           />
         </>
-      }
-      {
-        boardState?.effect.includes('draw2') && <div>ドロー2の効果が残っています。</div>
       }
     </>
   )

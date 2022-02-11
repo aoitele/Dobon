@@ -72,8 +72,6 @@ const updateHandsFn = ({ state, authUser, dispatch} : UpdateHandFnProps) => {
 const updateMyHandsStatus = ({state, hands, trash, dispatch}: UpdateHandProps) => {
   // 場に出せる手札を判定、isPutable=trueにする(['${suit}${num}op', ...])
   const putableCards = cardsICanPutOut(hands,trash)
-  console.log(hands, 'hands')
-  console.log(putableCards, 'putableCards')
   const newHands = hands.map(_ => putableCards.includes(_) ? `${_}p`: `${_}`)
   const data = {
     game: {
@@ -87,7 +85,6 @@ const updateMyHandsStatus = ({state, hands, trash, dispatch}: UpdateHandProps) =
 }
 
 const resetMyHandsStatus = ({state, hands, dispatch}: ResetHandProps) => {
-  console.log('resetMyHandsStatus fire')
   // IsPutable=falseにする
   const newHands = hands.map(_ => _.replace('p', ''))
   const data = {
