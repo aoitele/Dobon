@@ -45,7 +45,6 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
 
   const btnFn = async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     if (!emitArgs || styleClass === 'disabled') return
-    const toggleClass = values.actionBtnStyle === 'action' ? 'active' : 'action'
 
     switch(styleClass) {
       case 'draw':
@@ -56,16 +55,6 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
         break
       case 'dobon':
         await emit(addEmitArgEvent(emitArgs, 'dobon'))
-        break
-      case 'action':
-        setValues({
-          ...initialState,
-          actionBtnStyle: toggleClass,
-          isBtnActive: {
-            ...values.isBtnActive,
-            action: !values.isBtnActive.action
-          }
-        })
         break
       default : break;
     }

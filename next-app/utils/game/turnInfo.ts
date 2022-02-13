@@ -46,4 +46,15 @@ const culcFromMinus = (nextTurn: number, len: number, minus:number) => {
   return orLess0 ? len + _nextTurn : _nextTurn
 }
 
-export { isMyTurnFn, isNextUserTurnFn, culcNextUserTurn }
+/**
+ * 前のターンを計算する処理
+ * isReversed true(+1),false(-1)
+ */
+const culcBeforeUserTurn = (turn: number, users:NestedPartial<Player>[], isReversed: boolean): number => {
+  const len = users.length
+  const culcNum = isReversed ? 1 : -1
+  const test = turn + culcNum
+  const result = test === 0 ? len : test > len ? 1 : test
+  return result
+}
+export { isMyTurnFn, isNextUserTurnFn, culcNextUserTurn, culcBeforeUserTurn }

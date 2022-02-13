@@ -16,8 +16,11 @@ import { createEmitFnArgs } from '../../../utils/game/emit'
 import EffectAnimation from '../EffectAnimation'
 import { createMsg } from '../../../utils/game/message'
 import useBoardHooks from '../../../hooks/useBoardHooks'
-import { isModalEffect, resEffectName, resNewEffectState } from '../../../utils/game/effect'
+import { existShouldBeSolvedEffect, resEffectName, resNewEffectState } from '../../../utils/game/effect'
+import { isModalEvent } from '../../../utils/game/event'
 import ModalBack from '../../feedback/ModalBack'
+import AvoidEffectSelecter from '../AvoidEffectSelecter'
+import { culcBeforeUserTurn } from '../../../utils/game/turnInfo'
 
 export interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -43,10 +46,14 @@ export const initialState: InitialBoardState = {
 const board = (data: Props) => {
   const [ values, setValues ] = useState(initialState)
   const { room, handleEmit, state, authUser } = data
-  const boardState = state.game?.board
-  const users = boardState?.users
-  const me = users?.filter(_=>_.id === authUser?.id)[0]
-  const turnUser = boardState && users ? users.filter(_ => _.turn === boardState.turn)[0] : null
+  if (typeof state.game === 'undefined' || !authUser) return <></>
+
+  const boardState = state.game.board
+  const users = boardState.users
+  const me = users.filter(_=>_.id === authUser.id)[0]
+  const turnUser = users.filter(_ => _.turn === boardState.turn)[0]
+  const beforeUserTurn = boardState.turn && culcBeforeUserTurn(boardState.turn, users, boardState?.effect.includes('reverse'))
+  const beforeUser = users.filter(_ => _.turn === beforeUserTurn)[0]
   const isCardSelecting = values.selectedCard !== ''
   const eventUser = state.game?.event.user
 
@@ -72,7 +79,7 @@ const board = (data: Props) => {
         userId: me.id,
         event: 'effectcard',
         user: me,
-        data: { type:'action', data:effectName }
+        data: { type:'action', data: { effectState:boardState.effect, effect:effectName } }
       }
       await handleEmit(actionEmit)
     }
@@ -112,7 +119,7 @@ const board = (data: Props) => {
     // 参加者2人でskipが出た場合は自分のターンとなる
     const isNextUserIsMe = boardState.users.length === 2 && effectName === 'skip'
     const newValues:InitialBoardState = isNextUserIsMe
-    ? { ...initialState, isMyTurn: true, isMyTurnConsecutive:true, actionBtnStyle: 'action' }
+    ? { ...initialState, isMyTurn: true, isMyTurnConsecutive:true, actionBtnStyle: 'draw' }
     : { ...initialState, isNextUserTurn: true }
     setValues(newValues)
   }
@@ -127,7 +134,7 @@ const board = (data: Props) => {
           {
             boardState && users &&
             users.map(
-              user => authUser?.id !== user.id &&
+              user => authUser.id !== user.id &&
               <UserInfo key={`user_${user.id}_info`} user={user} otherHands={boardState.otherHands} turnUser={turnUser} />
             )
           }
@@ -189,7 +196,7 @@ const board = (data: Props) => {
             <ActionBtn key={'btn__dobon'} text='どぼん！' styleClass={values.dobonBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
           </div>
         }
-        { (isCardSelecting || values.isBtnActive.action) &&
+        { isCardSelecting &&
           <div
             className={`${style.stateResetArea} ${isCardSelecting ? style.bg_transparent : style.bg_black}`}
             onClick={() => setValues({
@@ -202,7 +209,7 @@ const board = (data: Props) => {
           />
         }
       </div>
-      { eventUser && state.game && isModalEffect(state.game.event.action) && boardState?.trash &&
+      { eventUser && state.game && isModalEvent(state.game.event.action) && boardState?.trash &&
         <>
           <ModalBack />
           <EffectAnimation
@@ -212,6 +219,14 @@ const board = (data: Props) => {
           />
         </>
       }
+      { boardState && values.isMyTurn && state.game?.board.effect.length && existShouldBeSolvedEffect(state.game.board.effect) &&
+      <AvoidEffectSelecter
+        authUser={authUser}
+        emitter={beforeUser}
+        effect={state.game.board.effect}
+        state={state}
+        handleEmit={handleEmit}
+      /> }
     </>
   )
 }

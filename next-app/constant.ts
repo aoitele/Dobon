@@ -11,6 +11,11 @@ namespace DobonConst {
   export const DOBON_CARD_NAME_JA_S = 'スペード'
   export const DOBON_CARD_NAME_JA_H = 'ハート'
   export const DOBON_CARD_NAME_JA_X = 'ジョーカー'
+  export const DOBON_CARD_NUMBER_SKIP = 1
+  export const DOBON_CARD_NUMBER_DRAW_2 = 2
+  export const DOBON_CARD_NUMBER_WILD = 8
+  export const DOBON_CARD_NUMBER_REVERSE = 11
+  export const DOBON_CARD_NUMBER_OPENCARD = 13
 }
 
 export default DobonConst

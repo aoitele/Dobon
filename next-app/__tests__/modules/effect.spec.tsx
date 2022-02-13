@@ -1,19 +1,28 @@
-import { modalEffect, isModalEffect, resEffectName, resNewEffectState } from "../../utils/game/effect";
-import { ModalEffect, Effect } from "../../@types/game"
+import { shouldBeSolvedEffects, existShouldBeSolvedEffect, resEffectNumber, resEffectName, resNewEffectState } from "../../utils/game/effect";
+import { Effect } from "../../@types/game"
 
 const effects_1:Effect[] = ['wildclub']
 const effects_2:Effect[] = ['wilddia']
 const effects_3:Effect[] = ['wildheart']
 const effects_4:Effect[] = ['wildspade']
 
-describe('isModalEffect TestCases', () => {
-  test.each(modalEffect)(`%s - 正規アクションはtrueを返す`, action => {
-    expect(isModalEffect(action)).toBe(true)
+describe('existShouldBeSolvedEffect TestCases', () => {
+  test.each(shouldBeSolvedEffects)(`%s - shouldBeSolvedEffect 正規アクションはtrueを返す`, action => {
+    const result = existShouldBeSolvedEffect([action])
+    expect(result).toBe(true)
   })
-  it('nullが渡された場合はfalse', () => {
-    const action:ModalEffect['action'] = null
-    const result = isModalEffect(action)
-    expect(result).toBe(false)
+})
+describe.each`
+ solvableEffects | expected
+ ${['draw2']}    | ${2}
+ ${['draw4']}    | ${2}
+ ${['draw6']}    | ${2}
+ ${['draw8']}    | ${2}
+ ${['opencard']} | ${13}
+ ${''}           | ${null}
+`('$solvableEffects should be', ({ solvableEffects, expected }) => {
+  test(`returns ${expected}`, () => {
+    expect(resEffectNumber(solvableEffects)).toBe(expected)
   })
 })
 describe.each`

@@ -40,7 +40,7 @@ const useEventHooks = (
     const action = state.game?.event.action
     if (!action || !hookEventCases.includes(action)) return
     const { game, roomId } = state
-    if (!roomId || !game || game.event.action === '' || !authUser) return
+    if (!roomId || !game || game.event.action === null || !authUser) return
     const { event } = game
 
     const handler = async () => {

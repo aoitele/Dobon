@@ -3,23 +3,20 @@
  */
 
 import { HandCards } from "../../@types/card"
-import { ModalEffect, Effect } from "../../@types/game"
+import { Effect, SolvableEffects } from "../../@types/game"
+import DobonConst from "../../constant"
 
-const modalEffect: ModalEffect['action'][] = [
-  'avoidEffect',
-  'notAvoidEffect',
-  'skip',
-  'draw',
+/**
+ * 下記カード効果は次ターンのユーザーで解決されるため、shouldBeSolvedEffectsの複数共存はない
+ * 'dobonfailure'も(誤どぼん)→(他ユーザーがどぼんできるかチェック)の1回で解決される
+ * extractShouldBeSolvedEffect()でeffectNameを取り出す際は[0]インデックスで使用してOK
+ */
+const shouldBeSolvedEffects: SolvableEffects  = [
   'draw2',
   'draw4',
   'draw6',
   'draw8',
-  'wild',
-  'reverse',
-  'opencard',
-  'dobon',
-  'dobonsuccess',
-  'dobonfailure'
+  'opencard'
 ]
 
 type CardEffects = {
@@ -36,7 +33,24 @@ const cardEffects: CardEffects = {
 
 const rankCardNums = [0, 1, 2, 8, 11, 13]
 
-const isModalEffect = (action: string | null) => typeof action === 'string' && modalEffect.includes(action)
+const extractShouldBeSolvedEffect = (effect: SolvableEffects) => effect.filter(_ => shouldBeSolvedEffects.includes(_))
+const existShouldBeSolvedEffect = (effect: SolvableEffects) => {
+  return extractShouldBeSolvedEffect(effect).length > 0
+}
+
+const resEffectNumber = (effectName: SolvableEffects) => {
+  switch(effectName[0]) {
+    case 'draw2':
+    case 'draw4':
+    case 'draw6':
+    case 'draw8':
+      return DobonConst.DOBON_CARD_NUMBER_DRAW_2
+    case 'opencard':
+      return DobonConst.DOBON_CARD_NUMBER_OPENCARD
+    default: return null
+  }
+}
+
 const resEffectName = (card: HandCards | string) => {
   const re = /[0-9]+/gu
   const mat = card.match(re)
@@ -130,4 +144,4 @@ const treatDrawEffect:EffectStateTreatFn = (effect, effectName) => {
   return res
 }
 
-export { modalEffect, isModalEffect, resEffectName, resNewEffectState }
+export { shouldBeSolvedEffects, extractShouldBeSolvedEffect, existShouldBeSolvedEffect, resEffectNumber, resEffectName, resNewEffectState }

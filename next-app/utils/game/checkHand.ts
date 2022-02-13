@@ -98,4 +98,9 @@ const resetMyHandsStatus = ({state, hands, dispatch}: ResetHandProps) => {
   dispatch({ type: 'updateStateSpecify', payload: newState })  
 }
 
-export { isPutOut2or13, hasSameCard, chkAvoidCardEffect, cardsICanPutOut, updateHandsFn, updateMyHandsStatus, resetMyHandsStatus }
+const resMyHandsCardNumbers = (hands: Board['hands']) => {
+  const res = hands.map(hand => Number(hand.replace(/[^0-9]/gu, '')))
+  return res
+}
+
+export { isPutOut2or13, hasSameCard, chkAvoidCardEffect, cardsICanPutOut, updateHandsFn, updateMyHandsStatus, resetMyHandsStatus, resMyHandsCardNumbers }

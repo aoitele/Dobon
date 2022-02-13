@@ -1,6 +1,8 @@
+/* eslint-disable */
 import React, { useState } from 'react'
 import style from './ChatBoard.module.scss'
-import { Emit, HandleEmitFn } from '../../@types/socket'
+import { HandleEmitFn } from '../../@types/socket'
+// import { Emit, HandleEmitFn } from '../../@types/socket'
 
 interface Props {
   roomId: number
@@ -16,18 +18,18 @@ const chatBoard: React.FC<Props> = ({ roomId, posts, handleEmit }) => {
   const [message, setMessage] = useState('')
 
   const submit = async () => {
-    const data: Emit = {
-      roomId,
-      gameId: 1,
-      userId: 1,
-      nickname: 'taro',
-      event: 'chat',
-      data: {
-        type: 'chat',
-        message
-      }
-    }
-    await handleEmit(data)
+    // const data: Emit = {
+    //   roomId,
+    //   gameId: 1,
+    //   userId: 1,
+    //   nickname: 'taro',
+    //   event: 'chat',
+    //   data: {
+    //     type: 'chat',
+    //     message
+    //   }
+    // }
+    // await handleEmit(data)
   }
   return (
     <div className={style.wrap}>

@@ -1,4 +1,4 @@
-import { isMyTurnFn, isNextUserTurnFn, culcNextUserTurn } from '../../utils/game/turnInfo'
+import { isMyTurnFn, isNextUserTurnFn, culcNextUserTurn, culcBeforeUserTurn } from '../../utils/game/turnInfo'
 import { Player } from '../../@types/game'
 
 const noInfoUser = { id: 0, nickname: '', turn: 0, score: 0 }
@@ -121,5 +121,36 @@ describe.each`
 `('$turn should be', ({ turn, users, effect, isReversed, expected }) => {
   test(`returns ${expected}`, () => {
     expect(culcNextUserTurn(turn, users, effect, isReversed)).toBe(expected)
+  })
+})
+
+/**
+ * culcBeforeUserTurn TestCases
+ * isReversed false - turnに-1(結果が0なら最後のユーザーとなる)
+ * isReversed true  - turnに+1(結果がユーザー数+1なら最初のユーザーとなる)
+ */
+describe.each`
+ turn  | users    | isReversed | expected
+ ${1}  | ${user2} | ${false}   | ${2}
+ ${2}  | ${user2} | ${false}   | ${1}
+ ${1}  | ${user2} | ${true}    | ${2}
+ ${2}  | ${user2} | ${true}    | ${1}
+ ${1}  | ${user3} | ${false}   | ${3}
+ ${2}  | ${user3} | ${false}   | ${1}
+ ${3}  | ${user3} | ${false}   | ${2}
+ ${1}  | ${user3} | ${true}    | ${2}
+ ${2}  | ${user3} | ${true}    | ${3}
+ ${3}  | ${user3} | ${true}    | ${1}
+ ${1}  | ${user4} | ${false}   | ${4}
+ ${2}  | ${user4} | ${false}   | ${1}
+ ${3}  | ${user4} | ${false}   | ${2}
+ ${4}  | ${user4} | ${false}   | ${3}
+ ${1}  | ${user4} | ${true}    | ${2}
+ ${2}  | ${user4} | ${true}    | ${3}
+ ${3}  | ${user4} | ${true}    | ${4}
+ ${4}  | ${user4} | ${true}    | ${1}
+`('$turn should be', ({ turn, users, isReversed, expected }) => {
+  test(`returns ${expected}`, () => {
+    expect(culcBeforeUserTurn(turn, users, isReversed)).toBe(expected)
   })
 })

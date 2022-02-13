@@ -2,10 +2,10 @@ import { Redis } from 'ioredis'
 import { Socket } from 'socket.io'
 import { reducerPayloadSpecify } from '../utils/game/roomStateReducer'
 import { Emit } from '../@types/socket'
-import { isEmitChat } from '../utils/function/useEmitDataType'
+import { isEmitAction } from '../utils/function/useEmitDataType'
 import { rowQuery } from '../prisma/prismaExec'
 import { prisma, Prisma } from '../prisma'
-import { Player } from '../@types/game'
+import { Effect, Player } from '../@types/game'
 import { dobonJudge } from '../utils/game/dobonJudge'
 import sleep from '../utils/game/sleep'
 import { resEffectName } from '../utils/game/effect'
@@ -19,7 +19,7 @@ const emitHandler = (io: Socket, socket: any) => {
     if (prisma === null) { return {} }  
     console.log(payload, 'payload')
     const { event, roomId, user, userId, nickname } = payload
-    const room = `room${payload.roomId}`
+    const room = `room${roomId}`
 
     switch (event) {
       case 'getparticipants': {
@@ -189,7 +189,7 @@ const emitHandler = (io: Socket, socket: any) => {
       }
       case 'drawcard': {
         const deckKey = `room:${roomId}:deck`
-        const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
+        const userHandsKey = `room:${roomId}:user:${userId}:hands`
         const newCard = await adapterPubClient.spop(deckKey, 1)
         await adapterPubClient.sadd(userHandsKey, newCard)
         // ルームメンバーに手札更新指令
@@ -201,6 +201,34 @@ const emitHandler = (io: Socket, socket: any) => {
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)
+        break
+      }
+      case 'drawcard__duetoeffect': {
+        const { data } = payload
+        if (!isEmitAction(data)) return {}
+
+        const { effectState, effect } = data.data
+        const mat = effect.match(/[0-9]/u)
+
+        if (mat !== null) {
+          const drawCardNum = Number(mat)
+          console.log(drawCardNum, 'drawCardNum')
+          const deckKey = `room:${roomId}:deck`
+          const userHandsKey = `room:${roomId}:user:${userId}:hands`
+          const newCard = await adapterPubClient.spop(deckKey, drawCardNum)
+          await adapterPubClient.sadd(userHandsKey, newCard)
+          // ルームメンバーに手札更新指令
+          const reducerPayload: reducerPayloadSpecify = {
+            game: {
+              event: {
+                action: 'gethand'
+              }
+            }
+          }
+          io.in(room).emit('updateStateSpecify', reducerPayload)
+        }
+        await sleep(1000)
+        resolveEffect(io, room, effectState, effect) // 全クライアントのboardState.effectを更新
         break
       }
       case 'drawcard__deckset': {
@@ -297,7 +325,7 @@ const emitHandler = (io: Socket, socket: any) => {
          */
         const { data } = payload
         if (data?.type !== 'action' || !user) break
-        const action = data.data
+        const action = data.data.effect
         const { turn } = user
         const reducerPayload:reducerPayloadSpecify = {
           game: {
@@ -360,27 +388,6 @@ const emitHandler = (io: Socket, socket: any) => {
         resetEvent(io, room)
         break
       }
-      case 'chat': {
-        const { data } = payload
-        let message = ''
-
-        if (isEmitChat(data)) {
-          message = data.message
-        }
-        if (nickname && message) {
-          adapterPubClient.xadd(
-            'myStream',
-            'MAXLEN',
-            '2',
-            '*',
-            'user',
-            nickname,
-            'message',
-            message
-          )
-        }
-        break
-      }
       default:
         return {}
     }
@@ -392,6 +399,18 @@ const resetEvent = (io:Socket, room:string) => {
   const reducerPayload: reducerPayloadSpecify = {
     game: {
       event: initialState.game?.event
+    }
+  }
+  io.in(room).emit('updateStateSpecify', reducerPayload)
+}
+
+const resolveEffect = (io:Socket, room:string, effectState:Effect[], effect:Effect) => {
+  const newEffectState = effectState.filter(_ => _ !== effect)
+  const reducerPayload: reducerPayloadSpecify = {
+    game: {
+      board: {
+        effect: newEffectState
+      }
     }
   }
   io.in(room).emit('updateStateSpecify', reducerPayload)

@@ -3,8 +3,10 @@ import { Action, Order, Board, Player, Effect } from './game'
 import { LiteralUnion } from 'type-fest'
 import { NestedPartial } from '../@types/utility'
 
-type Event = LiteralUnion<
+type Event =
   | 'drawcard'
+  | 'drawcard__duetoeffect'
+  | 'drawcard__deckset'
   | 'playcard'
   | 'call'
   | 'chat'
@@ -16,26 +18,19 @@ type Event = LiteralUnion<
   | 'gethand'
   | 'getparticipants'
   | 'getusers'
+  | 'draw'
   | 'turnchange'
   | 'dobon'
   | 'dobonsuccess'
   | 'dobonfailure'
   | 'action'
   | 'effect'
+  | 'effectcard'
   | 'effectupdate'
   | 'avoidEffect'
   | 'notAvoidEffect'
-  | 'skip'
-  | 'draw'
-  | 'draw2'
-  | 'draw4'
-  | 'draw6'
-  | 'draw8'
-  | 'wild'
-  | 'reverse'
-  | 'opencard',
-  string
-> | null
+  | Effect
+  | null
 
 export type ModalEvent = Pick<Event,'dobon' ,'dobonsuccess' , 'dobonfailure', 'avoidEffect', 'notAvoidEffect', 'skip', 'draw', 'draw2', 'draw4', 'draw6', 'draw8', 'wild', 'reverse', 'opencard'>
 
@@ -46,12 +41,10 @@ export type EmitCard = {
 
 export type EmitAction = {
   type: 'action'
-  data: Effect
-}
-
-export type EmitChat = {
-  type: 'chat'
-  message: string
+  data: {
+    effectState: Effect[]
+    effect: Effect
+  }
 }
 
 export type EmitBoard = {
@@ -66,7 +59,7 @@ export type Emit = {
   user?: Player
   nickname?: string
   event: Event
-  data?: EmitCard | EmitAction | EmitChat | EmitBoard
+  data?: EmitCard | EmitAction | EmitBoard
 }
 
 export type HandleEmitFn = (data: Emit) => Promise<any> // eslint-disable-line no-unused-vars

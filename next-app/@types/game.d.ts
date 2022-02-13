@@ -76,3 +76,5 @@ export type ModalEffect = {
   message: string  | null
 }
 export type Effect = 'draw2'| 'draw4'| 'draw6'| 'draw8' | 'skip' | 'wild' |'wildspade' | 'wildheart' | 'wildclub' | 'wilddia' | 'reverse' | 'opencard'
+
+export type SolvableEffects = Effect[]
