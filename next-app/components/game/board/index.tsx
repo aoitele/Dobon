@@ -189,7 +189,15 @@ const board = (data: Props) => {
             <UserInfo key='my_info' user={me} turnUser={turnUser}/>
           </div>
         }
-        { boardState?.hands.length && <Hands cards={spreadCardState(boardState.hands, true)} putOut={putOut} selectedCard={values.selectedCard} values={values} setValues={setValues} /> }
+        { boardState.hands.length &&
+        <Hands
+          states={{
+            cards:spreadCardState(boardState.hands, true),
+            values,
+            selectedCard:values.selectedCard
+          }}
+          functions={{putOut, setValues}}
+        /> }
         { boardState && me &&
           <div className={style.actionBtnWrap}>
             <ActionBtn key={'btn__action'} text={values.isDrawnCard ? 'スキップ' : boardState.deckCount === 0 ? 'デッキセット＆ドロー' : 'ドロー'} styleClass={values.actionBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
@@ -221,11 +229,15 @@ const board = (data: Props) => {
       }
       { boardState && values.isMyTurn && state.game?.board.effect.length && existShouldBeSolvedEffect(state.game.board.effect) &&
       <AvoidEffectSelecter
-        authUser={authUser}
-        emitter={beforeUser}
-        effect={state.game.board.effect}
-        state={state}
-        handleEmit={handleEmit}
+        states={{
+          state,
+          authUser,
+          emitter:beforeUser,
+          effect:state.game.board.effect,
+          cards:spreadCardState(boardState.hands, true),
+          values,
+        }}
+        functions={{ handleEmit, setValues, putOut}}
       /> }
     </>
   )

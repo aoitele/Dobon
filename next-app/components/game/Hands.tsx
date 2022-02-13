@@ -5,15 +5,22 @@ import { HaveAllPropertyCard } from '../../@types/card'
 import { InitialBoardState } from '../../@types/game'
 import style from './Hands.module.scss'
 
-interface Cards {
-  cards: HaveAllPropertyCard[]
-  putOut: any
-  selectedCard: string
-  values: InitialBoardState
-  setValues: React.Dispatch<React.SetStateAction<InitialBoardState>>
+interface Props {
+  states: {
+    cards: HaveAllPropertyCard[]
+    values: InitialBoardState
+    selectedCard: string
+  }
+  functions: {
+    putOut: (card: string) => Promise<void> // eslint-disable-line no-unused-vars
+    setValues: React.Dispatch<React.SetStateAction<InitialBoardState>>
+  }
 }
   
-const hands: React.FC<Cards> = ({ cards, putOut, selectedCard, values, setValues }) => {
+const hands: React.FC<Props> = ({ states, functions}) => {
+  const { cards, values, selectedCard } = states
+  const { putOut, setValues } = functions
+
   return (
   <div className={style.wrap}>
     <div className={style.slides}>
