@@ -69,15 +69,22 @@ type EffectStateTreatFn = (effect: Effect[], effectName: Effect | '') => Effect[
 const resNewEffectState:EffectStateTreatFn = (effect, effectName) => {
   let res = effect
   // 現効果が空の場合、追加して返却
-  if (res.length === 0 && effectName !== '') {
+  if (addEffectOnlyPat(effect, effectName) && effectName !== '') {
     res.push(effectName)
     return res
   }
   // 以降、現効果が存在する場合
   res = treatReverseEffect(res, effectName)
+  res = treatOpenCardEffect(res, effectName)
   res = treatWildEffect(res, effectName)
   res = treatDrawEffect(res, effectName)
   return res
+}
+
+const addEffectOnlyPat = (effect:Effect[], effectName:Effect | '') => {
+  const pat1 = effect.length === 0 && effectName !== ''
+  const pat2 = effect.length === 1 && effect[0] === 'reverse' && effectName !== 'reverse'
+  return pat1 || pat2
 }
 
 /**
@@ -90,6 +97,20 @@ const treatReverseEffect:EffectStateTreatFn = (effect, effectName) => {
   res.includes(effectName)
   ? res = effect.filter(_ => _ !== effectName)
   : res.push(effectName)
+  return res
+}
+
+/**
+ * Opencard処理。
+ * 現効果にopencardがない場合→現効果に追加
+ * 現効果にopencardがある場合→現効果をそのまま返す
+ */
+const treatOpenCardEffect:EffectStateTreatFn = (effect, effectName) => {
+  const res = effect
+  if (effectName !== 'opencard') return res
+  if (!res.includes(effectName)) {
+    res.push(effectName)
+  }
   return res
 }
 

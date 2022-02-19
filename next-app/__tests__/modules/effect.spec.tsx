@@ -106,6 +106,14 @@ describe('resNewEffectState TestCases', () => {
 
     expect(result).toEqual(expected)
   })
+  it('reverse効果中でopencardカードが出た場合、両方含む配列が返却される', () => {
+    const effects:Effect[] = ['reverse']
+    const effectName:Effect = 'opencard'
+    const result = resNewEffectState(effects, effectName)
+    const expected:Effect[] = ['reverse', 'opencard']
+
+    expect(result).toEqual(expected)
+  })
   it('opencard効果中で別にopencardカードが出た場合、opencard入りの配列が返却される', () => {
     const effects:Effect[] = ['opencard']
     const effectName:Effect = 'opencard'

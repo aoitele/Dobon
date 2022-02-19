@@ -108,12 +108,15 @@ const board = (data: Props) => {
       }
     }
     await handleEmit(boardEmit)
-
     boardEmit = {
       roomId: room.id,
       userId: me.id,
       event: 'turnchange',
-      data: { type:'board', data: { users, turn: boardState.turn, trash: [`${card}o`], effect: boardState.effect }}
+      data: {
+        type:'board',
+        data: { users, turn: boardState.turn, trash: [`${card}o`], effect: boardState.effect },
+        option: { values: { isMyTurnConsecutive: values.isMyTurnConsecutive }, triggered: 'putOut' }
+      }
     }
     await handleEmit(boardEmit)
     // 参加者2人でskipが出た場合は自分のターンとなる
@@ -186,7 +189,7 @@ const board = (data: Props) => {
         {
           boardState && me &&
           <div className={style.myInfo}>
-            <UserInfo key='my_info' user={me} turnUser={turnUser}/>
+            <UserInfo key='my_info' user={me} turnUser={turnUser} />
           </div>
         }
         { boardState.hands.length &&
@@ -200,8 +203,24 @@ const board = (data: Props) => {
         /> }
         { boardState && me &&
           <div className={style.actionBtnWrap}>
-            <ActionBtn key={'btn__action'} text={values.isDrawnCard ? 'スキップ' : boardState.deckCount === 0 ? 'デッキセット＆ドロー' : 'ドロー'} styleClass={values.actionBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
-            <ActionBtn key={'btn__dobon'} text='どぼん！' styleClass={values.dobonBtnStyle} values={values} setValues={setValues} isMyTurn={values.isMyTurn} emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined } />
+            <ActionBtn
+              key={'btn__action'}
+              text={values.isDrawnCard ? 'スキップ' : boardState.deckCount === 0 ? 'デッキセット＆ドロー' : 'ドロー'}
+              styleClass={values.actionBtnStyle}
+              values={values}
+              setValues={setValues}
+              isMyTurn={values.isMyTurn}
+              emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit, options:{ values: { isMyTurnConsecutive: values.isMyTurnConsecutive }, triggered:'actionBtn'} }): undefined
+            } />
+            <ActionBtn
+              key={'btn__dobon'}
+              text='どぼん！'
+              styleClass={values.dobonBtnStyle}
+              values={values}
+              setValues={setValues}
+              isMyTurn={values.isMyTurn}
+              emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit }): undefined
+            } />
           </div>
         }
         { isCardSelecting &&
@@ -236,6 +255,7 @@ const board = (data: Props) => {
           effect:state.game.board.effect,
           cards:spreadCardState(boardState.hands, true),
           values,
+          turnUser,
         }}
         functions={{ handleEmit, setValues, putOut}}
       /> }

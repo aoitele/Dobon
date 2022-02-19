@@ -1,5 +1,5 @@
 import { Card } from './card'
-import { Action, Order, Board, Player, Effect } from './game'
+import { Action, Order, Board, Player, Effect, InitialBoardState } from './game'
 import { LiteralUnion } from 'type-fest'
 import { NestedPartial } from '../@types/utility'
 
@@ -50,6 +50,10 @@ export type EmitAction = {
 export type EmitBoard = {
   type: 'board'
   data: NestedPartial<Board>
+  option?: {
+    values: Partial<InitialBoardState>
+    triggered: 'putOut' | 'actionBtn' | undefined
+  }
 }
 
 export type Emit = {

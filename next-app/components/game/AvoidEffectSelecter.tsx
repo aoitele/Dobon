@@ -13,6 +13,7 @@ import { Emit, HandleEmitFn } from '../../@types/socket'
 import { gameInitialState } from '../../utils/game/roomStateReducer'
 import Hands from './Hands'
 import { HaveAllPropertyCard } from '../../@types/card'
+import UserInfo from './UserInfo'
 
 interface Props {
   states:{
@@ -22,6 +23,7 @@ interface Props {
     effect: SolvableEffects
     cards: HaveAllPropertyCard[]
     values: InitialBoardState
+    turnUser: Player
   }
   functions: {
     handleEmit: HandleEmitFn
@@ -30,12 +32,22 @@ interface Props {
   }
 }
 
+interface UserHandsInfoProps {
+  users: Player[]
+  authUser: AuthAPIResponse.UserMe
+}
+
+const initialState = {
+  cardSelecting: false,
+  handsInspecting: false
+}
+
 const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
   const { authUser, emitter, effect, state, cards, values } = states
-  const { handleEmit, setValues, putOut } =functions
+  const { handleEmit, setValues, putOut } = functions
   if (!state.game) return <></>
 
-  const [selectMode, setSelectMode] = useState(false)
+  const [localState, setLocalState] = useState(initialState)
   const effectName = extractShouldBeSolvedEffect(effect)
   const cardNumber = resEffectNumber(effectName)
   const myHandsNums = resMyHandsCardNumbers(state.game.board.hands)
@@ -54,35 +66,28 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
     console.log(actionEmit, 'actionEmit')
     await handleEmit(actionEmit)
   }
+
+  /**
+   * 自分以外のユーザーの手札情報を出力する
+   */
+  const UserHandsInfo = ({users}:UserHandsInfoProps) => {
+    const showUsers = users.filter(_ => _.id !== authUser.id)
+    const me = users.filter(_ => _.id === authUser.id)
+    return (
+      <>
+        { showUsers.map(_ => <UserInfo key={_.nickname} user={_} turnUser={me[0]} otherHands={state.game?.board.otherHands} />)}
+      </>
+    )
+  }
+
   return (
     <>
       <ModalBack />
         <div className={styles.wrap}>
           <div className={styles.imageBg}>
             <div className={styles.inner}>
-            { selectMode
-            ? <>
-              <div>
-                <p className={styles.attention}>カードを選択してください</p>
-                {/* {states.cards:効果回避ができる同数字のカードのみをputableにしてHandsに渡す} */}
-                <Hands
-                  states={{
-                    cards:updatePutableState(cards, state.game.board.trash),
-                    values,
-                    selectedCard: values.selectedCard
-                  }}
-                  functions={{
-                    putOut,
-                    setValues
-                  }}
-                  />
-                <span
-                  className={styles.noEscapeEffect}
-                  onClick={() => setSelectMode(false)}
-                >戻る</span>
-              </div>
-            </>
-            : <>
+            { !localState.cardSelecting && !localState.handsInspecting &&
+              <>
                 <p className={styles.attention}>{`${emitter?.nickname}が\n「${effectName}」を発動しました`}</p>
                 <div className={styles.singleCardWrap}>
                   <SingleCard card={
@@ -96,11 +101,46 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
                   <span className={styles.acceptEffect} onClick={acceptEffect}>効果を受ける</span>
                   <span
                     className={existCardNumInMyHands ? styles.escapeEffect : styles.noEscapeEffect}
-                    onClick={() => existCardNumInMyHands ? setSelectMode(true) : undefined}
+                    onClick={() => existCardNumInMyHands ? setLocalState({ cardSelecting: true, handsInspecting: false }) : undefined}
                     >{cardNumber}を出して回避する</span>
-                  <span className={styles.acceptEffect} onClick={acceptEffect}>みんなの手札をみる</span>
+                  <span className={styles.inspectOtherHands} onClick={() => setLocalState({ cardSelecting: false, handsInspecting: true })}>みんなの手札をみる</span>
                 </div>
               </>
+            }
+
+            { localState.cardSelecting &&
+              <div>
+                <p className={styles.attention}>カードを選択してください</p>
+                {/* {states.cards:効果回避ができる同数字のカードのみをputableにしてHandsに渡す} */}
+                <Hands
+                  states={{
+                    cards:updatePutableState(cards, state.game.board.trash),
+                    values,
+                    selectedCard: values.selectedCard
+                  }}
+                  functions={{
+                    putOut,
+                    setValues
+                  }}
+                />
+                <span
+                  className={styles.noEscapeEffect}
+                  onClick={() => setLocalState(initialState)}
+                >戻る</span>
+              </div>
+            }
+
+            { localState.handsInspecting &&
+            <div>
+              <UserHandsInfo
+                users={state.game.board.users}
+                authUser={authUser}
+              />
+              <span
+                className={styles.noEscapeEffect}
+                onClick={() => setLocalState(initialState)}
+              >戻る</span>
+             </div>
             }
             </div>
           </div>

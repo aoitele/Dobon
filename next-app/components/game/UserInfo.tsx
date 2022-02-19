@@ -4,7 +4,7 @@ import type { Player, OtherHands } from '../../@types/game'
 import style from './UserInfo.module.scss'
 import CardWithCount from './CardWithCount'
 import spreadCardState from '../../utils/game/spreadCardState'
-import { HaveAllPropertyCard } from '../../@types/card'
+import { HaveAllPropertyCard, DevidedCardWithStatus } from '../../@types/card'
 import hasProperty from '../../utils/function/hasProperty'
 
 interface Props {
@@ -37,13 +37,21 @@ const userInfo: React.FC<Props> = ({ user, otherHands, turnUser }) => {
       { hands.length > 0 &&
       <div className={style.handInfo}>
         <CardWithCount
-          card={hands}
+          card={cardState(hands)}
           numStyle={'bottom'}
         />
       </div>
     }
   </div>
   )
+}
+
+const cardState = (cards: HaveAllPropertyCard[]): DevidedCardWithStatus => {
+  const res = {
+    open: cards.filter((x) => x.isOpen),
+    close: cards.filter((x) => !x.isOpen)
+  }
+  return res
 }
 
 export default userInfo

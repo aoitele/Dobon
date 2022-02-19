@@ -173,14 +173,14 @@ const emitHandler = (io: Socket, socket: any) => {
         await adapterPubClient.lpush(trashKey, initialTrash)
         initialTrash = [`${initialTrash[0]}o`] // フロント返却時はOpen状態にする
         const deckCount = await adapterPubClient.scard(deckKey)
-        // Const deckCount = 0
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             status: 'playing',
             board: {
               turn: 1,
               trash: initialTrash,
-              deckCount
+              deckCount,
+              effect: []
             }
           }
         }
@@ -269,8 +269,11 @@ const emitHandler = (io: Socket, socket: any) => {
         if (data?.type === 'board') {
           const board = data.data
           const { users, turn, trash, effect } = board
+          const isMyTurnConsecutive = data.option?.values.isMyTurnConsecutive
+          const triggered = data.option?.triggered
           if (users && turn && trash) {
-            const effectName = resEffectName(trash[0])
+            // Skipカード効果で得た自分の連続ターンでない、純粋に自分のターンが来てカードを出した場合のみeffectNameを取得する
+            const effectName = (!isMyTurnConsecutive || triggered === 'putOut') ? resEffectName(trash[0]) : ''
             const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
             const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed) 
             const reducerPayload: reducerPayloadSpecify = {
@@ -351,6 +354,31 @@ const emitHandler = (io: Socket, socket: any) => {
           game: { board: { effect } }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)
+        break
+      }
+      case 'opencard': {
+        const { data } = payload
+        if (!isEmitAction(data)) return {}
+        const { effectState, effect } = data.data
+
+        // Redis user:{id}:handsを全てオープン状態に書き換え
+        const userHandsKey = `room:${roomId}:user:${userId}:hands`
+        let hands = await adapterPubClient.smembers(userHandsKey)
+        const re = /[a-z][0-9]+o/gu
+        hands = hands.map(_ => _.match(re) ? _ : `${_}o`)
+        await adapterPubClient.del(userHandsKey)
+        await adapterPubClient.sadd(userHandsKey, hands)
+        // ルームメンバーに手札更新指令
+        const reducerPayload:reducerPayloadSpecify = {
+          game: {
+            event: {
+              action: 'gethand'
+            }
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload)
+        await sleep(1000)
+        resolveEffect(io, room, effectState, effect) // 全クライアントのboardState.effectを更新
         break
       }
       case 'dobon': {

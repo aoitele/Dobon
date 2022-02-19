@@ -32,15 +32,16 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
         dobon: false
       },
       isMyTurn: true,
+      isMyTurnConsecutive: values.isMyTurnConsecutive,
       isDrawnCard: true,
       actionBtnStyle: 'skip',
       dobonBtnStyle: 'disabled'
     })
   }
 
-  const turnChange = () => {
+  const turnChange = async() => {
     if (!emitArgs) return
-    emit(addEmitArgEvent(emitArgs, 'turnchange'))
+    await emit(addEmitArgEvent(emitArgs, 'turnchange'))
   }
 
   const btnFn = async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {

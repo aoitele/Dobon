@@ -41,15 +41,19 @@
       }
       .acceptEffect {
         @extend .btn;
-        background-color: lightgreen;
+        background-color: lightcoral;
       }
       .escapeEffect {
         @extend .btn;
-        background-color:lightsalmon;
+        background-color: gold;
       }
       .noEscapeEffect {
         @extend .btn;
         background-color:lightgray;
+      }
+      .inspectOtherHands {
+        @extend .btn;
+        background-color: lightgreen;
       }
       .actionBtn {
         margin: 20px 0px;

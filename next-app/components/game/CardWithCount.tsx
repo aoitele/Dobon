@@ -1,51 +1,64 @@
-import React, { useReducer } from 'react'
+import React from 'react'
 import Image from 'next/image'
-import type {
-  HaveAllPropertyCard,
-  DevidedCardWithStatus
-} from '../../@types/card'
+import { HaveAllPropertyCard } from '../../@types/card'
 import style from './CardWithCount.module.scss'
-import reducer from '../../utils/game/cardWithCountReducer'
 
-interface Cards {
-  card: HaveAllPropertyCard[]
+export interface CardWithCountProps {
+  card: {
+    open: HaveAllPropertyCard[]
+    close: HaveAllPropertyCard[]
+  }
   numStyle: 'bottom' | 'right'
 }
 
-const setState = (cards: HaveAllPropertyCard[]): DevidedCardWithStatus => {
-  const res = {
-    open: cards.filter((x) => x.isOpen),
-    close: cards.filter((x) => !x.isOpen)
-  }
-  return res
-}
+/**
+ * 表示する内容
+ * クローズカードのみ：裏面カード×枚数
+ * オープンカードのみ：表面カード×枚数(柄数は最初の1枚)
+ * 両方ある場合：裏面カード×枚数＆表面カード×枚数
+ */
+type HandPattern = 'close' | 'open' | 'both'
 
-const CardWithCount: React.FC<Cards> = ({ card, numStyle }) => {
-  const initialState = setState(card)
-  const [state] = useReducer(reducer, initialState)
-  const cardCount = card.length
-  const existOpenCard = state.open.length > 0
-  let suit = null
+const CardWithCount: React.FC<CardWithCountProps> = ({ card, numStyle }) => {
+  const { open, close } = card
+  const olen = open.length
+  const clen = close.length
+  const cardCount = olen + clen
+  const pattern:HandPattern = cardCount === olen ? 'open' : cardCount === clen ? 'close' : 'both'
   let num = null
-  if (existOpenCard) {
-    ;({ suit, num } = state.open[0])
+  let suit = null
+  if (pattern !== 'close') {
+    num = open[0].num
+    suit = open[0].suit
   }
+
   return (
     <div className={numStyle === 'bottom' ? style.wrapBottom : style.wrapRight}>
-      {existOpenCard ? (
-        <Image src={`/images/cards/${suit}${num}.png`} width={40} height={60} />
-      ) : (
-        <Image
-          src="/images/cards/z.png"
-          width={40}
-          height={60}
-          className={style.cardImage}
-        />
-      )}
-      <div className={style.cardCountWrap}>
-        <span className={style.cardCount}>×{cardCount}</span>
-      </div>
+      { pattern === 'both' &&
+        <>
+          { cardImageWithCount(false, clen) }
+          { cardImageWithCount(true, olen, suit, num) }
+        </>
+      }
+      { pattern === 'open' && cardImageWithCount(true, olen, suit, num) }
+      { pattern === 'close' && cardImageWithCount(false, clen) }
     </div>
+  )
+}
+
+const cardImageWithCount = (isOpen: boolean, count: number, suit?:HaveAllPropertyCard['suit'], num?:HaveAllPropertyCard['num']) => {
+  return (
+    <>
+      <Image
+        src={isOpen ? `/images/cards/${suit}${num}.png` : "/images/cards/z.png"}
+        width={40}
+        height={60}
+        className={style.cardImage}
+      />
+      <div className={style.cardCountWrap}>
+        <span className={style.cardCount}>×{count}</span>
+      </div>
+    </>
   )
 }
 
