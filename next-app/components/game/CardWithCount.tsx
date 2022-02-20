@@ -48,7 +48,7 @@ const CardWithCount: React.FC<CardWithCountProps> = ({ card, numStyle }) => {
 
 const cardImageWithCount = (isOpen: boolean, count: number, suit?:HaveAllPropertyCard['suit'], num?:HaveAllPropertyCard['num']) => {
   return (
-    <>
+    <div>
       <Image
         src={isOpen ? `/images/cards/${suit}${num}.png` : "/images/cards/z.png"}
         width={40}
@@ -58,7 +58,7 @@ const cardImageWithCount = (isOpen: boolean, count: number, suit?:HaveAllPropert
       <div className={style.cardCountWrap}>
         <span className={style.cardCount}>×{count}</span>
       </div>
-    </>
+    </div>
   )
 }
 

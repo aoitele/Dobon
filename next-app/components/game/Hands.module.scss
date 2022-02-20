@@ -1,5 +1,6 @@
 .wrap {
   width: 100%;
+  height: auto;
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -12,6 +13,11 @@
     padding: 8px;
     .card {
       width: 70px;
+      position: relative;
+      .effectEye {
+        width: 100%;
+        height: 20px;
+      }
     }
     div {
       // min-width: 20%;

@@ -25,13 +25,13 @@ const hands: React.FC<Props> = ({ states, functions}) => {
   <div className={style.wrap}>
     <div className={style.slides}>
       { cards && cards.map(_ =>
-      <div key={`${_.suit}${_.num}_slide`} className={style.slide}>
-        <>
-        { _.isOpen && <Image src={`/images/game/effect/eye.png`} width={15} height={15} /> }
+      <>
+        <div key={`${_.suit}${_.num}_slide`} className={style.slide}>
           <div
             className={`${style.card} ${_.isPutable ? '' : style.cantPut} ${selectedCard === `${_.suit}${_.num}` ? style.selected : '' }`}
             onClick={ selectedCard === `${_.suit}${_.num}` ? () => putOut(`${_.suit}${_.num}`) : undefined }
           >
+            <div className={style.effectEye}>{ _.isOpen && <Image src={`/images/game/effect/eye.png`} width={15} height={15} />}</div>
             <SingleCard
               key={`hands-${_.suit}${_.num}`}
               card={{
@@ -47,11 +47,11 @@ const hands: React.FC<Props> = ({ states, functions}) => {
               values={values}
               setValues={setValues}
             />
+            { selectedCard === `${_.suit}${_.num}` && <span>⚫︎</span>}
           </div>
-        </>
-        { selectedCard === `${_.suit}${_.num}` && <span>⚫︎</span>}
-      </div>
-        ) }
+        </div>
+      </>
+      ) }
     </div>
   </div>
   )
