@@ -193,14 +193,22 @@ const board = (data: Props) => {
           </div>
         }
         { boardState.hands.length &&
-        <Hands
-          states={{
-            cards:spreadCardState(boardState.hands, true),
-            values,
-            selectedCard:values.selectedCard
-          }}
-          functions={{putOut, setValues}}
-        /> }
+        <div className={style.handsWrap}>
+          <div className={style.slides}>
+          { spreadCardState(boardState.hands, true).map(card =>
+            <Hands
+              key={`${card.num}${card.suit}`}
+              states={{
+                card,
+                values,
+                selectedCard:values.selectedCard
+              }}
+              functions={{putOut, setValues}}
+            />
+          )}
+          </div>
+        </div>
+        }
         { boardState && me &&
           <div className={style.actionBtnWrap}>
             <ActionBtn

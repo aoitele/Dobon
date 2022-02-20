@@ -26,7 +26,12 @@ export const SingleCard: React.FC<Props> = ({ card, values, setValues }) => {
       : undefined
     }>
       { isOpen
-      ? <Image src={`/images/cards/${suit}${num}.png`} width={width} height={height} />
+      ? <Image
+          key={`${suit}${num}-Image`}
+          src={`/images/cards/${suit}${num}.png`}
+          width={width}
+          height={height}
+        />
       : <Image src="/images/cards/z.png" width={width} height={height} />
       }
     </div>
