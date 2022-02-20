@@ -138,7 +138,11 @@ const board = (data: Props) => {
             boardState && users &&
             users.map(
               user => authUser.id !== user.id &&
-              <UserInfo key={`user_${user.id}_info`} user={user} otherHands={boardState.otherHands} turnUser={turnUser} />
+              <UserInfo
+                key={`user_${user.id}_info`}
+                user={user}
+                hands={boardState.otherHands.filter(_=>_.userId === user.id)[0]} turnUser={turnUser}
+              />
             )
           }
         </div>

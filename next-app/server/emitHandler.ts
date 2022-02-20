@@ -128,8 +128,8 @@ const emitHandler = (io: Socket, socket: any) => {
         break
       }
       case 'gethand': {
-        const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
-        const allUserHandsKey = await adapterPubClient.keys(`room:${payload.roomId}:user:*`)
+        const userHandsKey = `room:${roomId}:user:${userId}:hands`
+        const allUserHandsKey = await adapterPubClient.keys(`room:${roomId}:user:*:hands`)
         const otherHandsKey = allUserHandsKey.filter(_=>_ !== userHandsKey)
         const re = /user:([0-9]+)/gu
         const re2 = /[a-z][0-9]+o/gu
@@ -141,13 +141,15 @@ const emitHandler = (io: Socket, socket: any) => {
           re.lastIndex = 0;  // Reset pointer index
           const uid = search ? search[1] : null
           if (uid) {
-            let otherHand = await adapterPubClient.smembers(`room:${payload.roomId}:user:${uid}:hands`) // eslint-disable-line no-await-in-loop
-            otherHand = otherHand.map(_ => re2.test(_) ? _ : 'z') // If not open card, OverWrite suit 'z'
+            let otherHand = await adapterPubClient.smembers(`room:${roomId}:user:${uid}:hands`) // eslint-disable-line no-await-in-loop
+            otherHand = otherHand.map(_ => {
+              re2.lastIndex = 0;  // Reset pointer index
+              return re2.test(_) ? _ : 'z'
+            }) // If not open card, OverWrite suit 'z'
             const data = { userId: Number(uid), hands: otherHand }
             otherHands.push(data)
           }
         }
-
         const hands = await adapterPubClient.smembers(userHandsKey)
         const deckKey = `room:${roomId}:deck`
         const deckCount = await adapterPubClient.scard(deckKey)
