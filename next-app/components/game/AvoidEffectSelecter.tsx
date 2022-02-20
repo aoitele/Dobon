@@ -75,7 +75,14 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
     const me = users.filter(_ => _.id === authUser.id)
     return (
       <>
-        { showUsers.map(_ => <UserInfo key={_.nickname} user={_} turnUser={me[0]} otherHands={state.game?.board.otherHands} />)}
+        { showUsers.map(_ => 
+        <UserInfo 
+          key={_.nickname}
+          user={_}
+          turnUser={me[0]}
+          hands={state.game?.board.otherHands.filter(hand=>hand.userId===_.id)[0]}
+        />
+        )}
       </>
     )
   }
@@ -112,17 +119,20 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
               <div>
                 <p className={styles.attention}>カードを選択してください</p>
                 {/* {states.cards:効果回避ができる同数字のカードのみをputableにしてHandsに渡す} */}
-                <Hands
-                  states={{
-                    cards:updatePutableState(cards, state.game.board.trash),
-                    values,
-                    selectedCard: values.selectedCard
-                  }}
-                  functions={{
-                    putOut,
-                    setValues
-                  }}
-                />
+                { cards.map(_ => 
+                  <Hands
+                    key={`${_.num}${_.suit}`}
+                    states={{
+                      card: updatePutableState(_, state.game?.board.trash),
+                      values,
+                      selectedCard: values.selectedCard
+                    }}
+                    functions={{
+                      putOut,
+                      setValues
+                    }}
+                  />
+                )}
                 <span
                   className={styles.noEscapeEffect}
                   onClick={() => setLocalState(initialState)}
@@ -149,15 +159,14 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
   )
 }
 
-const updatePutableState = (cards: HaveAllPropertyCard[], trash:Board['trash'] ) => {
+const updatePutableState = (card: HaveAllPropertyCard, trash:Board['trash'] | undefined ) => {
+  if (!trash) return card
+
   const trashCardNum = Number(spreadCardState(trash)[0].num)
-  const res:HaveAllPropertyCard[] = cards.map(card => {
-    if (card.isPutable && card.num !== trashCardNum) {
-      card.isPutable = false
-    }
-    return card
-  })
-  return res
+  if (card.isPutable && card.num !== trashCardNum) {
+    card.isPutable = false
+  }
+  return card
 }
 
 export default avoidEffectSelecter
