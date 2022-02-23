@@ -1,4 +1,4 @@
-import { shouldBeSolvedEffects, existShouldBeSolvedEffect, resEffectNumber, resEffectName, resNewEffectState } from "../../utils/game/effect";
+import { shouldBeSolvedEffects, existShouldBeSolvedEffect, resEffectNumber, resEffectName, isEffectCard, resNewEffectState } from "../../utils/game/effect";
 import { Effect } from "../../@types/game"
 
 const effects_1:Effect[] = ['wildclub']
@@ -37,6 +37,27 @@ describe.each`
 `('$card should be', ({ card, expected }) => {
   test(`returns ${expected}`, () => {
     expect(resEffectName(card)).toBe(expected)
+  })
+})
+describe.each`
+   card   | expected
+ ${'z0'}  | ${true}
+ ${'s1'}  | ${true}
+ ${'s2'}  | ${true}
+ ${'s3'}  | ${false}
+ ${'s4'}  | ${false}
+ ${'s5'}  | ${false}
+ ${'s6'}  | ${false}
+ ${'s7'}  | ${false}
+ ${'s8'}  | ${true}
+ ${'s9'}  | ${false}
+ ${'s10'} | ${false}
+ ${'s11'} | ${true}
+ ${'s12'} | ${false}
+ ${'s13'} | ${true}
+`('$card should be', ({ card, expected }) => {
+  test(`returns ${expected}`, () => {
+    expect(isEffectCard(card)).toBe(expected)
   })
 })
 describe('resNewEffectState TestCases', () => {

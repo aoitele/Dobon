@@ -54,16 +54,16 @@ export type Board = {
 
 export type InitialBoardState = {
   selectedCard: string
-  isBtnActive: {
-    action: boolean
-    dobon: boolean
-  }
   isMyTurn: boolean
   isMyTurnConsecutive: boolean // 連続して自分のターンかどうか(skip使用時にtrueとなる)
   isNextUserTurn: boolean
   isDrawnCard: boolean
   actionBtnStyle: 'disabled' | 'active' | 'action' | 'skip' | 'draw'
   dobonBtnStyle: 'disabled' | 'active' | 'dobon'
+  isBtnActive: {
+    action: boolean
+    dobon: boolean
+  }
 }
 
 export type Action = 'avoidEffect' | 'notAvoidEffect'

@@ -59,6 +59,14 @@ const resEffectName = (card: HandCards | string) => {
   return rankCardNums.includes(Number(_mat)) ? cardEffects[Number(_mat)] : ''
 }
 
+const isEffectCard = (card: HandCards | string) => {
+  const re = /[0-9]+/gu
+  const mat = card.match(re)
+  const _mat = mat ? mat[0]: null
+  if (_mat === null) return false
+  return rankCardNums.includes(Number(_mat))
+}
+
 type EffectStateTreatFn = (effect: Effect[], effectName: Effect | '') => Effect[] // eslint-disable-line no-unused-vars
 
 /**
@@ -165,4 +173,4 @@ const treatDrawEffect:EffectStateTreatFn = (effect, effectName) => {
   return res
 }
 
-export { shouldBeSolvedEffects, extractShouldBeSolvedEffect, existShouldBeSolvedEffect, resEffectNumber, resEffectName, resNewEffectState }
+export { shouldBeSolvedEffects, extractShouldBeSolvedEffect, existShouldBeSolvedEffect, resEffectNumber, resEffectName, isEffectCard, resNewEffectState }

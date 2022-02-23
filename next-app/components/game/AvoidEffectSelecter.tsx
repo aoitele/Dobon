@@ -124,8 +124,7 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
                     key={`${_.num}${_.suit}`}
                     states={{
                       card: updatePutableState(_, state.game?.board.trash),
-                      values,
-                      selectedCard: values.selectedCard
+                      values
                     }}
                     functions={{
                       putOut,

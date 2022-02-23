@@ -1,0 +1,16 @@
+.wrap {
+  background-color: cornsilk;
+  border-radius: 10px;
+  width: 90%;
+  height: 50px;
+  text-align: center;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .txt {
+    white-space: pre-wrap;
+    font-size: 14px;    
+    transition: 3s;
+  }
+}

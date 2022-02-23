@@ -16,11 +16,12 @@ import { createEmitFnArgs } from '../../../utils/game/emit'
 import EffectAnimation from '../EffectAnimation'
 import { createMsg } from '../../../utils/game/message'
 import useBoardHooks from '../../../hooks/useBoardHooks'
-import { existShouldBeSolvedEffect, resEffectName, resNewEffectState } from '../../../utils/game/effect'
+import { existShouldBeSolvedEffect, resEffectName, isEffectCard, resNewEffectState } from '../../../utils/game/effect'
 import { isModalEvent } from '../../../utils/game/event'
 import ModalBack from '../../feedback/ModalBack'
 import AvoidEffectSelecter from '../AvoidEffectSelecter'
 import { culcBeforeUserTurn } from '../../../utils/game/turnInfo'
+import SelectCardInfo from '../SelectCardInfo'
 
 export interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -190,8 +191,9 @@ const board = (data: Props) => {
             <p className={style.deckCount}>x {boardState?.deckCount}</p>
           </div>
         </div>
-        {
-          boardState && me &&
+        { isEffectCard(values.selectedCard)
+        ? <SelectCardInfo states={{values}}/>
+        : boardState && me &&
           <div className={style.myInfo}>
             <UserInfo key='my_info' user={me} turnUser={turnUser} />
           </div>
@@ -204,8 +206,7 @@ const board = (data: Props) => {
               key={`${card.num}${card.suit}`}
               states={{
                 card,
-                values,
-                selectedCard:values.selectedCard
+                values
               }}
               functions={{putOut, setValues}}
             />
