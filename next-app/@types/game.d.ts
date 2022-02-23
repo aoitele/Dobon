@@ -1,5 +1,5 @@
 import { Event, ModalEvent } from './socket'
-import { HandCards } from './card'
+import { HandCards, Card } from './card'
 import { GameUserInfo } from './user'
 
 export type Room = {
@@ -54,6 +54,10 @@ export type Board = {
 
 export type InitialBoardState = {
   selectedCard: string
+  selectedWildCard: {
+    isSelected: boolean
+    suit: Card['suit']
+  }
   isMyTurn: boolean
   isMyTurnConsecutive: boolean // 連続して自分のターンかどうか(skip使用時にtrueとなる)
   isNextUserTurn: boolean

@@ -22,6 +22,7 @@ import ModalBack from '../../feedback/ModalBack'
 import AvoidEffectSelecter from '../AvoidEffectSelecter'
 import { culcBeforeUserTurn } from '../../../utils/game/turnInfo'
 import SelectCardInfo from '../SelectCardInfo'
+import SelectSuit from '../SelectSuit'
 
 export interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -32,6 +33,10 @@ export interface Props {
 
 export const initialState: InitialBoardState = {
   selectedCard: '',
+  selectedWildCard: {
+    isSelected: false,
+    suit: null
+  },
   isMyTurn: false,
   isMyTurnConsecutive: false,
   isNextUserTurn: false,
@@ -214,7 +219,12 @@ const board = (data: Props) => {
           </div>
         </div>
         }
-        { boardState && me &&
+        { values.selectedWildCard.isSelected
+        ? <SelectSuit
+            states={{ values }}
+            functions={{ setValues }}
+          />
+        : boardState && me &&
           <div className={style.actionBtnWrap}>
             <ActionBtn
               key={'btn__action'}
@@ -236,6 +246,7 @@ const board = (data: Props) => {
             } />
           </div>
         }
+
         { isCardSelecting &&
           <div
             className={`${style.stateResetArea} ${isCardSelecting ? style.bg_transparent : style.bg_black}`}
@@ -244,7 +255,12 @@ const board = (data: Props) => {
               selectedCard: '',
               actionBtnStyle: values.actionBtnStyle === 'skip' ? 'skip' : 'draw',
               dobonBtnStyle: values.actionBtnStyle === 'skip' || values.isMyTurnConsecutive ? 'disabled' : 'dobon',
-              isBtnActive: { action:false, dobon: false }})
+              isBtnActive: { action:false, dobon: false },
+              selectedWildCard: {
+                isSelected: false,
+                suit: null
+              }
+            })
             }
           />
         }
@@ -259,7 +275,7 @@ const board = (data: Props) => {
           />
         </>
       }
-      { boardState && values.isMyTurn && state.game?.board.effect.length && existShouldBeSolvedEffect(state.game.board.effect) &&
+      { boardState && values.isMyTurn && state.game.board.effect.length > 0 && existShouldBeSolvedEffect(state.game.board.effect) &&
       <AvoidEffectSelecter
         states={{
           state,

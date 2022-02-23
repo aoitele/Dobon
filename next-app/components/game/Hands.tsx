@@ -53,10 +53,33 @@ const hands: React.FC<Props> = ({ states, functions}) => {
 
 const cardOnClickFn = (states: Props['states'], functions: Props['functions']) => {
   const { card, values } = states
-  const { putOut } = functions
-  if (card.num === DobonConst.DOBON_CARD_NUMBER_WILD) return undefined // 8は柄選択によってputOutするため
-  if (values.selectedCard === `${card.suit}${card.num}`) return putOut(`${card.suit}${card.num}`)
-  return undefined
+  const { putOut, setValues } = functions
+  if (card.suit === null || card.num === null) return undefined
+
+  /**
+   * 8とそれ以外の数字により処理が変わる
+   * 8：柄選択状態になってからputOutできる
+   * 他：そのままputOutできる
+   */
+  const { selectedCard, selectedWildCard } = values
+  const suitNum = `${card.suit}${card.num}`
+
+  if (card.num === DobonConst.DOBON_CARD_NUMBER_WILD) {
+    // eslint-disable-next-line
+    const isMeetCondition = selectedCard === suitNum && selectedWildCard.isSelected && selectedWildCard.suit != null
+    return isMeetCondition
+    ? putOut(suitNum)
+    : setValues({
+      ...values,
+      selectedCard: suitNum,
+      selectedWildCard: {
+        isSelected: true,
+        suit: `${card.suit}`
+      }
+    })
+  } else { // eslint-disable-line
+    return selectedCard === suitNum ? putOut(suitNum) : undefined
+  }
 }
 
 export default hands
