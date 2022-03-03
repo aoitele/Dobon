@@ -78,7 +78,7 @@ const board = (data: Props) => {
     await handleEmit(boardEmit)
 
     // Effect notice
-    const effectName = resEffectName(card)
+    const effectName = resEffectName({ card: [card], selectedWildCard: values.selectedWildCard })
     if (effectName !== '') {
       const actionEmit: Emit = {
         roomId: room.id,
@@ -196,7 +196,10 @@ const board = (data: Props) => {
             <p className={style.deckCount}>x {boardState?.deckCount}</p>
           </div>
         </div>
-        { isEffectCard(values.selectedCard)
+        { isEffectCard({
+          card:[values.selectedCard],
+          isMyCard:true
+        })
         ? <SelectCardInfo states={{values}}/>
         : boardState && me &&
           <div className={style.myInfo}>

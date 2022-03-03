@@ -3,8 +3,9 @@
  */
 
 import { HandCards } from "../../@types/card"
-import { Effect, SolvableEffects } from "../../@types/game"
+import { Effect, InitialBoardState, SolvableEffects, WildEffect } from "../../@types/game"
 import DobonConst from "../../constant"
+import spreadCardState from "./spreadCardState"
 
 /**
  * 下記カード効果は次ターンのユーザーで解決されるため、shouldBeSolvedEffectsの複数共存はない
@@ -51,20 +52,34 @@ const resEffectNumber = (effectName: SolvableEffects) => {
   }
 }
 
-const resEffectName = (card: HandCards | string) => {
-  const re = /[0-9]+/gu
-  const mat = card.match(re)
-  const _mat = mat ? mat[0]: null
-  if (_mat === null) return ''
-  return rankCardNums.includes(Number(_mat)) ? cardEffects[Number(_mat)] : ''
+interface resEffectNameProps {
+  card: HandCards[] | string[]
+  selectedWildCard:InitialBoardState['selectedWildCard'] | null
 }
 
-const isEffectCard = (card: HandCards | string) => {
-  const re = /[0-9]+/gu
-  const mat = card.match(re)
-  const _mat = mat ? mat[0]: null
-  if (_mat === null) return false
-  return rankCardNums.includes(Number(_mat))
+const resEffectName = ({ card, selectedWildCard }:resEffectNameProps) => {
+  const _card = spreadCardState(card, true)[0]
+  if (_card === null) return ''
+  if (_card.num === DobonConst.DOBON_CARD_NUMBER_WILD && selectedWildCard) {
+    const { suit } = selectedWildCard
+    const effectName: WildEffect =
+    suit === 's' ? 'wildspade' :
+    suit === 'h' ? 'wildheart' :
+    suit === 'c' ? 'wildclub' : 'wilddia'
+    return effectName
+  }
+  return rankCardNums.includes(_card.num) ? cardEffects[_card.num] : ''
+}
+
+interface isEffectCardProps {
+  card: HandCards[] | string[]
+  isMyCard: boolean
+}
+
+const isEffectCard = ({ card, isMyCard }:isEffectCardProps) => {
+  const _card = spreadCardState(card, isMyCard)[0]
+  if (_card === null) return false
+  return rankCardNums.includes(_card.num)
 }
 
 type EffectStateTreatFn = (effect: Effect[], effectName: Effect | '') => Effect[] // eslint-disable-line no-unused-vars

@@ -275,7 +275,7 @@ const emitHandler = (io: Socket, socket: any) => {
           const triggered = data.option?.triggered
           if (users && turn && trash) {
             // Skipカード効果で得た自分の連続ターンでない、純粋に自分のターンが来てカードを出した場合のみeffectNameを取得する
-            const effectName = (!isMyTurnConsecutive || triggered === 'putOut') ? resEffectName(trash[0]) : ''
+            const effectName = (!isMyTurnConsecutive || triggered === 'putOut') ? resEffectName({ card: trash, selectedWildCard: null }) : ''
             const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
             const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed) 
             const reducerPayload: reducerPayloadSpecify = {

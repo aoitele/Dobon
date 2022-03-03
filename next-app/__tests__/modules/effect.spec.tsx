@@ -1,10 +1,14 @@
 import { shouldBeSolvedEffects, existShouldBeSolvedEffect, resEffectNumber, resEffectName, isEffectCard, resNewEffectState } from "../../utils/game/effect";
-import { Effect } from "../../@types/game"
+import { Effect, InitialBoardState } from "../../@types/game"
 
 const effects_1:Effect[] = ['wildclub']
 const effects_2:Effect[] = ['wilddia']
 const effects_3:Effect[] = ['wildheart']
 const effects_4:Effect[] = ['wildspade']
+
+const selectedWildCard_1:InitialBoardState['selectedWildCard'] = { isSelected: false, suit: null }
+const selectedWildCard_2:InitialBoardState['selectedWildCard'] = { isSelected: true, suit: 's' }
+const selectedWildCard_3:InitialBoardState['selectedWildCard'] = { isSelected: true, suit: 'h' }
 
 describe('existShouldBeSolvedEffect TestCases', () => {
   test.each(shouldBeSolvedEffects)(`%s - shouldBeSolvedEffect 正規アクションはtrueを返す`, action => {
@@ -26,38 +30,40 @@ describe.each`
   })
 })
 describe.each`
-   card   | expected
- ${'z0'}  | ${'wild'}
- ${'s1'}  | ${'skip'}
- ${'s2'}  | ${'draw2'}
- ${'s3'}  | ${''}
- ${'s8'}  | ${'wild'}
- ${'s11'} | ${'reverse'}
- ${'s13'} | ${'opencard'}
-`('$card should be', ({ card, expected }) => {
+   card     | selectedWildCard      | expected
+ ${['s1']}  | ${selectedWildCard_1} | ${'skip'}
+ ${['s2']}  | ${selectedWildCard_1} | ${'draw2'}
+ ${['s3']}  | ${selectedWildCard_1} | ${''}
+ ${['s8']}  | ${selectedWildCard_2} | ${'wildspade'}
+ ${['h8']}  | ${selectedWildCard_3} | ${'wildheart'}
+ ${['s11']} | ${selectedWildCard_1} | ${'reverse'}
+ ${['s13']} | ${selectedWildCard_1} | ${'opencard'}
+`('$card should be', ({ card, selectedWildCard, expected }) => {
   test(`returns ${expected}`, () => {
-    expect(resEffectName(card)).toBe(expected)
+    let result = resEffectName({ card, selectedWildCard })
+    expect(result).toBe(expected)
   })
 })
 describe.each`
-   card   | expected
- ${'z0'}  | ${true}
- ${'s1'}  | ${true}
- ${'s2'}  | ${true}
- ${'s3'}  | ${false}
- ${'s4'}  | ${false}
- ${'s5'}  | ${false}
- ${'s6'}  | ${false}
- ${'s7'}  | ${false}
- ${'s8'}  | ${true}
- ${'s9'}  | ${false}
- ${'s10'} | ${false}
- ${'s11'} | ${true}
- ${'s12'} | ${false}
- ${'s13'} | ${true}
-`('$card should be', ({ card, expected }) => {
+   card     | isMyCard | expected
+ ${['x0']}  | ${true}  | ${true}
+ ${['s1']}  | ${true}  | ${true}
+ ${['s2']}  | ${true}  | ${true}
+ ${['s3']}  | ${true}  | ${false}
+ ${['s4']}  | ${true}  | ${false}
+ ${['s5']}  | ${true}  | ${false}
+ ${['s6']}  | ${true}  | ${false}
+ ${['s7']}  | ${true}  | ${false}
+ ${['s8']}  | ${true}  | ${true}
+ ${['s9']}  | ${true}  | ${false}
+ ${['s10']} | ${true}  | ${false}
+ ${['s11']} | ${true}  | ${true}
+ ${['s12']} | ${true}  | ${false}
+ ${['s13']} | ${true}  | ${true}
+`('$card should be', ({ card, isMyCard, expected }) => {
   test(`returns ${expected}`, () => {
-    expect(isEffectCard(card)).toBe(expected)
+    let result = isEffectCard({ card, isMyCard })
+    expect(result).toBe(expected)
   })
 })
 describe('resNewEffectState TestCases', () => {
