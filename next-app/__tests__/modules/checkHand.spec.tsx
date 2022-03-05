@@ -5,6 +5,7 @@
  * 入力がない場合は効果を受け入れると処理し、ゲームが続行する
  */
 import { HandCards } from '../../@types/card'
+import { Effect } from '../../@types/game'
 import {
   isPutOut2or13,
   hasSameCard,
@@ -87,11 +88,12 @@ describe('checkHand TestCases', () => {
     const expected = ['s2', 'h8', 'x0']
     expect(result).toEqual(expected)
   })
-  // it('wild効果が発動中の場合、指定された柄は無条件で出すことができる', async () => {
-  //   const trash = ['s8o']
-  //   const hands:HandCards[] = ['s2', 'c2', 'h8', 'x0']
-  //   const result = cardsICanPutOut(hands, trash)
-  //   const expected = ['s2', 'h8', 'x0']
-  //   expect(result).toEqual(expected)
-  // })
+  it('wild効果が発動中の場合、指定された柄はどの数字でも出すことができる', async () => {
+    const trash = ['s8o']
+    const hands:HandCards[] = ['s2', 'c2', 'c6', 'h8', 'x0']
+    const effect: Effect[] = ['wildclub']
+    const result = cardsICanPutOut(hands, trash, effect)
+    const expected = ['c2', 'c6', 'h8', 'x0']
+    expect(result).toEqual(expected)
+  })
 })
