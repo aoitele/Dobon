@@ -5,6 +5,7 @@ import { useUpdateStateFn } from './state'
 import { gameInitialState, Action as StateAction } from './roomStateReducer'
 import { AuthState } from '../../context/authProvider'
 import hasProperty from '../function/hasProperty'
+import { extractPutableSuitStr } from './effect'
 
 const card2 = Number(process.env.NEXT_PUBLIC_RANK_CARD_DRAWTWO)
 const card13 = Number(process.env.NEXT_PUBLIC_RANK_CARD_OPENCARD)
@@ -31,13 +32,34 @@ const sepalateSuitNum = (cards: Board['hands'] | Board['trash']) => {
   return res
 }
 
-const cardsICanPutOut = (hands:string[] | HandCards[], trash:Board['trash']) => {
+interface HandSep {
+  suit: string
+  num: string
+  isOpen: boolean
+  isPutable: boolean
+}
+
+type HandsFilterCallback = (handSep: HandSep) => boolean // eslint-disable-line no-unused-vars
+
+const cardsICanPutOut = (hands:string[] | HandCards[], trash:Board['trash'], effect?:Board['effect']) => {
   if (!trash.length || hands.length === 1) return []
   const handsSep = sepalateSuitNum(hands)
   const trashSep = sepalateSuitNum(trash)
   const { suit, num } = trashSep[0]
   if (suit === 'x') return hands // Trash - joker is all card allow put
-  const filteredHands = handsSep.filter(_ => _.suit === suit || _.suit === 'x' || _.num === num || _.num === '8')
+
+  /**
+   * Wild effectが場にある時、出せるカード条件は下記となる
+   * ある場合：選択された柄、ジョーカー(suit:x)、wildカード(num:8)
+   * ない場合：trashの(数字 or 柄)、ジョーカー(suit:x)、wildカード(num:8)、
+   */
+  const putableSuit = effect ? extractPutableSuitStr({ effect, isShorten:true }) : ''
+
+  const filterCallback: HandsFilterCallback = (putableSuit === '')
+  ? (arg: HandSep) => (arg.suit === suit || arg.suit === 'x' || arg.num === num || arg.num === '8')
+  : (arg: HandSep) => (arg.suit === putableSuit || arg.suit === 'x' || arg.num === '8')
+
+  const filteredHands = handsSep.filter(_ => filterCallback(_))
   return filteredHands.map(_=>`${_.suit}${_.num}${_.isOpen?'o':''}${_.isPutable?'p':''}`)
 }
 
@@ -71,7 +93,8 @@ const updateHandsFn = ({ state, authUser, dispatch} : UpdateHandFnProps) => {
 
 const updateMyHandsStatus = ({state, hands, trash, dispatch}: UpdateHandProps) => {
   // 場に出せる手札を判定、isPutable=trueにする(['${suit}${num}op', ...])
-  const putableCards = cardsICanPutOut(hands,trash)
+  const effect = state.game?.board.effect
+  const putableCards = cardsICanPutOut(hands, trash, effect)
   const newHands = hands.map(_ => putableCards.includes(_) ? `${_}p`: `${_}`)
   const data = {
     game: {

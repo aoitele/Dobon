@@ -1,4 +1,12 @@
-import { shouldBeSolvedEffects, existShouldBeSolvedEffect, resEffectNumber, resEffectName, isEffectCard, resNewEffectState } from "../../utils/game/effect";
+import {
+  shouldBeSolvedEffects,
+  existShouldBeSolvedEffect,
+  resEffectNumber,
+  resEffectName,
+  isEffectCard,
+  resNewEffectState,
+  extractPutableSuitStr
+} from "../../utils/game/effect";
 import { Effect, InitialBoardState } from "../../@types/game"
 
 const effects_1:Effect[] = ['wildclub']
@@ -179,6 +187,38 @@ describe('resNewEffectState TestCases', () => {
     const result = resNewEffectState(effects, effectName)
     const expected:Effect[] = []
 
+    expect(result).toEqual(expected)
+  })
+})
+describe('extractPutableSuitStr TestCases', () => {
+  it('wild効果発動なしの場合', () => {
+    const effect:Effect[] = ['opencard']
+    const result = extractPutableSuitStr({ effect, isShorten:false })
+    const expected = ''
+    expect(result).toEqual(expected)
+  })
+  it('wild効果のみ発動中の場合 - wilddia', () => {
+    const effect:Effect[] = ['wilddia']
+    const result = extractPutableSuitStr({ effect, isShorten:false })
+    const expected:Effect = 'wilddia'
+    expect(result).toEqual(expected)
+  })
+  it('wildとreverse発動中の場合 - wilddia', () => {
+    const effect:Effect[] = ['wilddia', 'reverse']
+    const result = extractPutableSuitStr({ effect, isShorten:false })
+    const expected:Effect = 'wilddia'
+    expect(result).toEqual(expected)
+  })
+  it('wild効果のみ発動中の場合 - wilddia(短縮系で取得)', () => {
+    const effect:Effect[] = ['wilddia']
+    const result = extractPutableSuitStr({ effect, isShorten:true })
+    const expected = 'd'
+    expect(result).toEqual(expected)
+  })
+  it('wildとreverse発動中の場合 - wildspade(短縮系で取得)', () => {
+    const effect:Effect[] = ['wildspade', 'reverse']
+    const result = extractPutableSuitStr({ effect, isShorten:true })
+    const expected = 's'
     expect(result).toEqual(expected)
   })
 })

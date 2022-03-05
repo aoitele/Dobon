@@ -87,4 +87,11 @@ describe('checkHand TestCases', () => {
     const expected = ['s2', 'h8', 'x0']
     expect(result).toEqual(expected)
   })
+  // it('wild効果が発動中の場合、指定された柄は無条件で出すことができる', async () => {
+  //   const trash = ['s8o']
+  //   const hands:HandCards[] = ['s2', 'c2', 'h8', 'x0']
+  //   const result = cardsICanPutOut(hands, trash)
+  //   const expected = ['s2', 'h8', 'x0']
+  //   expect(result).toEqual(expected)
+  // })
 })

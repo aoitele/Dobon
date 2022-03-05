@@ -81,6 +81,22 @@ const isEffectCard = ({ card, isMyCard }:isEffectCardProps) => {
   if (_card === null) return false
   return rankCardNums.includes(_card.num)
 }
+interface ExtractPutableSuitStrProps {
+  effect: Effect[]
+  isShorten: boolean
+}
+
+const extractPutableSuitStr = ({
+  effect,
+  isShorten
+}: ExtractPutableSuitStrProps): string => {
+  const allEffectStr = effect.join()
+  const regex = isShorten ? /wild(?<suit>c|d|h|s)/u : /wild(club|dia|heart|spade)/u
+  const mat:RegExpMatchArray | null = allEffectStr.match(regex)
+  return isShorten
+  ? mat?.groups ? mat.groups.suit : ''
+  : mat?.[0] ?? ''
+}
 
 type EffectStateTreatFn = (effect: Effect[], effectName: Effect | '') => Effect[] // eslint-disable-line no-unused-vars
 
@@ -188,4 +204,4 @@ const treatDrawEffect:EffectStateTreatFn = (effect, effectName) => {
   return res
 }
 
-export { shouldBeSolvedEffects, extractShouldBeSolvedEffect, existShouldBeSolvedEffect, resEffectNumber, resEffectName, isEffectCard, resNewEffectState }
+export { shouldBeSolvedEffects, extractShouldBeSolvedEffect, existShouldBeSolvedEffect, resEffectNumber, resEffectName, isEffectCard, resNewEffectState, extractPutableSuitStr }
