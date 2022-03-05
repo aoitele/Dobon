@@ -1,11 +1,6 @@
 const path = require('path')
-const withPWA = require('next-pwa')
 
-module.exports = withPWA({
-  pwa: {
-    disable: process.env.NODE_ENV === 'development',
-    dest: 'public'
-  },
+module.exports = {
   reactStrictMode: true,
   productionBrowserSourceMaps: true,
   sassOptions: {
@@ -31,4 +26,4 @@ module.exports = withPWA({
   images: {
     domains: ['placehold.jp']
   }
-})
+}
