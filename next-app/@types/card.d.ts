@@ -39,7 +39,7 @@ export type DevidedCardWithStatus = {
 }
 
 export type Rank = {
-  0: 'ジョーカー(ワイルド、23でドボン可能)',
+  0: 'ジョーカー(ワイルド、21でドボン可能)',
   1: 'スキップ',
   2: 'ドローカード+2',
   8: 'ワイルド',

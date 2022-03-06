@@ -39,6 +39,8 @@ describe.each`
 })
 describe.each`
    card     | selectedWildCard      | expected
+ ${['x0']}  | ${selectedWildCard_1} | ${'joker'}
+ ${['x1']}  | ${selectedWildCard_1} | ${'joker'}
  ${['s1']}  | ${selectedWildCard_1} | ${'skip'}
  ${['s2']}  | ${selectedWildCard_1} | ${'draw2'}
  ${['s3']}  | ${selectedWildCard_1} | ${''}

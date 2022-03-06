@@ -178,6 +178,7 @@ const board = (data: Props) => {
                 { boardState.effect.includes('wildclub') && <span className={style.wildSuit}>♣️</span> }
                 { boardState.effect.includes('wilddia') && <span className={style.wildSuit}>♦️</span> }
                 { boardState.effect.includes('wildheart') && <span className={style.wildSuit}>♥️</span> }
+                { boardState.effect.includes('joker') && <span className={style.joker}>🃏</span> }
                 { boardState.effect.includes('draw2') &&
                   <div className={style.drawCardInfo}>
                     <div>
@@ -249,6 +250,7 @@ const board = (data: Props) => {
             } />
           </div>
         }
+        { boardState.effect.includes('joker') && <div className={style.hint}><span className={style.hintTxt}>{`手札合計21でどぼん可能！`}</span></div> }
 
         { isCardSelecting &&
           <div

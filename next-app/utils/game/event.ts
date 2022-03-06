@@ -4,6 +4,7 @@ import { Event } from '../../@types/socket'
 const modalEvents: ModalEffect['action'][] = [
   'avoidEffect',
   'notAvoidEffect',
+  'joker',
   'skip',
   'draw',
   'draw2',

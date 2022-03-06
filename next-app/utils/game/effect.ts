@@ -24,7 +24,7 @@ type CardEffects = {
   [key:number]: Effect
 }
 const cardEffects: CardEffects = {
-  0: 'wild',
+  0: 'joker',
   1: 'skip',
   2: 'draw2',
   8: 'wild',
@@ -57,6 +57,11 @@ interface resEffectNameProps {
   selectedWildCard:InitialBoardState['selectedWildCard'] | null
 }
 
+/**
+ * CardEffects変数のkeyを_card.numで参照して、カード効果名を返す
+ * 8の場合は選択された柄によりwildが決まる
+ * jokerはdeckにx0,x1が存在するため、x1 -> x0として扱う
+ */
 const resEffectName = ({ card, selectedWildCard }:resEffectNameProps) => {
   const _card = spreadCardState(card, true)[0]
   if (_card === null) return ''
@@ -67,6 +72,9 @@ const resEffectName = ({ card, selectedWildCard }:resEffectNameProps) => {
     suit === 'h' ? 'wildheart' :
     suit === 'c' ? 'wildclub' : 'wilddia'
     return effectName
+  }
+  if (_card.suit === 'x' &&  _card.num === 1) {
+    _card.num = 0
   }
   return rankCardNums.includes(_card.num) ? cardEffects[_card.num] : ''
 }
@@ -79,6 +87,9 @@ interface isEffectCardProps {
 const isEffectCard = ({ card, isMyCard }:isEffectCardProps) => {
   const _card = spreadCardState(card, isMyCard)[0]
   if (_card === null) return false
+  if (_card.suit === 'x' &&  _card.num === 1) {
+    _card.num = 0
+  }
   return rankCardNums.includes(_card.num)
 }
 interface ExtractPutableSuitStrProps {
@@ -116,6 +127,7 @@ const resNewEffectState:EffectStateTreatFn = (effect, effectName) => {
   res = treatReverseEffect(res, effectName)
   res = treatOpenCardEffect(res, effectName)
   res = treatWildEffect(res, effectName)
+  res = treatJokerEffect(res, effectName)
   res = treatDrawEffect(res, effectName)
   return res
 }
@@ -171,6 +183,29 @@ const treatWildEffect:EffectStateTreatFn = (effect, effectName) => {
     if (reMatchWild && effectName !== '') {
       res.push(effectName) // Wildカードが出された場合は追加
     }
+  }
+  return res
+}
+
+/**
+ * ジョーカー処理
+ * (1)現効果にジョーカーがあり、出されたカードがジョーカーの場合→なにもしない
+ * (2)現効果にジョーカーがなく、出されたカードがジョーカーでない場合→なにもしない
+ * (3)現効果にジョーカーがあり、出されたカードがジョーカーでない場合→現効果からジョーカーが消える
+ * (4)現効果にジョーカーがなく、出されたカードがジョーカーの場合→現効果にジョーカーを追加
+ */
+ const treatJokerEffect:EffectStateTreatFn = (effect, effectName) => {
+  let res = effect
+  const isJoker = effectName === 'joker' // 出されたカードがjokerか
+  const existJokerInEffect = res.includes('joker') // 現効果にjokerが存在するか
+
+  if (existJokerInEffect && isJoker) return res // (1)
+  if (!existJokerInEffect && !isJoker) return res // (2)
+  if (existJokerInEffect && !isJoker) { // (3)
+    res = res.filter(_ => _ !== 'joker')
+  }
+  if (!existJokerInEffect && effectName && isJoker) { // (4)
+    res.push(effectName)
   }
   return res
 }

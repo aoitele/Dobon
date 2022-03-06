@@ -19,7 +19,7 @@ const CardEffect: React.FC<Props> = ({ order, value }) => {
     Number(process.env.NEXT_PUBLIC_RANK_CARD_DRAWTWO)
   )
   const rankCards: Rank = {
-    0: 'ジョーカー(ワイルド、23でドボン可能)',
+    0: 'ジョーカー(ワイルド、21でドボン可能)',
     1: 'スキップ',
     2: 'ドローカード+2',
     8: 'ワイルド',

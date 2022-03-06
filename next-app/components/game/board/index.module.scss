@@ -30,10 +30,13 @@
       display: flex;
       justify-content: space-between;
       .reverse {
-        font-size: 24px;
+        font-size: 28px;
+      }
+      .joker {
+        font-size: 28px;
       }
       .wildSuit {
-        font-size: 24px;
+        font-size: 28px;
         animation: light .5s infinite alternate ease-in-out;
         // padding: 4px;
         width: 40px;
@@ -70,6 +73,19 @@
     .deckCount {
       font-size: 14px;
       text-align: center;
+    }
+  }
+  .hint{
+    text-align: center;
+    position: fixed;
+    bottom: 3px;
+    right: 10px;
+    background-color:burlywood;
+    border-radius: 5px;
+    animation: light .8s infinite alternate ease-in-out;
+    .hintTxt {
+      font-size: 14px;
+      white-space: pre-wrap;
     }
   }
   .myInfo {
