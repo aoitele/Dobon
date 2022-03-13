@@ -6,7 +6,9 @@ const user:Player = {
      id: 1,
      nickname: 'taro',
      turn: 1,
-     score: 0 
+     score: 0,
+     isWinner: false,
+     isLoser: false
 } 
 
 describe('suitNameTo__Ja TestCases', () => {

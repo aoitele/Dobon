@@ -1,7 +1,7 @@
 import { isMyTurnFn, isNextUserTurnFn, culcNextUserTurn, culcBeforeUserTurn } from '../../utils/game/turnInfo'
 import { Player } from '../../@types/game'
 
-const noInfoUser = { id: 0, nickname: '', turn: 0, score: 0 }
+const noInfoUser = { id: 0, nickname: '', turn: 0, score: 0, isWinner: false, isLoser: false }
 
 describe('turnInfo TestCases', () => {
   it('isMyTurn:自分のターンかどうか', () => {
@@ -9,19 +9,25 @@ describe('turnInfo TestCases', () => {
       id: 1,
       nickname: 'taro',
       turn: 1,
-      score: 0
+      score: 0,
+      isWinner: false,
+      isLoser: false
     }
     const turnUser__me: Player = {
       id: 1,
       nickname: 'taro',
       turn: 1,
-      score: 0
+      score: 0,
+      isWinner: false,
+      isLoser: false
     }
     const turnUser__other: Player = {
       id: 2,
       nickname: 'jiro',
       turn: 2,
-      score: 0
+      score: 0,
+      isWinner: false,
+      isLoser: false
     }
 
     const result1 = isMyTurnFn(me, turnUser__me)
@@ -32,10 +38,10 @@ describe('turnInfo TestCases', () => {
   })
   it('isNextUserTurn:自分の次のユーザーのターンかどうか', () => {
     const users: Player[] = [
-      { id: 1, nickname: 'taro', turn: 1, score: 0 },
-      { id: 2, nickname: 'jiro', turn: 2, score: 0 },
-      { id: 3, nickname: 'saburo', turn: 3, score: 0 },
-      { id: 4, nickname: 'siro', turn: 4, score: 0 },
+      { id: 1, nickname: 'taro', turn: 1, score: 0, isWinner: false, isLoser: false },
+      { id: 2, nickname: 'jiro', turn: 2, score: 0, isWinner: false, isLoser: false },
+      { id: 3, nickname: 'saburo', turn: 3, score: 0, isWinner: false, isLoser: false },
+      { id: 4, nickname: 'siro', turn: 4, score: 0, isWinner: false, isLoser: false },
     ]
 
     const me1 = users.find(_ => _.nickname === 'taro') ?? noInfoUser
@@ -62,10 +68,10 @@ describe('turnInfo TestCases', () => {
 })
 
 const users: Player[] = [
-  { id: 1, nickname: 'taro', turn: 1, score: 0 },
-  { id: 2, nickname: 'jiro', turn: 2, score: 0 },
-  { id: 3, nickname: 'saburo', turn: 3, score: 0 },
-  { id: 4, nickname: 'siro', turn: 4, score: 0 },
+  { id: 1, nickname: 'taro', turn: 1, score: 0, isWinner: false, isLoser: false },
+  { id: 2, nickname: 'jiro', turn: 2, score: 0, isWinner: false, isLoser: false },
+  { id: 3, nickname: 'saburo', turn: 3, score: 0, isWinner: false, isLoser: false },
+  { id: 4, nickname: 'siro', turn: 4, score: 0, isWinner: false, isLoser: false },
 ]
 
 const user2 = users.slice(0, 2)

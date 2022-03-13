@@ -15,6 +15,7 @@ import { AuthStateContext } from '../../context/authProvider'
 import Board from '../../components/game/board'
 import sleep from '../../utils/game/sleep'
 import { initialState } from '../../utils/game/state'
+import ScoreBoard from '../../components/game/score'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -48,6 +49,9 @@ const Room: React.FC<Props> = ({ room }) => {
     return <Board room={room} handleEmit={handleEmit} state={state} authUser={authUser}/>
   }
 
+  if (state.game?.status === 'ended') {
+    return <ScoreBoard room={room} handleEmit={handleEmit} state={state} authUser={authUser} />
+  }
   const isCreatedUser = authUser.id === room.create_user_id
   if (state.game && isCreatedUser) {
     state.game.status = 'created'

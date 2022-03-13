@@ -1,0 +1,33 @@
+.winCardInfo {
+  font-size: 20px;
+  
+  .bonusCardContainer {
+    display: flex;
+    overflow-x: scroll;
+    .bonusCard {
+      min-width: 110px;
+      margin: 0px 0px 0px -15px;
+    }
+  }
+  .winNumText {
+    white-space: pre-wrap;
+    animation: fadeupDelay 3s cubic-bezier(0.33, 1, 0.68, 1) 1 forwards;
+  }
+}
+
+@keyframes fadeupDelay {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  80% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

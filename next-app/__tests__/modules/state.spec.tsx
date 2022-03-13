@@ -48,7 +48,9 @@ describe('gameState TestCases', () => {
       image: 'hoge.jpg',
       nickname: 'taro',
       score: 0,
-      turn: 0
+      turn: 0,
+      isWinner: false,
+      isLoser: false
     }
 
     const payload: reducerPayloadSpecify = {

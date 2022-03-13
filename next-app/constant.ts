@@ -16,6 +16,7 @@ namespace DobonConst {
   export const DOBON_CARD_NUMBER_WILD = 8
   export const DOBON_CARD_NUMBER_REVERSE = 11
   export const DOBON_CARD_NUMBER_OPENCARD = 13
+  export const DOBON_CARD_NUMBER_JOKER = 21
 }
 
 export default DobonConst

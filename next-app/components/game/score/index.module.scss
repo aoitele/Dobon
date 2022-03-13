@@ -1,0 +1,146 @@
+.wrap {
+  height: 100vh;
+  overflow: hidden;
+  animation: fadeup 1s cubic-bezier(0.33, 1, 0.68, 1) 1 forwards;
+
+  .heading {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 2px;
+    background-color: bisque;
+    border-radius: 50px;
+    padding: 20px;
+    animation: showin 2s cubic-bezier(0.12, 0, 0.39, 0) 1 forwards;
+    &:before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -40px;
+      margin-top: -15px;
+      border: 15px solid transparent;
+      border-right: 30px solid bisque;
+      z-index: 0;
+    }
+  }
+
+  .infoWrap {
+    width: 95%;
+    margin: 20px auto;
+    padding: 10px;
+    border-radius: 10px;
+    transition: 0.3s;
+    font-weight: bold;
+  }
+
+  .winerInfoContainer {
+    @extend .infoWrap;
+    height: 72%;
+    padding: 20px;
+    background: rgba(255, 183, 0, 0.6); // 背景のみ透過
+    box-shadow: 0 4px 0 #aaaaaa;
+    .winNum {
+      white-space: pre-wrap;
+    }
+    .winAndBonusInfoContainer {
+      position: relative;
+      margin: 20px 0px;
+      .winAndBonusInfo {
+        display: flex;
+        justify-content: space-evenly;
+        .winCardInfoContainer {
+          width: 50%;
+          padding: 20px 10px 10px;
+          text-align: center;
+        }
+        .productMark {
+          position: absolute;
+          bottom: 10px;
+          font-size: 40px
+        }
+      }
+    }
+    .addBonus {
+      text-align: center;
+      background-color: antiquewhite;
+      border-radius: 10px;
+      padding: 4px;
+      animation: fadeupDelay 3s cubic-bezier(0.33, 1, 0.68, 1) 1 forwards;
+    }
+    .winScoreContainer {
+      animation: fadeupDelay 5s cubic-bezier(0.33, 1, 0.68, 1) 1 forwards;
+      padding: 0px 0px 0px 65px;      
+      span {
+        font-size: 40px;
+      }
+    }
+  }
+  .loserInfoContainer {
+    @extend .infoWrap;
+    height: 20%;
+    padding: 20px;
+    background: rgba(255, 132, 38, 0.6); // 背景のみ透過
+    box-shadow: 0 4px 0 #aaaaaa;
+    display: flex;
+
+    .loserScoreContainer {
+      animation: fadeupDelay 5s cubic-bezier(0.33, 1, 0.68, 1) 1 forwards;
+      padding: 20px;
+      span {
+        font-size: 30px;
+      }
+    }
+  }
+}
+
+@keyframes fadeup {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes showin {
+  0% {
+    transform: translateX(140px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(0);
+  }
+  65% {
+    transform: translateX(30px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+  20%,100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeupDelay {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  80% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

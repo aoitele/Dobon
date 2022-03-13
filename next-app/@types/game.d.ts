@@ -36,6 +36,8 @@ export type Player = {
   image?: string
   turn: number
   score: number
+  isWinner: boolean
+  isLoser: boolean
 }
 export type OtherHands = {
   userId: number

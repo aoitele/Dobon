@@ -25,9 +25,9 @@ const emitHandler = (io: Socket, socket: any) => {
       case 'getparticipants': {
         const usersKey = `room:${roomId}:users`
         const users = await adapterPubClient.smembers(usersKey)
-        const userData = []
+        const userData:Player[] = []
         for (let i = 0; i < users.length; i += 1) {
-          userData.push({ id: 0, nickname: users[i] || 'no user', turn: 0, score: 0 })
+          userData.push({ id: 0, nickname: users[i] || 'no user', turn: 0, score: 0, isWinner: false, isLoser: false })
         }
         const reducerPayload: reducerPayloadSpecify = {
           game: {
@@ -59,13 +59,18 @@ const emitHandler = (io: Socket, socket: any) => {
           }
         }
         // 参加者データ取得
-        const participants:Player[] = await prisma.$queryRaw(
+        let participants:Player[] = await prisma.$queryRaw(
           rowQuery({
             model: 'Participant',
             method: 'GameBoardUsersInit',
             params: { roomId }
           })
         )
+        // IsWinner, isLoserの初期値を付与
+        const mergeObj = { isWinner:false, isLoser:false }
+        participants = participants.map(_ => {
+          return { ..._, ...mergeObj }
+        })
         // Game.board.usersにユーザーを追加
         let reducerPayload: reducerPayloadSpecify = {
           game: {
@@ -415,6 +420,17 @@ const emitHandler = (io: Socket, socket: any) => {
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)
         await sleep(3000)
+
+        if (judge) {
+          // ドボン成功ならスコア計算画面へ移行
+          reducerPayload = {
+            game: {
+              status: 'ended'
+            }
+          }
+          io.in(room).emit('updateStateSpecify', reducerPayload)
+          await sleep(3000)
+        }
         resetEvent(io, room)
         break
       }
