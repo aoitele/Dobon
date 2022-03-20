@@ -25,15 +25,15 @@ const initialState = {
 }
 
 const ScoreBoard:React.FC<Props> = ({ state }) => {
+  console.log(state, 'state')
   const [ values, setValues ] = useState(initialState)
-  const boardState = state.game?.board
-  const winner = boardState?.users.filter(_=>_.id===1)[0]
-  const loser = boardState?.users.filter(_=>_.id===32)[0]
-  // Const dobonCard = boardState?.trash
-  const dobonCard = ['d10o']
+  const boardState = state.game.board
+  const winner = boardState.users.filter(user => user.isWinner)[0]
+  const loser = boardState.users.filter(user => user.isLoser)[0]
+  const dobonCard = boardState.trash.card
   const extractNumRegex = (arg: string[]) => arg.join().match(/\d+/gu) 
   
-  const mat = extractNumRegex(dobonCard)
+  const mat = extractNumRegex([dobonCard])
   const dobonNum = mat ? Number(mat[0]) : null // 計算に使われる上がりカードの数値
 
   useEffect(() => {
@@ -58,7 +58,7 @@ const ScoreBoard:React.FC<Props> = ({ state }) => {
     }
   },[boardState?.users])
 
-  if (!winner || !loser || !dobonCard ||dobonCard.length === 0 || !dobonNum) return <></>
+  if (!winner || !loser || !dobonCard || dobonCard.length === 0 || !dobonNum) return <></>
   
   return (
     <div className={styles.wrap}>
@@ -76,7 +76,7 @@ const ScoreBoard:React.FC<Props> = ({ state }) => {
             <div className={styles.winCardInfoContainer}>
               <WinCardInfo 
                 key='winCardInfo-dobon'
-                cards={dobonCard}
+                cards={[dobonCard]}
                 message={`上がり値\n「${dobonNum}」`}
               />
             </div>

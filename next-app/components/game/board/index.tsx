@@ -73,7 +73,7 @@ const board = (data: Props) => {
       roomId: room.id,
       userId: me.id,
       event: 'playcard',
-      data: { type: 'board', data: { trash: [`${card}o`] }} // Trashで見せるためopenフラグをつけて送る
+      data: { type: 'board', data: { trash: { card:`${card}o`, user:me } } } // Trashで見せるためopenフラグをつけて送る
     }
     await handleEmit(boardEmit)
 
@@ -120,7 +120,7 @@ const board = (data: Props) => {
       event: 'turnchange',
       data: {
         type:'board',
-        data: { users, turn: boardState.turn, trash: [`${card}o`], effect: boardState.effect },
+        data: { users, turn: boardState.turn, trash: { card:`${card}o`, user: me }, effect: boardState.effect },
         option: { values: { isMyTurnConsecutive: values.isMyTurnConsecutive }, triggered: 'putOut' }
       }
     }
@@ -153,12 +153,12 @@ const board = (data: Props) => {
           }
         </div>
         <div className={style.boardInfo}>
-          { boardState?.trash.length &&
+          { boardState?.trash.card &&
             <SingleCard
               key='trash'
               card = {
                 Object.assign(
-                  spreadCardState(boardState.trash)[0],
+                  spreadCardState([boardState.trash.card])[0],
                   { style: { width:80, height: 120} }
                 )
               }
@@ -276,7 +276,7 @@ const board = (data: Props) => {
           <EffectAnimation
             user={eventUser}
             action={state.game.event.action}
-            message={createMsg({action: state.game.event.action, card: boardState.trash[0]})}
+            message={createMsg({action: state.game.event.action, card: boardState.trash.card})}
           />
         </>
       }

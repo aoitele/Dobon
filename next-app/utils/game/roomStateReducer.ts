@@ -4,8 +4,8 @@ import { PartiallyPartial, NestedPartial } from '../../@types/utility'
 
 export type gameInitialState = {
   roomId: number | null
-  userId?: number | null
-  game?: Game
+  userId: number | null
+  game: Game
   connected: boolean
   wsClient: SocketClient | null
 }

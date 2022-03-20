@@ -27,15 +27,7 @@ describe('gameState TestCases', () => {
         id: null,
         status: 'join',
         event: { user: { nickname:'', turn:0 }, action: 'gamestart', message: null},
-        board: {
-          users: [],
-          deckCount: 0,
-          hands: [],
-          trash: [],
-          otherHands: [],
-          turn: null,
-          effect: []
-        }
+        board: initialState['game']['board']
       },
       connected: false,
       wsClient: null
@@ -69,15 +61,7 @@ describe('gameState TestCases', () => {
         id: null,
         status: 'join',
         event: { user:{ nickname:'', turn:0 }, action: 'gamestart', message: null },
-        board: {
-          users: [user],
-          deckCount: 0,
-          hands: [],
-          trash: [],
-          otherHands: [],
-          turn: null,
-          effect: []
-        }
+        board: initialState['game']['board']
       },
       connected: false,
       wsClient: null

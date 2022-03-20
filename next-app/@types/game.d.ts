@@ -48,7 +48,10 @@ export type Board = {
   users: Player[]
   deckCount: number
   hands: string[] | HandCards[]
-  trash: string[] | HandCards[]
+  trash: {
+    card: string | HandCards
+    user: Player
+  }
   otherHands: OtherHands[]
   turn: number | null
   effect: Effect[] // カードの効果名

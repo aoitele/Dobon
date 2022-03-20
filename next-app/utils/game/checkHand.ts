@@ -16,7 +16,7 @@ const hasSameCard = (putOutCard: number, hand: number[]): boolean =>
   hand.includes(putOutCard)
 const chkAvoidCardEffect = (action: Action) => action === 'avoidEffect'
 
-const sepalateSuitNum = (cards: Board['hands'] | Board['trash']) => {
+const sepalateSuitNum = (cards: string[] | HandCards[]) => {
   const res = []
   for (let i=0; i<cards.length; i+=1 ){
     const re = /(h|s|c|d|x)([0-9]+)(op|o|p|)/u
@@ -42,9 +42,9 @@ interface HandSep {
 type HandsFilterCallback = (handSep: HandSep) => boolean // eslint-disable-line no-unused-vars
 
 const cardsICanPutOut = (hands:string[] | HandCards[], trash:Board['trash'], effect?:Board['effect']) => {
-  if (!trash.length || hands.length === 1) return []
+  if (!trash.card || hands.length === 1) return []
   const handsSep = sepalateSuitNum(hands)
-  const trashSep = sepalateSuitNum(trash)
+  const trashSep = sepalateSuitNum([trash.card])
   const { suit, num } = trashSep[0]
   if (suit === 'x') return hands // Trash - joker is all card allow put
 

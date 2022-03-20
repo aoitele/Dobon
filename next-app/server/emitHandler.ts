@@ -176,16 +176,18 @@ const emitHandler = (io: Socket, socket: any) => {
         const trashKey = `room:${roomId}:trash`
         await adapterPubClient.del(trashKey) // Trash初期化
 
-        let initialTrash = await adapterPubClient.spop(deckKey, 1)
-        await adapterPubClient.lpush(trashKey, initialTrash)
-        initialTrash = [`${initialTrash[0]}o`] // フロント返却時はOpen状態にする
+        const trash = await adapterPubClient.spop(deckKey, 1)
+        await adapterPubClient.lpush(trashKey, trash)
+        const initialTrash = `${trash[0]}o` // フロント返却時はOpen状態にする
         const deckCount = await adapterPubClient.scard(deckKey)
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             status: 'playing',
             board: {
               turn: 1,
-              trash: initialTrash,
+              trash: {
+                card: initialTrash
+              },
               deckCount,
               effect: []
             }
@@ -278,9 +280,9 @@ const emitHandler = (io: Socket, socket: any) => {
           const { users, turn, trash, effect } = board
           const isMyTurnConsecutive = data.option?.values.isMyTurnConsecutive
           const triggered = data.option?.triggered
-          if (users && turn && trash) {
+          if (users && turn && trash?.card) {
             // Skipカード効果で得た自分の連続ターンでない、純粋に自分のターンが来てカードを出した場合のみeffectNameを取得する
-            const effectName = (!isMyTurnConsecutive || triggered === 'putOut') ? resEffectName({ card: trash, selectedWildCard: null }) : ''
+            const effectName = (!isMyTurnConsecutive || triggered === 'putOut') ? resEffectName({ card: [trash.card], selectedWildCard: null }) : ''
             const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
             const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed) 
             const reducerPayload: reducerPayloadSpecify = {
@@ -298,11 +300,15 @@ const emitHandler = (io: Socket, socket: any) => {
       case 'playcard': {
         const { data } = payload
         if (data?.type !== 'board' || typeof data.data.trash === 'undefined') break
+
         const { trash } = data.data
+        if (trash.card === '' || !trash.user || typeof trash.card === 'undefined') break
+        const { card } = trash
+
         const trashKey = `room:${roomId}:trash`
         // `${suit}${num}o`でデータがくるため、redisはoなしでlpush
-        const _trash = trash[0].replace('o', '')
-        await adapterPubClient.lpush(trashKey, _trash) // 最新の捨て札を先頭に追加
+        const trashCard = card.replace('o', '')
+        await adapterPubClient.lpush(trashKey, trashCard) // 最新の捨て札を先頭に追加
 
         let reducerPayload: reducerPayloadSpecify = {
           game: {
@@ -315,7 +321,7 @@ const emitHandler = (io: Socket, socket: any) => {
 
         // `${suit}${num}o`でデータがくるため、redisはoあり/なしでsrem
         const userHandsKey = `room:${payload.roomId}:user:${payload.userId}:hands`
-        await adapterPubClient.srem(userHandsKey, trash[0], trash[0].slice(0, -1))
+        await adapterPubClient.srem(userHandsKey, card, card.slice(0, -1))
 
         // ルームメンバーに手札更新指令
         reducerPayload = {
@@ -391,7 +397,9 @@ const emitHandler = (io: Socket, socket: any) => {
       case 'dobon': {
         const { data } = payload
         if (data?.type !== 'board') break
-        if (typeof data.data.trash === 'undefined' || typeof data.data.hands === 'undefined') break
+
+        const boardState = data.data
+        if (!user || typeof boardState.trash === 'undefined' || !boardState.trash.card || typeof boardState.hands === 'undefined' || !boardState.users) break
         // 全ユーザーにドボン発生を通知
         let reducerPayload: reducerPayloadSpecify = {
           game: {
@@ -406,15 +414,29 @@ const emitHandler = (io: Socket, socket: any) => {
 
         // 数字のみ抜き取り計算に利用する
         const re = /[0-9]+/gui
-        const trash = data.data.trash.map(_ => Number(_.match(re)))[0]
-        const hand = data.data.hands.flatMap(_ => Number(_.match(re)))
-        const judge = dobonJudge(trash, hand)
+        const trashCard = Number(boardState.trash.card.match(re))
+        const lastTrashUser = boardState.trash.user
+        const hand = boardState.hands.flatMap(_ => Number(_.match(re)))
+        const judge = dobonJudge(trashCard, hand)
+        // Const judge = true
+
+        // ドボン成功ならユーザーデータのwiner/loserを更新させる
+        const newUsersState = boardState.users.map(u => {
+          if(judge) {
+            if (u.id === user.id) { u.isWinner = true}
+            if (u.id === lastTrashUser?.id) { u.isLoser = true }
+          }
+          return u
+        })
 
         // ドボン結果を通知
         reducerPayload = {
           game: {
             event: {
               action: judge ? 'dobonsuccess' : 'dobonfailure'
+            },
+            board: {
+              users: newUsersState
             }
           }
         }

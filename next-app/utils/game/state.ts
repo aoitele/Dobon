@@ -25,7 +25,17 @@ const initialState: gameInitialState = {
       users: [],
       deckCount: 0,
       hands: [],
-      trash: [],
+      trash: {
+        card: '',
+        user: {
+          id: 0,
+          nickname: '',
+          turn: 0,
+          score: 0,
+          isWinner: false,
+          isLoser: false
+        }
+      },
       otherHands: [],
       turn: null,
       effect: []

@@ -99,7 +99,7 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
                 <div className={styles.singleCardWrap}>
                   <SingleCard card={
                     Object.assign(
-                      spreadCardState(state.game.board.trash)[0],
+                      spreadCardState([state.game.board.trash.card])[0],
                       { style: { width:80, height: 120} }
                     )
                   }/>
@@ -161,7 +161,7 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
 const updatePutableState = (card: HaveAllPropertyCard, trash:Board['trash'] | undefined ) => {
   if (!trash) return card
 
-  const trashCardNum = Number(spreadCardState(trash)[0].num)
+  const trashCardNum = Number(spreadCardState([trash.card])[0].num)
   if (card.isPutable && card.num !== trashCardNum) {
     card.isPutable = false
   }
