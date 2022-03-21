@@ -51,7 +51,7 @@ const useBoardHooks = ({ state, values, setValues, initialState, me } : Props) =
 
     const isNextUserTurn = isNextUserTurnFn(me, turnUser, users, isReversed)
     const actionBtnStyle = resActionBtnStyle(isMyTurn)
-    const dobonBtnStyle = resDobonBtnStyle(isNextUserTurn, lastTrashUserIsMe)
+    const dobonBtnStyle = resDobonBtnStyle()
 
     // ターン変更orアクションボタン作動時 → 自ターンとアクションボタンのステートを変更
     setValues({
