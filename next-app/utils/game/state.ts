@@ -38,7 +38,8 @@ const initialState: gameInitialState = {
       },
       otherHands: [],
       turn: null,
-      effect: []
+      effect: [],
+      allowDobon: true
     }
   },
   connected: false,

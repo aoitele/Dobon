@@ -19,6 +19,8 @@ interface Props {
 const useBoardHooks = ({ state, values, setValues, initialState, me } : Props) => {
   const users = state.game?.board.users
   const turnUser = state.game?.board && users ? users.filter(_ => _.turn === state.game?.board.turn)[0] : null
+  const lastTrashUserIsMe = state.game.board.trash.user.id === me?.id
+  const effect = state.game.board.effect
 
   const resActionBtnStyle = (isMyTurn:boolean) => {
     if (!isMyTurn) return 'disabled'
@@ -26,12 +28,30 @@ const useBoardHooks = ({ state, values, setValues, initialState, me } : Props) =
     return values.isBtnActive.action ? 'active' : 'draw'
   }
 
+  /**
+   * どぼんボタンがアクティブになるパターン
+   * - ゲーム開始時
+   * - 他ユーザーがカードを出した次のターン(そのターン限り)
+   * - 自分がまだドローしていない時
+   */
+  const resDobonBtnStyle = () => {
+    const isGameStartPhase = state.game.board.trash.user.turn === 0 // ゲーム開始時
+    const allowDobon = state.game.board.allowDobon
+
+    if (isGameStartPhase && allowDobon) return 'dobon'
+    if (!lastTrashUserIsMe && allowDobon) return 'dobon'
+
+    return 'disabled'
+  }
+
   useEffect(() => {
     if (!users || !turnUser || !me) return
     const isMyTurn = isMyTurnFn(me, turnUser)
-    const isNextUserTurn = isNextUserTurnFn(me, turnUser, users)
+    const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
+
+    const isNextUserTurn = isNextUserTurnFn(me, turnUser, users, isReversed)
     const actionBtnStyle = resActionBtnStyle(isMyTurn)
-    const dobonBtnStyle = isNextUserTurn ? 'disabled' : values.isBtnActive.dobon ? 'active': 'dobon'
+    const dobonBtnStyle = resDobonBtnStyle(isNextUserTurn, lastTrashUserIsMe)
 
     // ターン変更orアクションボタン作動時 → 自ターンとアクションボタンのステートを変更
     setValues({

@@ -3,12 +3,22 @@ import { NestedPartial } from "../../@types/utility"
 
 const isMyTurnFn = (me:Player, turnUser:Player) => me.turn === turnUser.turn
 
-const isNextUserTurnFn = (me:Player, turnUser:Player, users:Player[]) => {
+// 自分の次のユーザーターンかどうかの判定
+const isNextUserTurnFn = (me:Player, turnUser:Player, users:Player[], isReversed: boolean) => {
   const userCnt = users.length
-  const isLastUser = me.turn === userCnt
-  return isLastUser
-  ? turnUser.turn === 1
-  : me.turn + 1 === turnUser.turn
+  const isMeFirstUser = me.turn === 1
+  const isMeLastUser = me.turn === userCnt
+  let myNextTurnNum: number = 0
+
+  if (isMeFirstUser) {
+    myNextTurnNum = isReversed ? userCnt : 2
+  } else if (isMeLastUser) {
+    myNextTurnNum = isReversed ? me.turn - 1 : 1
+  } else {
+    myNextTurnNum = isReversed ? me.turn - 1 : me.turn + 1
+  }
+
+  return myNextTurnNum === turnUser.turn
 }
 
 /**

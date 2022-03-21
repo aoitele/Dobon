@@ -189,7 +189,8 @@ const emitHandler = (io: Socket, socket: any) => {
                 card: initialTrash
               },
               deckCount,
-              effect: []
+              effect: [],
+              allowDobon: true
             }
           }
         }
@@ -276,13 +277,18 @@ const emitHandler = (io: Socket, socket: any) => {
       case 'turnchange': {
         const { data } = payload
         if (data?.type === 'board') {
+          // 実行経路(putOut or actionBtn)により処理を分ける
+          const byPutout = data.option?.triggered === 'putOut'
+          const byActionBtn = data.option?.triggered === 'actionBtn'
+
+          // ボードデータ取得、連続した自分のターンかどうかの判定(=skip効果によるturnchange?)
           const board = data.data
           const { users, turn, trash, effect } = board
           const isMyTurnConsecutive = data.option?.values.isMyTurnConsecutive
-          const triggered = data.option?.triggered
+
           if (users && turn && trash?.card) {
             // Skipカード効果で得た自分の連続ターンでない、純粋に自分のターンが来てカードを出した場合のみeffectNameを取得する
-            const effectName = (!isMyTurnConsecutive || triggered === 'putOut') ? resEffectName({ card: [trash.card], selectedWildCard: null }) : ''
+            const effectName = (!isMyTurnConsecutive || byPutout) ? resEffectName({ card: [trash.card], selectedWildCard: null }) : ''
             const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
             const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed) 
             const reducerPayload: reducerPayloadSpecify = {
@@ -292,6 +298,14 @@ const emitHandler = (io: Socket, socket: any) => {
                 }
               }
             }
+            /**
+             * どぼんボタンを有効にするかの状態制御
+             * actionBtnでスキップされた場合、全員どぼん実行は許可しない
+             */
+            if (byActionBtn && reducerPayload.game?.board) {
+              reducerPayload.game.board.allowDobon = false
+            }
+
             io.in(room).emit('updateStateSpecify', reducerPayload) // Roomのターンを更新
           }
         }
@@ -313,7 +327,8 @@ const emitHandler = (io: Socket, socket: any) => {
         let reducerPayload: reducerPayloadSpecify = {
           game: {
             board: { 
-              trash
+              trash,
+              allowDobon: true
             }
           }
         }

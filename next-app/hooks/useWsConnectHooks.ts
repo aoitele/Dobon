@@ -27,7 +27,6 @@ const useWsConnectHooks = (
               console.log('Socket is closed.')
             })
             wsClient._socket.on('updateStateSpecify', (data) => {
-              console.log(data, 'wsClient updateStateSpecify')
               const newState = useUpdateStateFn(state, data)
               dispatch({ type: 'updateStateSpecify', payload: newState })
             })

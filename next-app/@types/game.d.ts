@@ -55,6 +55,7 @@ export type Board = {
   otherHands: OtherHands[]
   turn: number | null
   effect: Effect[] // カードの効果名
+  allowDobon: boolean
 }
 
 export type InitialBoardState = {
