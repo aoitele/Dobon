@@ -23,6 +23,8 @@ type Event =
   | 'dobon'
   | 'dobonsuccess'
   | 'dobonfailure'
+  | 'dobonreverse'
+  | 'getbonus'
   | 'action'
   | 'effect'
   | 'effectcard'
@@ -32,7 +34,7 @@ type Event =
   | Effect
   | null
 
-export type ModalEvent = Pick<Event,'dobon' ,'dobonsuccess' , 'dobonfailure', 'avoidEffect', 'notAvoidEffect', 'skip', 'draw', 'draw2', 'draw4', 'draw6', 'draw8', 'wild', 'reverse', 'opencard'>
+export type ModalEvent = Pick<Event,'dobon' ,'dobonsuccess' , 'dobonfailure', 'dobonreverse', 'avoidEffect', 'notAvoidEffect', 'skip', 'draw', 'draw2', 'draw4', 'draw6', 'draw8', 'wild', 'reverse', 'opencard'>
 
 export type EmitCard = {
   type: 'card'

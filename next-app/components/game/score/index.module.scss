@@ -46,7 +46,7 @@
     }
     .winAndBonusInfoContainer {
       position: relative;
-      margin: 20px 0px;
+      margin: 16px 0px;
       .winAndBonusInfo {
         display: flex;
         justify-content: space-evenly;
@@ -71,12 +71,27 @@
     }
     .winScoreContainer {
       animation: fadeupDelay 5s cubic-bezier(0.33, 1, 0.68, 1) 1 forwards;
+      margin-top: 8px;
       padding: 0px 0px 0px 65px;      
       span {
         font-size: 40px;
       }
     }
+     .resultScore {
+       animation: fadeupDelay 5s cubic-bezier(0.33, 1, 0.68, 1) 1 forwards;
+       text-align: center;
+      }
   }
+  .NextGameInfo {
+    animation: blink .5s infinite alternate ease-in-out;
+    text-align: center;
+    font-size: 24px;
+    background-color: bisque;
+    position: fixed;
+    bottom: 140px;
+    width: 90%;
+  }
+
   .loserInfoContainer {
     @extend .infoWrap;
     height: 20%;
@@ -142,5 +157,13 @@
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+@keyframes blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.8;
   }
 }

@@ -1,4 +1,4 @@
-import { culcGetScore } from '../../utils/game/culcGetScore'
+import { culcGetScore, culcBonus } from '../../utils/game/score'
 
 const dobonNum_0 = 0 // jokerどぼんのテスト用
 const dobonNum_1 = 1

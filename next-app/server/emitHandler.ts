@@ -11,6 +11,7 @@ import sleep from '../utils/game/sleep'
 import { resEffectName } from '../utils/game/effect'
 import { culcNextUserTurn } from '../utils/game/turnInfo'
 import { initialState } from '../utils/game/state'
+import { shuffle } from '../utils/game/shuffle'
 
 const emitHandler = (io: Socket, socket: any) => {
   const adapterPubClient: Redis = socket.adapter.pubClient
@@ -433,7 +434,6 @@ const emitHandler = (io: Socket, socket: any) => {
         const lastTrashUser = boardState.trash.user
         const hand = boardState.hands.flatMap(_ => Number(_.match(re)))
         const judge = dobonJudge(trashCard, hand)
-        // Const judge = true
 
         // ドボン成功ならユーザーデータのwiner/loserを更新させる
         const newUsersState = boardState.users.map(u => {
@@ -469,6 +469,64 @@ const emitHandler = (io: Socket, socket: any) => {
           await sleep(3000)
         }
         resetEvent(io, room)
+        break
+      }
+      case 'getbonus': {
+        const deckKey = `room:${roomId}:deck`
+        let deckCards = await adapterPubClient.smembers(deckKey) // Deckのカードを全て取得
+        deckCards = shuffle(deckCards) // 固定化させないため改めてシャッフル
+        /**
+         * 上がり計算に利用するbonusCardの確定処理
+         * deckから2枚カードを引く
+         * 2枚目移行、11以上のカードとjokerが出ればカードを引き続ける事ができる
+         */
+        // 1枚目のボーナスは確定させておく
+        const bonusCards:string[] = [`${deckCards[0]}o`]
+
+        const isApper10Card = (card: string) => {
+          const cardNum = card.match(/\d+/u)
+          if (cardNum === null) return false
+          if (Number(cardNum) < 11 && Number(cardNum) !== 0) return false
+          return true
+        }
+
+        // 2枚目移行のボーナスを確定させていく、連続ドロー条件を適用。
+        for (let i=1; i<deckCards.length; i+=1) {
+          let bonusCard = deckCards[i]
+          const isDrawable = typeof bonusCard !== 'undefined'
+
+          // Deckからドローできる限りはdeckからカードを取得(10以下のカードを引いた場合は終了)
+          if (isDrawable) {
+            bonusCards.push(`${bonusCard}o`)
+            if (isApper10Card(bonusCard) === false) break
+          }
+          // もしdeckが切れた場合、trashの最新1枚以外で新デッキを生成してドローしていく
+          if (!isDrawable) {
+            const trashKey = `room:${roomId}:trash`
+            const trashCard = await adapterPubClient.lrange(trashKey, 1, -1) // eslint-disable-line no-await-in-loop
+            for (let j=0; j<trashCard.length; j+=1) {
+              bonusCard = trashCard[j]
+              bonusCards.push(`${bonusCard}o`)
+              if (isApper10Card(bonusCard) === false) break // eslint-disable-line max-depth
+            }
+          }
+        }
+        let reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              bonusCards
+            }
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload)
+        await sleep(3000)
+        // 結果表示状態に移行させる
+        reducerPayload = {
+          game: {
+            status: 'showScore'
+          }
+        }
+        io.in(room).emit('updateStateSpecify', reducerPayload)
         break
       }
       default:

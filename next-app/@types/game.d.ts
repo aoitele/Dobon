@@ -22,6 +22,7 @@ export type Game = {
     | 'created'
     | 'playing'
     | 'ended'
+    | 'showScore'
     | 'loading'
     | 'connection loss'
     | undefined
@@ -55,6 +56,7 @@ export type Board = {
   otherHands: OtherHands[]
   turn: number | null
   effect: Effect[] // カードの効果名
+  bonusCards: string[]
   allowDobon: boolean
 }
 

@@ -18,6 +18,27 @@ const culcGetScore = (dobonNum:number, bonusCards: number[], isReverseDobon = fa
   const isJokerDobon = dobonNum === 0
   const dobonBaseNum = isJokerDobon ? DobonConst.DOBON_CARD_NUMBER_JOKER : dobonNum
 
+  // ボーナスカードにあるjokerの枚数
+  const jokerCardCount = bonusCards.filter(card => card === 0).length
+  const existJocker = jokerCardCount > 0
+
+  // ボーナススコアを計算
+  const bonusCardScore = culcBonus(bonusCards)
+
+  // 最終返却時に積算される値を計算(squareRateは1,2,4,8のいずれかとなる)
+  const baseRate = isReverseDobon ? 2 : 1 // どぼん返しなら2倍
+  const jokerRate = existJocker ? jokerCardCount * 2 : 1 // Jokerの枚数だけ2倍
+  const squareRate = baseRate * jokerRate
+  const result = dobonBaseNum * bonusCardScore * squareRate
+
+  return result
+}
+
+/**
+ * どぼん時に与えられるボーナススコアの計算
+ * - 10以のカードは「10」
+ */
+const culcBonus = (bonusCards: number[]) => {
   // ボーナスカードのスコアを算出
   let bcs = bonusCards
 
@@ -36,13 +57,7 @@ const culcGetScore = (dobonNum:number, bonusCards: number[], isReverseDobon = fa
     return acc + curNum
   }, 0)
 
-  // 最終返却時に積算される値を計算(squareRateは1,2,4,8のいずれかとなる)
-  const baseRate = isReverseDobon ? 2 : 1 // どぼん返しなら2倍
-  const jokerRate = existJocker ? jokerCardCount * 2 : 1 // Jokerの枚数だけ2倍
-  const squareRate = baseRate * jokerRate
-  const result = dobonBaseNum * bonusCardScore * squareRate
-
-  return result
+  return bonusCardScore
 }
 
-export { culcGetScore }
+export { culcGetScore, culcBonus }

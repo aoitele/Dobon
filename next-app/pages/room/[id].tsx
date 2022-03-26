@@ -49,7 +49,7 @@ const Room: React.FC<Props> = ({ room }) => {
     return <Board room={room} handleEmit={handleEmit} state={state} authUser={authUser}/>
   }
 
-  if (state.game.status === 'ended') {
+  if (state.game.status === 'ended' || state.game.status === 'showScore') {
     return <ScoreBoard room={room} handleEmit={handleEmit} state={state} authUser={authUser} />
   }
   const isCreatedUser = authUser.id === room.create_user_id

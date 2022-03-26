@@ -6,6 +6,7 @@ import { Player } from '../../../@types/game'
 interface Props {
   user: Player
   score: number
+  roundUpScore?: number
 }
 const UserScore:VFC<Props> = ({ user, score }) => {
   return (

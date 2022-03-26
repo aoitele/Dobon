@@ -77,6 +77,7 @@ const useEventHooks = (
         case 'dobon':
         case 'dobonsuccess':
         case 'dobonfailure':
+        case 'dobonreverse':
         case 'skip':
         case 'draw2':
         case 'draw4':
