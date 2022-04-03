@@ -13,11 +13,12 @@ interface Args {
   emitArgs?: Props
 }
 
+export const addEmitArgEvent = (args: Props, event: string) => {
+  args.emitData.event = event
+  return args
+}
+
 const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitArgs }) => {
-  const addEmitArgEvent = (args: Props, event: string) => {
-    args.emitData.event = event
-    return args
-  }
 
   const draw = async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     if (!emitArgs) return

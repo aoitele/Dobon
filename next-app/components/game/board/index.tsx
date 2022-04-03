@@ -16,7 +16,7 @@ import { createEmitFnArgs } from '../../../utils/game/emit'
 import EffectAnimation from '../EffectAnimation'
 import { createMsg } from '../../../utils/game/message'
 import useBoardHooks from '../../../hooks/useBoardHooks'
-import { existShouldBeSolvedEffect, resEffectName, isEffectCard, resNewEffectState } from '../../../utils/game/effect'
+import { resEffectName, isEffectCard, resNewEffectState } from '../../../utils/game/effect'
 import { isModalEvent } from '../../../utils/game/event'
 import ModalBack from '../../feedback/ModalBack'
 import AvoidEffectSelecter from '../AvoidEffectSelecter'
@@ -46,7 +46,8 @@ export const initialState: InitialBoardState = {
   isBtnActive: {
     action: false,
     dobon: false
-  }
+  },
+  showAvoidEffectview: false
 }
 
 const board = (data: Props) => {
@@ -280,7 +281,7 @@ const board = (data: Props) => {
           />
         </>
       }
-      { boardState && values.isMyTurn && state.game.board.effect.length > 0 && existShouldBeSolvedEffect(state.game.board.effect) &&
+      { values.showAvoidEffectview &&
       <AvoidEffectSelecter
         states={{
           state,
@@ -292,6 +293,7 @@ const board = (data: Props) => {
           turnUser,
         }}
         functions={{ handleEmit, setValues, putOut}}
+        emitArgs={boardState ? createEmitFnArgs({ boardState, room, user:me, userId: me.id, handleEmit, event:'dobon' }): undefined}
       /> }
     </>
   )

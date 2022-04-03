@@ -6,7 +6,7 @@
   bottom: 0;
   margin: auto;
   width: 90%;
-  height: 80%;
+  height: 90%;
   z-index: 2500;
   .imageBg {
     position: absolute;
@@ -42,6 +42,7 @@
       .acceptEffect {
         @extend .btn;
         background-color: lightcoral;
+        white-space: pre-wrap;
       }
       .escapeEffect {
         @extend .btn;
@@ -54,6 +55,10 @@
       .inspectOtherHands {
         @extend .btn;
         background-color: lightgreen;
+      }
+      .dobonBtn {
+        @extend .btn;
+        background-color: orange;
       }
       .actionBtn {
         margin: 20px 0px;

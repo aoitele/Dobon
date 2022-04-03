@@ -5,6 +5,7 @@
 
 import { useEffect } from 'react'
 import { InitialBoardState, Player } from '../@types/game'
+import { existShouldBeSolvedEffect } from '../utils/game/effect'
 import { gameInitialState } from '../utils/game/roomStateReducer'
 import { isMyTurnFn, isNextUserTurnFn } from '../utils/game/turnInfo'
 
@@ -17,10 +18,10 @@ interface Props {
 }
 
 const useBoardHooks = ({ state, values, setValues, initialState, me } : Props) => {
-  const users = state.game?.board.users
-  const turnUser = state.game?.board && users ? users.filter(_ => _.turn === state.game?.board.turn)[0] : null
-  const lastTrashUserIsMe = state.game.board.trash.user.id === me?.id
-  const effect = state.game.board.effect
+  const boardState = state.game.board
+  const { users, trash, effect } = boardState
+  const turnUser = users ? users.filter(user => user.turn === boardState.turn)[0] : null
+  const lastTrashUserIsMe = trash.user.id === me?.id
 
   const resActionBtnStyle = (isMyTurn:boolean) => {
     if (!isMyTurn) return 'disabled'
@@ -52,6 +53,7 @@ const useBoardHooks = ({ state, values, setValues, initialState, me } : Props) =
     const isNextUserTurn = isNextUserTurnFn(me, turnUser, users, isReversed)
     const actionBtnStyle = resActionBtnStyle(isMyTurn)
     const dobonBtnStyle = resDobonBtnStyle()
+    const showAvoidEffectView = isMyTurn && effect.length > 0 && existShouldBeSolvedEffect(effect)
 
     // ターン変更orアクションボタン作動時 → 自ターンとアクションボタンのステートを変更
     setValues({
@@ -60,6 +62,7 @@ const useBoardHooks = ({ state, values, setValues, initialState, me } : Props) =
       isNextUserTurn,
       actionBtnStyle,
       dobonBtnStyle,
+      showAvoidEffectview: showAvoidEffectView,
     })
   },[turnUser])
 

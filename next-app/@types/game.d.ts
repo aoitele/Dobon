@@ -75,7 +75,8 @@ export type InitialBoardState = {
   isBtnActive: {
     action: boolean
     dobon: boolean
-  }
+  },
+  showAvoidEffectview: boolean
 }
 
 export type Action = 'avoidEffect' | 'notAvoidEffect'

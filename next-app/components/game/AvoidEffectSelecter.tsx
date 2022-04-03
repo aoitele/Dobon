@@ -3,7 +3,7 @@
  */
 import React, { useState } from 'react'
 import ModalBack from '../feedback/ModalBack'
-import { InitialBoardState, Player, SolvableEffects, Board } from '../../@types/game'
+import { InitialBoardState, Player, SolvableEffects, Board, Effect } from '../../@types/game'
 import { extractShouldBeSolvedEffect, resEffectNumber } from '../../utils/game/effect'
 import { resMyHandsCardNumbers } from '../../utils/game/checkHand'
 import styles from './AvoidEffectSelecter.module.scss'
@@ -14,8 +14,10 @@ import { gameInitialState } from '../../utils/game/roomStateReducer'
 import Hands from './Hands'
 import { HaveAllPropertyCard } from '../../@types/card'
 import UserInfo from './UserInfo'
+import { emit, Props } from '../../utils/game/emit'
+import { addEmitArgEvent } from './ActionBtn'
 
-interface Props {
+interface AvoidEffectProps {
   states:{
     state: gameInitialState
     authUser: AuthAPIResponse.UserMe
@@ -30,6 +32,7 @@ interface Props {
     setValues: React.Dispatch<React.SetStateAction<InitialBoardState>>
     putOut: (card: string) => Promise<void> // eslint-disable-line no-unused-vars
   }
+  emitArgs?: Props
 }
 
 interface UserHandsInfoProps {
@@ -38,11 +41,11 @@ interface UserHandsInfoProps {
 }
 
 const initialState = {
-  cardSelecting: false,
-  handsInspecting: false
+  cardSelectMode: false,
+  handsInspectMode: false
 }
 
-const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
+const avoidEffectSelecter:React.FC<AvoidEffectProps> = ({ states, functions, emitArgs }) => {
   const { authUser, emitter, effect, state, cards, values } = states
   const { handleEmit, setValues, putOut } = functions
   if (!state.game) return <></>
@@ -65,6 +68,7 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
     }
     console.log(actionEmit, 'actionEmit')
     await handleEmit(actionEmit)
+    setValues({ ...values, showAvoidEffectview:false })
   }
 
   /**
@@ -93,9 +97,9 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
         <div className={styles.wrap}>
           <div className={styles.imageBg}>
             <div className={styles.inner}>
-            { !localState.cardSelecting && !localState.handsInspecting &&
+            { !localState.cardSelectMode && !localState.handsInspectMode &&
               <>
-                <p className={styles.attention}>{`${emitter?.nickname}が\n「${effectName}」を発動しました`}</p>
+                <p className={styles.attention}>{`${emitter?.nickname}が\n「${effectName[0]}」を発動しました`}</p>
                 <div className={styles.singleCardWrap}>
                   <SingleCard card={
                     Object.assign(
@@ -105,17 +109,22 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
                   }/>
                 </div>
                 <div className={styles.actionBtn}>
-                  <span className={styles.acceptEffect} onClick={acceptEffect}>効果を受ける</span>
+                <span className={styles.acceptEffect} onClick={acceptEffect}>{`効果を受ける\n(${effectDescription(effectName)})`}</span>
                   <span
                     className={existCardNumInMyHands ? styles.escapeEffect : styles.noEscapeEffect}
-                    onClick={() => existCardNumInMyHands ? setLocalState({ cardSelecting: true, handsInspecting: false }) : undefined}
+                    onClick={() => existCardNumInMyHands ? setLocalState({ cardSelectMode: true, handsInspectMode: false }) : undefined}
                     >{cardNumber}を出して回避する</span>
-                  <span className={styles.inspectOtherHands} onClick={() => setLocalState({ cardSelecting: false, handsInspecting: true })}>みんなの手札をみる</span>
-                </div>
+                  <span className={styles.inspectOtherHands} onClick={() => setLocalState({ cardSelectMode: false, handsInspectMode: true })}>みんなの手札をみる</span>
+                  { emitArgs &&
+                    <span
+                      className={styles.dobonBtn}
+                      onClick={() => emit(addEmitArgEvent(emitArgs, 'dobon'))}
+                    >どぼんする！</span>
+                  }
+                  </div>
               </>
             }
-
-            { localState.cardSelecting &&
+            { localState.cardSelectMode &&
               <div>
                 <p className={styles.attention}>カードを選択してください</p>
                 {/* {states.cards:効果回避ができる同数字のカードのみをputableにしてHandsに渡す} */}
@@ -139,7 +148,7 @@ const avoidEffectSelecter:React.FC<Props> = ({ states, functions }) => {
               </div>
             }
 
-            { localState.handsInspecting &&
+            { localState.handsInspectMode &&
             <div>
               <UserHandsInfo
                 users={state.game.board.users}
@@ -166,6 +175,17 @@ const updatePutableState = (card: HaveAllPropertyCard, trash:Board['trash'] | un
     card.isPutable = false
   }
   return card
+}
+
+const effectDescription = (effect: Effect[]) => {
+  switch(effect[0]) {
+    case 'draw2'    : return 'カードを2枚引きます'
+    case 'draw4'    : return 'カードを4枚引きます'
+    case 'draw6'    : return 'カードを6枚引きます'
+    case 'draw8'    : return 'カードを8枚引きます'
+    case 'opencard' : return '手札を公開します'
+    default         : return ''
+  }
 }
 
 export default avoidEffectSelecter
