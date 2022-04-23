@@ -1,6 +1,6 @@
 import { HandCards } from "../../@types/card"
 import { Event } from '../../@types/socket'
-import DobonConst from '../../constant'
+import { DOBON_CARD_NAME_JA_H, DOBON_CARD_NAME_JA_S, DOBON_CARD_NAME_JA_C, DOBON_CARD_NAME_JA_D, DOBON_CARD_NAME_JA_X } from '../../constant'
 import spreadCardState from './spreadCardState'
 
 const suitNameTo__Ja = (card: HandCards | string): { suit: string, num: number} => {
@@ -9,11 +9,11 @@ const suitNameTo__Ja = (card: HandCards | string): { suit: string, num: number} 
   const num = _card[0].num
 
   switch (suit) {
-    case 'h' : return { suit: DobonConst.DOBON_CARD_NAME_JA_H, num }
-    case 's' : return { suit: DobonConst.DOBON_CARD_NAME_JA_S, num }
-    case 'c' : return { suit: DobonConst.DOBON_CARD_NAME_JA_C, num }
-    case 'd' : return { suit: DobonConst.DOBON_CARD_NAME_JA_D, num }
-    case 'x' : return { suit: DobonConst.DOBON_CARD_NAME_JA_X, num }
+    case 'h' : return { suit: DOBON_CARD_NAME_JA_H, num }
+    case 's' : return { suit: DOBON_CARD_NAME_JA_S, num }
+    case 'c' : return { suit: DOBON_CARD_NAME_JA_C, num }
+    case 'd' : return { suit: DOBON_CARD_NAME_JA_D, num }
+    case 'x' : return { suit: DOBON_CARD_NAME_JA_X, num }
     default  : return { suit: '', num: 0 }
   }
 }

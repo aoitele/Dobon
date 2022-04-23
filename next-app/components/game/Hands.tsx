@@ -4,7 +4,7 @@ import { SingleCard } from './SingleCard'
 import { HaveAllPropertyCard } from '../../@types/card'
 import { InitialBoardState } from '../../@types/game'
 import style from './Hands.module.scss'
-import DobonConst from '../../constant'
+import { DOBON_CARD_NUMBER_WILD } from '../../constant'
 
 interface Props {
   states: {
@@ -64,7 +64,7 @@ const cardOnClickFn = (states: Props['states'], functions: Props['functions']) =
   const { selectedCard, selectedWildCard } = values
   const suitNum = `${card.suit}${card.num}`
 
-  if (card.num === DobonConst.DOBON_CARD_NUMBER_WILD) {
+  if (card.num === DOBON_CARD_NUMBER_WILD) {
     // eslint-disable-next-line
     const isMeetCondition = selectedCard === suitNum && selectedWildCard.isSelected && selectedWildCard.suit != null
     return isMeetCondition

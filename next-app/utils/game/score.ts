@@ -1,4 +1,4 @@
-import DobonConst from "../../constant"
+import { DOBON_CARD_NUMBER_JOKER } from "../../constant"
 /**
  * @param dobonNum ドボンしたカードの数字
  * @param bonusCards デッキから引いたボーナスカード
@@ -16,7 +16,7 @@ import DobonConst from "../../constant"
 const culcGetScore = (dobonNum:number, bonusCards: number[], isReverseDobon = false) => {
   // ジョーカドボンならドボン数値を21にする
   const isJokerDobon = dobonNum === 0
-  const dobonBaseNum = isJokerDobon ? DobonConst.DOBON_CARD_NUMBER_JOKER : dobonNum
+  const dobonBaseNum = isJokerDobon ? DOBON_CARD_NUMBER_JOKER : dobonNum
 
   // ボーナスカードにあるjokerの枚数
   const jokerCardCount = bonusCards.filter(card => card === 0).length
