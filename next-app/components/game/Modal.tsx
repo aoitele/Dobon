@@ -5,7 +5,7 @@ import { HandleEmitFn } from '../../@types/socket'
 import { RoomAPIResponse } from '../../@types/api/roomAPI'
 import Link from 'next/link'
 import { AuthState } from '../../context/authProvider'
-import DobonConst from '../../constant'
+import { DOBON_ROOM_STATUS_WAITING } from '../../constant'
 
 interface Props {
   room?: RoomAPIResponse.RoomInfo
@@ -81,7 +81,7 @@ const modalInner = (handleEmit: HandleEmitFn, authUser: AuthAPIResponse.UserMe |
                 <p>あなた：👤{authUser.nickname}</p>
               </div>
               { !joinedUserIds.includes(userId)
-              && room.status === DobonConst.DOBON_ROOM_STATUS_WAITING
+              && room.status === DOBON_ROOM_STATUS_WAITING
               && <a
                   href="#"
                   className={style.startBtn}

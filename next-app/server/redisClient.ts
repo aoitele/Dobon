@@ -1,8 +1,11 @@
+const isDev = process.env.NODE_ENV !== 'production'
+if (isDev) {
+  require('dotenv').config()
+}
+
 import Redis from 'ioredis'
 
-const dev = process.env.NODE_ENV !== 'production'
-
-const pubClient = dev
+const pubClient = isDev
   ? new Redis(Number(process.env.REDIS_PORT), process.env.REDIS_HOST)
   : new Redis(process.env.REDIS_URL)
 const subClient = pubClient.duplicate()

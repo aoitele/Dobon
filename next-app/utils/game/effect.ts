@@ -4,7 +4,7 @@
 
 import { HandCards } from "../../@types/card"
 import { Effect, InitialBoardState, SolvableEffects, WildEffect } from "../../@types/game"
-import DobonConst from "../../constant"
+import { DOBON_CARD_NUMBER_DRAW_2, DOBON_CARD_NUMBER_WILD, DOBON_CARD_NUMBER_OPENCARD } from "../../constant"
 import spreadCardState from "./spreadCardState"
 
 /**
@@ -45,9 +45,9 @@ const resEffectNumber = (effectName: SolvableEffects) => {
     case 'draw4':
     case 'draw6':
     case 'draw8':
-      return DobonConst.DOBON_CARD_NUMBER_DRAW_2
+      return DOBON_CARD_NUMBER_DRAW_2
     case 'opencard':
-      return DobonConst.DOBON_CARD_NUMBER_OPENCARD
+      return DOBON_CARD_NUMBER_OPENCARD
     default: return null
   }
 }
@@ -65,7 +65,7 @@ interface resEffectNameProps {
 const resEffectName = ({ card, selectedWildCard }:resEffectNameProps) => {
   const _card = spreadCardState(card, true)[0]
   if (_card === null) return ''
-  if (_card.num === DobonConst.DOBON_CARD_NUMBER_WILD && selectedWildCard) {
+  if (_card.num === DOBON_CARD_NUMBER_WILD && selectedWildCard) {
     const { suit } = selectedWildCard
     const effectName: WildEffect =
     suit === 's' ? 'wildspade' :

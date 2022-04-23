@@ -1,27 +1,27 @@
 version: "3"
 
 services:
-  web:
-    env_file: ./next-app/.env
-    build:
-      context: ./next-app/
-      dockerfile: Dockerfile
-    image: dobon_web
-    container_name: dobon
-    command: npm run dev
-    environment:
-      NODE_ENV: development
-    volumes:
-      - ./next-app:/usr/src/next-app:delegated
-      - /usr/src/next-app/node_modules
-    ports:
-      - "3000:3000"
-    tty: true
-    logging:
-      driver: json-file
-      options:
-        max-file: '1'
-        max-size: 3m
+  # web:
+  #   env_file: ./next-app/.env
+  #   build:
+  #     context: ./next-app/
+  #     dockerfile: Dockerfile
+  #   image: dobon_web
+  #   container_name: dobon
+  #   command: npm run dev
+  #   environment:
+  #     NODE_ENV: development
+  #   volumes:
+  #     - ./next-app:/usr/src/next-app:delegated
+  #     - /usr/src/next-app/node_modules
+  #   ports:
+  #     - "3000:3000"
+  #   tty: true
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-file: '1'
+  #       max-size: 3m
   redis:
     image: "redis:latest"
     container_name: dobon_redis
