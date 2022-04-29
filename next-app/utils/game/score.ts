@@ -9,7 +9,7 @@ import { DOBON_CARD_NUMBER_JOKER } from "../../constant"
  * ジョーカーがbonusCardsに存在する場合も1枚につき2倍される
  *
  * dobonNumルール
- *  - ジョーカーは21として扱う
+ *  - ジョーカー(x0,x1)は21として扱う
  * bonusCardsルール
  *  - 10以上のカードは10として扱う
  */

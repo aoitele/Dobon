@@ -8,6 +8,7 @@ import UserScore from './UserScore'
 import WinCardInfo from './WinCardInfo'
 import { culcBonus, culcGetScore } from '../../../utils/game/score'
 import sleep from '../../../utils/game/sleep'
+import { DOBON_CARD_NUMBER_JOKER } from '../../../constant'
 
 export interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -52,11 +53,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
   const dobonCard = boardState.trash.card
   const isReverseDobon = state.game.event.action === 'dobonreverse'
   const bonusCards = state.game.board.bonusCards
-  const extractNumRegex = (arg: string[]) => arg.join().match(/\d+/gu) 
-  
-  const mat = extractNumRegex([dobonCard])
-  const dobonNum = mat ? Number(mat[0]) : null // 計算に使われる上がりカードの数値
-
+  const dobonNum = resDobonNum(dobonCard) // 計算に使われる上がりカードの数値
   const existAddBonus = values.addBonus.isReverseDobon || values.addBonus.jokerCount > 0
 
   useEffect(() => {
@@ -79,7 +76,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
 
   useEffect(() => {
     if (state.game.status !== 'showScore') return
-    const bonusNums = extractNumRegex(bonusCards)?.map(_ => Number(_))
+    const bonusNums = resBonusNumArray(bonusCards)
 
     if (winner && loser && dobonNum && bonusNums) {
       const bonusTotal = culcBonus(bonusNums)
@@ -142,7 +139,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
     }
   },[state.game.status])
 
-  if (!winner || !loser || !dobonCard || dobonCard.length === 0 || !dobonNum) return <></>
+  if (!winner || !loser || !dobonCard || dobonCard.length === 0) return <></>
   
   return (
     <div className={styles.wrap}>
@@ -206,6 +203,32 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
       </div>
     </div>
   )
+}
+
+/**
+ * 上がり計算のドボン値に利用する数字を算出させる
+ */
+const resDobonNum = (dobonCard: string) => {
+  if (['x0o', 'x1o'].includes(dobonCard)) return DOBON_CARD_NUMBER_JOKER
+  const num = dobonCard.match(/\d+/gu)
+  if (num === null) return null
+  return Number(num[0])
+}
+
+/**
+ * 上がり計算のボーナス値に利用する数字を算出させる
+ * jokerは0として返却させる
+ * (スコア計算ではjocker=0として利用するためx1o -> x0oに置き換えている)
+ * @param arg '[s1o, s2o, x1o, ...]'
+ * @returns [1, 2, 0, ...]
+ */
+
+const resBonusNumArray = (bonusCards: string[]): number[] => {
+  const _bonusCards = bonusCards.map(card => card === 'x1o' ? 'x0o' : card)
+  const joinedStr = _bonusCards.join()
+  const mat = joinedStr.match(/\d+/gu)
+  if (mat === null) return []
+  return mat.map(_ => Number(_))
 }
 
 export default ScoreBoard
