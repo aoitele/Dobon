@@ -53,8 +53,8 @@ const emitHandler = (io: Socket, socket: any) => {
           try {
             await prisma.participant.create({ data })
             // Redisにユーザーデータセット
-            const userDataMini = [{ id: userId, nickname }]
-            await adapterPubClient.hmset(userKey, userDataMini)
+            const userDataMini = [{ id: userId, nickname, score: 0 }]
+            await adapterPubClient.hset(userKey, userDataMini)
           } catch(e) {
             console.log(e,'e')
           }
@@ -103,6 +103,10 @@ const emitHandler = (io: Socket, socket: any) => {
         }
         break
       }
+      /**
+       * ゲーム開始時の処理
+       * nextGameでgame.idが切り替わる時もここから処理が行われる
+       */
       case 'prepare': {
         const deckKey = `room:${roomId}:deck`
         await adapterPubClient.sunionstore(deckKey, 'deck') // Redis copy deck for room
@@ -124,7 +128,6 @@ const emitHandler = (io: Socket, socket: any) => {
 
         const reducerPayload: reducerPayloadSpecify = {
           game: {
-            id: 1,
             event: {
               action: 'preparecomplete'
             },
@@ -172,17 +175,31 @@ const emitHandler = (io: Socket, socket: any) => {
         io.in(socket.id).emit('updateStateSpecify', reducerPayload)
         break
       }
+      /**
+       * ゲーム開始時の処理
+       * infoKeyでルームのゲーム情報を格納しておく
+       * (ゲームID切り替えや通信切断時の復帰にも利用)
+       */
       case 'gamestart': {
+        const infoKey = `room:${roomId}:info`
         const deckKey = `room:${roomId}:deck`
         const trashKey = `room:${roomId}:trash`
-        await adapterPubClient.del(trashKey) // Trash初期化
 
+        // GameIdを更新
+        const hgetGameId = await adapterPubClient.hget(infoKey, 'game-id')
+        const _gameId = hgetGameId ? Number(hgetGameId) + 1 : 1
+        const data = [{ 'game-id': _gameId }]
+        await adapterPubClient.hset(infoKey, data)
+
+        // Trash初期化
+        await adapterPubClient.del(trashKey)
         const trash = await adapterPubClient.spop(deckKey, 1)
         await adapterPubClient.lpush(trashKey, trash)
         const initialTrash = `${trash[0]}o` // フロント返却時はOpen状態にする
         const deckCount = await adapterPubClient.scard(deckKey)
         const reducerPayload: reducerPayloadSpecify = {
           game: {
+            id: _gameId,
             status: 'playing',
             board: {
               turn: 1,

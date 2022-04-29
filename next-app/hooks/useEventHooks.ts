@@ -49,7 +49,7 @@ const useEventHooks = (
           if (roomId) {
             const data: Emit = {
               roomId,
-              gameId: game.id || null,
+              gameId: game.id,
               userId: authUser.id,
               event: 'gethand'
             }
