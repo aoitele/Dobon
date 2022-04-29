@@ -61,4 +61,4 @@ const judgeWithJokerSumAndDiff = (
   return matcher.includes(sum(hand) - judgeNumber)
 }
 
-export { dobonJudge }
+export { sum, diff, dobonJudge }

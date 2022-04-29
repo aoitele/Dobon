@@ -23,6 +23,7 @@ import AvoidEffectSelecter from '../AvoidEffectSelecter'
 import { culcBeforeUserTurn } from '../../../utils/game/turnInfo'
 import SelectCardInfo from '../SelectCardInfo'
 import SelectSuit from '../SelectSuit'
+import HintText from '../HintText'
 
 export interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -251,7 +252,7 @@ const board = (data: Props) => {
             } />
           </div>
         }
-        { boardState.effect.includes('joker') && <div className={style.hint}><span className={style.hintTxt}>{`手札合計21でどぼん可能！`}</span></div> }
+        <HintText boardState={boardState}/>
 
         { isCardSelecting &&
           <div
