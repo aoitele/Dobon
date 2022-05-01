@@ -69,6 +69,11 @@ const board = (data: Props) => {
 
   const putOut = async(card: string) => {
     if (!boardState || !me?.id) return
+    /**
+     * PutOut発動時のeffect状態
+     * 処理中にboardState.effectは更新されるため、初期状態を取得してturnchangeで利用する
+     */
+    const initialEffect = boardState.effect
 
     // Update trash
     let boardEmit:Emit = {
@@ -122,7 +127,7 @@ const board = (data: Props) => {
       event: 'turnchange',
       data: {
         type:'board',
-        data: { users, turn: boardState.turn, trash: { card:`${card}o`, user: me }, effect: boardState.effect },
+        data: { users, turn: boardState.turn, trash: { card:`${card}o`, user: me }, effect: initialEffect },
         option: { values: { isMyTurnConsecutive: values.isMyTurnConsecutive }, triggered: 'putOut' }
       }
     }
