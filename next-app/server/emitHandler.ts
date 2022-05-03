@@ -204,12 +204,14 @@ const emitHandler = (io: Socket, socket: any) => {
             board: {
               turn: 1,
               trash: {
-                card: initialTrash
+                card: initialTrash,
+                user: initialState.game.board.trash.user,
               },
               deckCount,
-              effect: [],
-              allowDobon: true
-            }
+              effect: initialState.game.board.effect,
+              bonusCards: initialState.game.board.bonusCards,
+            },
+            result: initialState.game.result
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload) // ゲーム開始、Room全員のステータスを更新
