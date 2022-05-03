@@ -56,7 +56,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
   const isReverseDobon = state.game.event.action === 'dobonreverse'
   const bonusCards = state.game.board.bonusCards
   const dobonNum = resDobonNum(dobonCard) // 計算に使われる上がりカードの数値
-  const existAddBonus = values.addBonus.isReverseDobon || values.addBonus.jokerCount > 0
+  const existAddBonus = values.addBonus.isReverseDobon || values.addBonus.isSingleDobon || values.addBonus.jokerCount > 0
 
   useEffect(() => {
     if (winner.id !== authUser?.id) return
@@ -79,9 +79,9 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
   useEffect(() => {
     if (state.game.status !== 'showScore') return
     const bonusNums = resBonusNumArray(bonusCards)
+    const isSingleDobon = state.game.result?.dobonHandsCount === 1
 
     if (winner && loser && dobonNum && bonusNums) {
-      const isSingleDobon = state.game.result?.dobonHandsCount === 1
       const bonusTotal = culcBonus(bonusNums)
       const resultScore = culcGetScore({ dobonNum, bonusCards: bonusNums, isReverseDobon, isSingleDobon })
       const roundUpScore = Math.ceil(resultScore / 10) * 10
@@ -100,11 +100,11 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
         }
       }
 
-      setValues({
+      setValues(() => ({
         ...valueBaseObj,
         winerScore: winner.score,
         loserScore: loser.score,
-      })
+      }))
 
       const scoreAnimation = async() => {
         await sleep(3000)
@@ -114,21 +114,21 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
 
         const scoreCountUp = setInterval(async() => {
           cntUpNum += 1
-          setValues({
+          setValues(() => ({
             ...valueBaseObj,
             winerScore: cntUpNum,
             loserScore: loser.score - cntUpNum,
-          })
+          }))
           if (cntUpNum === end) {
             clearInterval(scoreCountUp)
             const nextGameId = state.game.id ? state.game.id + 1 : ''
             await sleep(1000)
-            setValues({
+            setValues(() => ({
               ...valueBaseObj,
               winerScore: cntUpNum,
               loserScore: loser.score - cntUpNum,
               message:`GoTo Next →「Game${nextGameId}」`
-            })
+            }))
             await sleep(3000)
             if (winner.id !== authUser?.id) return
             const emit:Emit = {
