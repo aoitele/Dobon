@@ -3,9 +3,11 @@ import { DOBON_CARD_NUMBER_JOKER } from "../../constant"
  * @param dobonNum ドボンしたカードの数字
  * @param bonusCards デッキから引いたボーナスカード
  * @param isReverseDobon ドボン返しかどうか
+ * @param isSingleDobon 手札1枚でのドボンかどうか
  *
  * スコア計算は「dobonNum * bonusCardsの合計値」
  * isReverseDobonがtrueであれば、最後に2倍した数がスコアとなる
+ * isSingleDobonがtrueであれば、最後に2倍した数がスコアとなる
  * ジョーカーがbonusCardsに存在する場合も1枚につき2倍される
  *
  * dobonNumルール
@@ -13,7 +15,15 @@ import { DOBON_CARD_NUMBER_JOKER } from "../../constant"
  * bonusCardsルール
  *  - 10以上のカードは10として扱う
  */
-const culcGetScore = (dobonNum:number, bonusCards: number[], isReverseDobon = false) => {
+
+interface Props {
+  dobonNum:number
+  bonusCards: number[]
+  isReverseDobon?: boolean
+  isSingleDobon?: boolean
+}
+
+const culcGetScore = ({ dobonNum, bonusCards, isReverseDobon=false, isSingleDobon=false }:Props) => {
   // ジョーカドボンならドボン数値を21にする
   const isJokerDobon = dobonNum === 0
   const dobonBaseNum = isJokerDobon ? DOBON_CARD_NUMBER_JOKER : dobonNum
@@ -25,9 +35,13 @@ const culcGetScore = (dobonNum:number, bonusCards: number[], isReverseDobon = fa
   // ボーナススコアを計算
   const bonusCardScore = culcBonus(bonusCards)
 
-  // 最終返却時に積算される値を計算(squareRateは1,2,4,8のいずれかとなる)
-  const baseRate = isReverseDobon ? 2 : 1 // どぼん返しなら2倍
-  const jokerRate = existJocker ? jokerCardCount * 2 : 1 // Jokerの枚数だけ2倍
+  /**
+   * 最終返却時に積算される値を計算(squareRateは1,2,4,8のいずれかとなる)
+   * baseRate:どぼん返し&&単騎なら4倍、片方が真なら2倍、ともに偽であれば1倍
+   * jokerRate:Jokerの枚数だけ2倍
+   */
+  const baseRate = (isReverseDobon && isSingleDobon) ? 4 : (isReverseDobon || isSingleDobon) ? 2 : 1
+  const jokerRate = existJocker ? jokerCardCount * 2 : 1
   const squareRate = baseRate * jokerRate
   const result = dobonBaseNum * bonusCardScore * squareRate
 

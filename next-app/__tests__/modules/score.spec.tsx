@@ -1,4 +1,4 @@
-import { culcGetScore, culcBonus } from '../../utils/game/score'
+import { culcGetScore } from '../../utils/game/score'
 
 const dobonNum_0 = 0 // jokerどぼんのテスト用
 const dobonNum_1 = 1
@@ -52,7 +52,26 @@ describe('Score TestCases - 通常どぼんパターン', () => {
   ${dobonNum_8} | ${bonusCards_10} |    ${true}     | ${1472}
   `('$card should be', ({ dobonNum, bonusCards, isReverseDobon, expected }) => {
     test(`returns ${expected}`, () => {
-      let result = culcGetScore(dobonNum, bonusCards, isReverseDobon)
+      let result = culcGetScore({ dobonNum, bonusCards, isReverseDobon })
+      expect(result).toBe(expected)
+    })
+  })
+})
+
+describe('Score TestCases - 単騎どぼんパターン', () => {
+  describe.each`
+    dobonNum    |   bonusCards                       | isReverseDobon | expected
+  ${dobonNum_0} | ${bonusCards_1}                    |    ${false}    | ${84}
+  ${dobonNum_0} | ${bonusCards_1}                    |    ${true}     | ${168}
+  ${dobonNum_1} | ${bonusCards_1}                    |    ${false}    | ${4}
+  ${dobonNum_1} | ${bonusCards_1}                    |    ${true}     | ${8}
+  ${dobonNum_8} | ${bonusCards_1}                    |    ${false}    | ${32}
+  ${dobonNum_8} | ${bonusCards_1}                    |    ${true}     | ${64}
+  ${dobonNum_0} | ${bonusCards_2_with_joker}         |    ${false}    | ${252}
+  ${dobonNum_0} | ${bonusCards_3_with_joker_double}  |    ${false}    | ${504}
+  `('$card should be', ({ dobonNum, bonusCards, isReverseDobon, expected }) => {
+    test(`returns ${expected}`, () => {
+      let result = culcGetScore({ dobonNum, bonusCards, isReverseDobon, isSingleDobon:true })
       expect(result).toBe(expected)
     })
   })
@@ -87,7 +106,7 @@ describe('Score TestCases - bonusCardにjokerが1枚ある場合', () => {
   ${dobonNum_8} | ${bonusCards_10_with_joker} |    ${true}     | ${2624}
   `('$card should be', ({ dobonNum, bonusCards, isReverseDobon, expected }) => {
     test(`returns ${expected}`, () => {
-      let result = culcGetScore(dobonNum, bonusCards, isReverseDobon)
+      let result = culcGetScore({ dobonNum, bonusCards, isReverseDobon })
       expect(result).toBe(expected)
     })
   })
@@ -116,7 +135,7 @@ describe('Score TestCases - bonusCardにjokerが2枚ある場合', () => {
   ${dobonNum_8} | ${bonusCards_10_with_joker_double} |    ${true}     | ${4608}
   `('$card should be', ({ dobonNum, bonusCards, isReverseDobon, expected }) => {
     test(`returns ${expected}`, () => {
-      let result = culcGetScore(dobonNum, bonusCards, isReverseDobon)
+      let result = culcGetScore({ dobonNum, bonusCards, isReverseDobon })
       expect(result).toBe(expected)
     })
   })

@@ -28,6 +28,7 @@ export type Game = {
     | undefined
   event: ModalEffect
   board: Board
+  result: GameResult
 }
 export type GameStatus = Game['status']
 
@@ -77,6 +78,10 @@ export type InitialBoardState = {
     dobon: boolean
   },
   showAvoidEffectview: boolean
+}
+
+export interface GameResult {
+  dobonHandsCount?: number // ドボン発生時にドボン手札のカード枚数が入る
 }
 
 export type Action = 'avoidEffect' | 'notAvoidEffect'

@@ -27,7 +27,8 @@ describe('gameState TestCases', () => {
         id: null,
         status: 'join',
         event: { user: { nickname:'', turn:0 }, action: 'gamestart', message: null},
-        board: initialState['game']['board']
+        board: initialState['game']['board'],
+        result: {}
       },
       connected: false,
       wsClient: null
@@ -61,7 +62,8 @@ describe('gameState TestCases', () => {
         id: null,
         status: 'join',
         event: { user:{ nickname:'', turn:0 }, action: 'gamestart', message: null },
-        board: initialState['game']['board']
+        board: initialState['game']['board'],
+        result: {}
       },
       connected: false,
       wsClient: null

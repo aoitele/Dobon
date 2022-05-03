@@ -41,7 +41,8 @@ const initialState: gameInitialState = {
       effect: [],
       allowDobon: true,
       bonusCards: []
-    }
+    },
+    result: {}
   },
   connected: false,
   wsClient: null

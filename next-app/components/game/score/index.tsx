@@ -21,6 +21,7 @@ interface ScoreBoardState {
   bonusCards: string[]
   bonusTotal: number
   addBonus: {
+    isSingleDobon: boolean
     isReverseDobon: boolean
     jokerCount: number
   }
@@ -35,6 +36,7 @@ const initialState: ScoreBoardState = {
   bonusCards: [],
   bonusTotal: 0,
   addBonus: {
+    isSingleDobon: false,
     isReverseDobon: false,
     jokerCount: 0
   },
@@ -79,8 +81,9 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
     const bonusNums = resBonusNumArray(bonusCards)
 
     if (winner && loser && dobonNum && bonusNums) {
+      const isSingleDobon = state.game.result?.dobonHandsCount === 1
       const bonusTotal = culcBonus(bonusNums)
-      const resultScore = culcGetScore(dobonNum, bonusNums, false)
+      const resultScore = culcGetScore({ dobonNum, bonusCards: bonusNums, isReverseDobon, isSingleDobon })
       const roundUpScore = Math.ceil(resultScore / 10) * 10
       const jokerCount = bonusNums.filter(card => card === 0).length
 
@@ -91,6 +94,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
         resultScore,
         roundUpScore,
         addBonus: {
+          isSingleDobon,
           isReverseDobon,
           jokerCount
         }
@@ -177,6 +181,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
         { existAddBonus &&
           <div className={styles.addBonus}>
             { values.addBonus.jokerCount > 0 && <p>ジョーカーボーナス ×{values.addBonus.jokerCount * 2}</p> }
+            { values.addBonus.isSingleDobon && <p>単騎どぼんボーナス ×2</p> }
             { values.addBonus.isReverseDobon && <p>どぼん返し成功！ ×2</p> }
           </div>
         }

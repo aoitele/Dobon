@@ -468,7 +468,10 @@ const emitHandler = (io: Socket, socket: any) => {
               action: judge ? 'dobonsuccess' : 'dobonfailure'
             },
             board: {
-              users: newUsersState
+              users: newUsersState,
+            },
+            result: {
+              dobonHandsCount: hand.length
             }
           }
         }
@@ -503,7 +506,7 @@ const emitHandler = (io: Socket, socket: any) => {
         const isApper10Card = (card: string) => {
           const cardNum = card.match(/\d+/u)
           if (cardNum === null) return false
-          if (Number(cardNum) < 11 && Number(cardNum) !== 0) return false
+          if (Number(cardNum) < 11 && ['x0', 'x1'].includes(card) === false) return false
           return true
         }
 
