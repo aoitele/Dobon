@@ -3,16 +3,34 @@
  */
 
 import { HandCards } from "../../@types/card"
-import { Effect, InitialBoardState, SolvableEffects, WildEffect } from "../../@types/game"
+import { AddableEffects, Effect, InitialBoardState, SolvableEffects, WildEffect } from "../../@types/game"
 import { DOBON_CARD_NUMBER_DRAW_2, DOBON_CARD_NUMBER_WILD, DOBON_CARD_NUMBER_OPENCARD } from "../../constant"
 import spreadCardState from "./spreadCardState"
+
+/**
+ * BoardState.effectに入れることができる効果
+ * 盤面の現効果にこれらが存在するため、出されたカードにより効果を解決していく事になる
+ */
+const addableEffects: AddableEffects = [
+  'draw2',
+  'draw4',
+  'draw6',
+  'draw8',
+  'joker',
+  'opencard',
+  'reverse',
+  'wildclub',
+  'wilddia',
+  'wildheart',
+  'wildspade'
+]
 
 /**
  * 下記カード効果は次ターンのユーザーで解決されるため、shouldBeSolvedEffectsの複数共存はない
  * 'dobonfailure'も(誤どぼん)→(他ユーザーがどぼんできるかチェック)の1回で解決される
  * extractShouldBeSolvedEffect()でeffectNameを取り出す際は[0]インデックスで使用してOK
  */
-const shouldBeSolvedEffects: SolvableEffects  = [
+const shouldBeSolvedEffects: SolvableEffects = [
   'draw2',
   'draw4',
   'draw6',
@@ -118,12 +136,12 @@ type EffectStateTreatFn = (effect: Effect[], effectName: Effect | '') => Effect[
  */
 const resNewEffectState:EffectStateTreatFn = (effect, effectName) => {
   let res = effect
-  // 現効果が空の場合、追加して返却
-  if (addEffectOnlyPat(effect, effectName) && effectName !== '') {
+  // 現効果がない場合、追加して返却
+  if (effect.length === 0 && isAddableEffect(effectName)) {
     res.push(effectName)
     return res
   }
-  // 以降、現効果が存在する場合
+  // 以下、現効果が存在する場合
   res = treatReverseEffect(res, effectName)
   res = treatOpenCardEffect(res, effectName)
   res = treatWildEffect(res, effectName)
@@ -132,10 +150,11 @@ const resNewEffectState:EffectStateTreatFn = (effect, effectName) => {
   return res
 }
 
-const addEffectOnlyPat = (effect:Effect[], effectName:Effect | '') => {
-  const pat1 = effect.length === 0 && effectName !== ''
-  const pat2 = effect.length === 1 && effect[0] === 'reverse' && effectName !== 'reverse'
-  return pat1 || pat2
+/**
+ * BoardState.effectに追加されるべき効果かどうかの判定
+ */
+const isAddableEffect = (effectName: Effect | ''): effectName is AddableEffects[number] => {
+  return addableEffects.includes(effectName as AddableEffects[number])
 }
 
 /**
@@ -239,4 +258,4 @@ const treatDrawEffect:EffectStateTreatFn = (effect, effectName) => {
   return res
 }
 
-export { shouldBeSolvedEffects, extractShouldBeSolvedEffect, existShouldBeSolvedEffect, resEffectNumber, resEffectName, isEffectCard, resNewEffectState, extractPutableSuitStr }
+export { shouldBeSolvedEffects, extractShouldBeSolvedEffect, existShouldBeSolvedEffect, resEffectNumber, resEffectName, isEffectCard, resNewEffectState, extractPutableSuitStr, isAddableEffect }

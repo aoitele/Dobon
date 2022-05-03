@@ -5,7 +5,8 @@ import {
   resEffectName,
   isEffectCard,
   resNewEffectState,
-  extractPutableSuitStr
+  extractPutableSuitStr,
+  isAddableEffect
 } from "../../utils/game/effect";
 import { Effect, InitialBoardState } from "../../@types/game"
 
@@ -222,5 +223,24 @@ describe('extractPutableSuitStr TestCases', () => {
     const result = extractPutableSuitStr({ effect, isShorten:true })
     const expected = 's'
     expect(result).toEqual(expected)
+  })
+})
+
+describe('isAddableEffect TestCases', () => {
+  it('空のeffectNameは追加できない', () => {
+    const effectName = ''
+    expect(isAddableEffect(effectName)).toBe(false)
+  })
+  it('effectName=skipは追加できない', () => {
+    const effectName:Effect = 'skip'
+    expect(isAddableEffect(effectName)).toBe(false)
+  })
+  it('effectName=wildは追加できない', () => {
+    const effectName:Effect = 'wild'
+    expect(isAddableEffect(effectName)).toBe(false)
+  })
+  it('effectName=opencardは追加できる', () => {
+    const effectName:Effect = 'opencard'
+    expect(isAddableEffect(effectName)).toBe(true)
   })
 })

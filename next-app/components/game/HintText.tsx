@@ -14,6 +14,7 @@ const HintText:VFC<Props> = ({ boardState }) => {
   const { hands, effect } = boardState
 
   useEffect(() => {
+    if (hands.length === 0) return
     // Jokerが場に出た時は優先してヒントを表示
     if (effect.includes('joker')) {
       setValues(`手札合計：${DOBON_CARD_NUMBER_JOKER}ならドボン可能！`)

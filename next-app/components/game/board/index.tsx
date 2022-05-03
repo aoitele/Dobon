@@ -16,7 +16,7 @@ import { createEmitFnArgs } from '../../../utils/game/emit'
 import EffectAnimation from '../EffectAnimation'
 import { createMsg } from '../../../utils/game/message'
 import useBoardHooks from '../../../hooks/useBoardHooks'
-import { resEffectName, isEffectCard, resNewEffectState } from '../../../utils/game/effect'
+import { resEffectName, isEffectCard, resNewEffectState, isAddableEffect } from '../../../utils/game/effect'
 import { isModalEvent } from '../../../utils/game/event'
 import ModalBack from '../../feedback/ModalBack'
 import AvoidEffectSelecter from '../AvoidEffectSelecter'
@@ -104,7 +104,7 @@ const board = (data: Props) => {
      * 対象となる効果は「draw(2/4/6)」「wild」「reverse」「opencard」
      */
     const existsEffect = boardState.effect.length > 0
-    if (!existsEffect && effectName !== '') {
+    if (!existsEffect && isAddableEffect(effectName)) {
       boardEmit = {
         roomId: room.id,
         event: 'effectupdate',
