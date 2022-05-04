@@ -4,7 +4,9 @@ const gameBoardUsersInit = (roomId: any) => {
     U.id,
     U.nickname,
     ROW_NUMBER() OVER(ORDER BY U.id) AS turn,
-    0 AS score
+    0 AS score,
+    false AS "isWinner",
+    false AS "isLoser"
   FROM users U, participants P
   WHERE U.id = P.user_id
   AND P.room_id = '${roomId}'

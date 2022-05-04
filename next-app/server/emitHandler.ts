@@ -19,7 +19,7 @@ const emitHandler = (io: Socket, socket: any) => {
   socket.on('emit', async (payload: Emit) => {
     if (prisma === null) { return {} }  
     console.log(payload, 'payload')
-    const { event, roomId, user, userId, nickname } = payload
+    const { event, roomId, gameId, user, userId, nickname } = payload
     const room = `room${roomId}`
 
     switch (event) {
@@ -43,9 +43,9 @@ const emitHandler = (io: Socket, socket: any) => {
       case 'join': {
         if (!roomId || !userId || !nickname) return {}
         const userKey = `room:${roomId}:user:${userId}`
-        const redisUserId = await adapterPubClient.hmget(userKey, 'id')
+        const redisUserId = await adapterPubClient.hget(userKey, 'id')
         // Redisにユーザーデータがない場合、参加者をDBに保存
-        if (redisUserId[0] === null) {
+        if (redisUserId === null) {
           const data:Prisma.ParticipantUncheckedCreateInput = {
             user_id: userId,
             room_id: roomId
@@ -60,25 +60,20 @@ const emitHandler = (io: Socket, socket: any) => {
           }
         }
         // 参加者データ取得
-        let participants:Player[] = await prisma.$queryRaw(
+        const participants:Player[] = await prisma.$queryRaw(
           rowQuery({
             model: 'Participant',
             method: 'GameBoardUsersInit',
             params: { roomId }
           })
         )
-        // IsWinner, isLoserの初期値を付与
-        const mergeObj = { isWinner:false, isLoser:false }
-        participants = participants.map(_ => {
-          return { ..._, ...mergeObj }
-        })
+
         // Game.board.usersにユーザーを追加
         let reducerPayload: reducerPayloadSpecify = {
           game: {
             board: {
               users: participants
             }
-            // Event: 'gamestart'
           }
         }
         socket.broadcast.to(room).emit('updateStateSpecify', reducerPayload) // 送信者以外を更新
@@ -86,9 +81,6 @@ const emitHandler = (io: Socket, socket: any) => {
         // 送信者はgame.statusをcreatedに
         reducerPayload = {
           game: {
-            board: {
-              users: participants
-            },
             status: 'created'
           }
         }
@@ -108,6 +100,7 @@ const emitHandler = (io: Socket, socket: any) => {
        * nextGameでgame.idが切り替わる時もここから処理が行われる
        */
       case 'prepare': {
+        const isFirstGame = !gameId && gameId !== 1
         const deckKey = `room:${roomId}:deck`
         await adapterPubClient.sunionstore(deckKey, 'deck') // Redis copy deck for room
 
@@ -118,12 +111,25 @@ const emitHandler = (io: Socket, socket: any) => {
             params: { roomId }
           })
         )
-        // Redis sadd hands for users
+
+        // 手札を初期化、スコアを最新に
+        const users:Player[] = []
         for (let i=0; i<participants.length; i+=1) {
-          const userHandsKey = `room:${payload.roomId}:user:${participants[i].id}:hands`
+          // Hands init
+          const participant = participants[i]
+          const userHandsKey = `room:${roomId}:user:${participant.id}:hands`
           await adapterPubClient.del(userHandsKey) // eslint-disable-line no-await-in-loop
           const hands = await adapterPubClient.spop(deckKey, 5) // eslint-disable-line no-await-in-loop
           adapterPubClient.sadd(userHandsKey, hands)
+
+          // Score Update
+          const userKey = `room:${roomId}:user:${participant.id}`
+          if (isFirstGame) {
+            adapterPubClient.hset(userKey, 'score', 0)
+          } else {
+            const score = await adapterPubClient.hget(userKey, 'score') // eslint-disable-line no-await-in-loop
+            users.push({ ...participant, score: Number(score) })
+          }
         }
 
         const reducerPayload: reducerPayloadSpecify = {
@@ -131,6 +137,9 @@ const emitHandler = (io: Socket, socket: any) => {
             event: {
               action: 'preparecomplete'
             },
+            board: {
+              users: isFirstGame ? participants : users
+            }
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload) // Room全員のステータスを更新
@@ -549,6 +558,26 @@ const emitHandler = (io: Socket, socket: any) => {
           }
         }
         io.in(room).emit('updateStateSpecify', reducerPayload)
+        break
+      }
+      case 'postprocess': {
+        /**
+         * ゲーム終了時に行う処理を定義
+         * - ユーザースコアの更新(data.users[]でスコアがくるのでredisを更新させる)
+         */
+        const { data } = payload
+        if (data?.type !== 'board') break
+
+        const { users } = data.data
+        if (users && users.length > 0) {
+          for (let i=0; i<users.length; i+=1) {
+            const updateUser: typeof users[number] = users[i]
+            if (updateUser.id && updateUser.score) {
+              const userKey = `room:${roomId}:user:${updateUser.id}`
+              adapterPubClient.hset(userKey, 'score', updateUser.score)
+            }
+          }
+        }
         break
       }
       default:

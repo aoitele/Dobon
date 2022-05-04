@@ -9,6 +9,7 @@ import WinCardInfo from './WinCardInfo'
 import { culcBonus, culcGetScore } from '../../../utils/game/score'
 import sleep from '../../../utils/game/sleep'
 import { DOBON_CARD_NUMBER_JOKER } from '../../../constant'
+import { Player } from '../../../@types/game'
 
 export interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -32,26 +33,31 @@ interface ScoreBoardState {
   message: string
 }
 
-const initialState: ScoreBoardState = {
-  bonusCards: [],
-  bonusTotal: 0,
-  addBonus: {
-    isSingleDobon: false,
-    isReverseDobon: false,
-    jokerCount: 0
-  },
-  resultScore: 0,
-  roundUpScore: 0,
-  winerScore: 0,
-  loserScore: 0,
-  message: '',
+const createInitialState = (winner: Player, loser: Player) => {
+  const initialState: ScoreBoardState = {
+    bonusCards: [],
+    bonusTotal: 0,
+    addBonus: {
+      isSingleDobon: false,
+      isReverseDobon: false,
+      jokerCount: 0
+    },
+    resultScore: 0,
+    roundUpScore: 0,
+    winerScore: winner?.score ?? 0,
+    loserScore: loser?.score ?? 0,
+    message: '',
+  }
+  return initialState
 }
 
+
 const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
-  const [ values, setValues ] = useState(initialState)
   const boardState = state.game.board
   const winner = boardState.users.filter(user => user.isWinner)[0]
   const loser = boardState.users.filter(user => user.isLoser)[0]
+  const [ values, setValues ] = useState(createInitialState(winner, loser))
+
   const dobonCard = boardState.trash.card
   const isReverseDobon = state.game.event.action === 'dobonreverse'
   const bonusCards = state.game.board.bonusCards
@@ -108,31 +114,30 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
 
       const scoreAnimation = async() => {
         await sleep(3000)
-        let cntUpNum = winner.score
-        const end = cntUpNum + roundUpScore
-        if (cntUpNum === end) return
+        let i = 0
 
         const scoreCountUp = setInterval(async() => {
-          cntUpNum += 1
+          i += 1
           setValues(() => ({
             ...valueBaseObj,
-            winerScore: cntUpNum,
-            loserScore: loser.score - cntUpNum,
+            winerScore: winner.score + i,
+            loserScore: loser.score - i,
           }))
-          if (cntUpNum === end) {
+          if (i === roundUpScore) {
             clearInterval(scoreCountUp)
-            const nextGameId = state.game.id ? state.game.id + 1 : ''
+            const nextGameId = state.game.id ? state.game.id + 1 : null
             await sleep(1000)
             setValues(() => ({
               ...valueBaseObj,
-              winerScore: cntUpNum,
-              loserScore: loser.score - cntUpNum,
+              winerScore: winner.score + i,
+              loserScore: loser.score - i,
               message:`GoTo Next →「Game${nextGameId}」`
             }))
             await sleep(3000)
             if (winner.id !== authUser?.id) return
-            const emit:Emit = {
+            const emit: Emit = {
               roomId: room.id,
+              gameId: nextGameId,
               userId: authUser?.id,
               event: 'prepare',
             }
@@ -141,6 +146,14 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
         }, 10)
       }
       scoreAnimation()
+
+      // ゲームの勝者にスコア更新を実行させる
+      if (winner.id === authUser?.id) {
+        sendScore({
+          data: { roomId: room.id, winner, loser, roundUpScore },
+          fn: { handleEmit }
+        })
+      }
     }
   },[state.game.status])
 
@@ -235,6 +248,40 @@ const resBonusNumArray = (bonusCards: string[]): number[] => {
   const mat = joinedStr.match(/\d+/gu)
   if (mat === null) return []
   return mat.map(_ => Number(_))
+}
+
+/**
+ * Redisユーザーデータのスコア更新関数
+ */
+interface SendScoreProps {
+  data: {
+    roomId: number,
+    winner: Player,
+    loser:Player,
+    roundUpScore: number,
+  }
+  fn: {
+    handleEmit: HandleEmitFn
+  }
+}
+
+const sendScore = ({ data, fn }: SendScoreProps) => {
+  const winnerScore = data.winner.score + data.roundUpScore
+  const loserScore = data.loser.score - data.roundUpScore
+  const emit:Emit = {
+    roomId: data.roomId,
+    event: 'postprocess',
+    data: {
+      type: 'board',
+      data: {
+        users: [
+          { id: data.winner.id, score: winnerScore },
+          { id: data.loser.id, score: loserScore }
+        ]
+      }
+    }
+  }
+  fn.handleEmit(emit)
 }
 
 export default ScoreBoard

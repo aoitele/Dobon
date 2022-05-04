@@ -25,6 +25,7 @@ type Event =
   | 'dobonfailure'
   | 'dobonreverse'
   | 'getbonus'
+  | 'postprocess'
   | 'action'
   | 'effect'
   | 'effectcard'
