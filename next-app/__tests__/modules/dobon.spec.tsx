@@ -2,10 +2,10 @@ import { dobonJudge } from '../../utils/game/dobonJudge'
 
 describe('Dobon Judge TestCases', () => {
   it('手札が2枚の時、手札の合計/差分のどちらかが出されたカードと合致すればドボン成功', () => {
-    const putOutCard = 4
-    const hand1 = [3, 1]
-    const hand2 = [5, 9]
-    const hand3 = [3, 2]
+    const putOutCard = 's4'
+    const hand1 = ['s3', 'd1']
+    const hand2 = ['s5', 'h9']
+    const hand3 = ['c3', 'h2']
 
     const result1 = dobonJudge(putOutCard, hand1)
     const result2 = dobonJudge(putOutCard, hand2)
@@ -16,9 +16,9 @@ describe('Dobon Judge TestCases', () => {
     expect(result3).toBe(false)
   })
   it('手札が1枚の時、手札が出されたカードと合致すればドボン成功', () => {
-    const putOutCard = 4
-    const hand1 = [4]
-    const hand2 = [5]
+    const putOutCard = 's4'
+    const hand1 = ['d4']
+    const hand2 = ['s5']
 
     const result1 = dobonJudge(putOutCard, hand1)
     const result2 = dobonJudge(putOutCard, hand2)
@@ -29,21 +29,21 @@ describe('Dobon Judge TestCases', () => {
 })
 
 describe.each`
-putOutCard  | hand            | expected
- ${4}       | ${[0, 3]}       | ${true}
- ${4}       | ${[0, 5]}       | ${true}
- ${4}       | ${[0, 2, 1]}    | ${true}
- ${4}       | ${[0, 4, 1]}    | ${true}
- ${4}       | ${[0, 2, 2]}    | ${false}
- ${4}       | ${[0, 1, 1]}    | ${false}
- ${4}       | ${[0, 0, 2]}    | ${true}
- ${4}       | ${[0, 0, 4]}    | ${true}
- ${4}       | ${[0, 0, 6]}    | ${true}
- ${6}       | ${[4, 3, 0]}    | ${true}
- ${11}      | ${[4, 5, 3, 0]} | ${true}
- ${12}      | ${[4, 5, 3, 0]} | ${false}
- ${13}      | ${[4, 5, 3, 0]} | ${true}
-`('手札がJoker(0)を含む時、Jokerは+1/-1どちらでも合計値に利用できる', ({ putOutCard, hand, expected }) => {
+putOutCard     | hand                        | expected
+ ${'s4'}       | ${['x0', 's3']}             | ${true}
+ ${'s4'}       | ${['x0', 's5']}             | ${true}
+ ${'s4'}       | ${['x0', 's2', 's1']}       | ${true}
+ ${'s4'}       | ${['x1', 's4', 's1']}       | ${true}
+ ${'s4'}       | ${['x0', 's2', 's2']}       | ${false}
+ ${'s4'}       | ${['x0', 's1', 's1']}       | ${false}
+ ${'s4'}       | ${['x0', 'x1', 's2']}       | ${true}
+ ${'s4'}       | ${['x0', 'x1', 's4']}       | ${true}
+ ${'s4'}       | ${['x0', 'x1', 's6']}       | ${true}
+ ${'s6'}       | ${['s4', 's3', 'x0']}       | ${true}
+ ${'s11'}      | ${['s4', 's5', 's3', 'x0']} | ${true}
+ ${'s12'}      | ${['s4', 's5', 's3', 'x1']} | ${false}
+ ${'s13'}      | ${['s4', 's5', 's3', 'x0']} | ${true}
+`('手札がJoker(x0もしくはx1)を含む時、Jokerは+1/-1どちらでも合計値に利用できる', ({ putOutCard, hand, expected }) => {
   test(`$putOutCard - $hand returns ${expected}`, () => {
     let result = dobonJudge(putOutCard, hand)
     expect(result).toBe(expected)

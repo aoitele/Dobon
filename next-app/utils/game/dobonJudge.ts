@@ -1,3 +1,7 @@
+import { HandCards } from "../../@types/card"
+import { DOBON_CARD_NUMBER_JOKER } from "../../constant"
+import { countJoker, existJoker, extractCardNum, isJoker } from "./checkCard"
+
 /**
  **
  * 出されたカード(putOutCard) / 手札(hand)
@@ -6,42 +10,40 @@
  * 手札が3枚以上の場合： 出されたカードが手札の合計値と合致すればドボン
  *
  * 出されたカードがJoker(0)1枚の場合、計算値が21であればドボン
- * 手札にJoker(0)が含まれる場合、手札数にかかわらず+1/-1どちらでも使える
+ * 手札にJoker(x0もしくはx1)が含まれる場合、手札数にかかわらず+1/-1どちらでも使える
  */
-const dobonJudge = (putOutCard: number, hand: number[]): boolean => {
-  let judgeNumber = putOutCard
-  const cardCnt = hand.length
-  const isPutOutJoker =
-    putOutCard === Number(process.env.NEXT_PUBLIC_JOKER_DOBON_NUMBER) // Jokerが出されたか
-  const existJokerInHand = hand.includes(
-    Number(process.env.NEXT_PUBLIC_JOKER_CARD_NUMBER)
-  ) // 手札にJokerがあるか
-  const cntJokerInHand = hand.filter(
-    (x) => x === Number(process.env.NEXT_PUBLIC_JOKER_CARD_NUMBER)
-  ).length
-  const judgeMethod =
-    cardCnt === 1 ? 'single' : cardCnt === 2 ? 'sumAndDiff' : 'sum'
+const dobonJudge = (putOutCard: HandCards | string, hands: HandCards[] | string[]): boolean => {
+  const isPutOutJoker = isJoker(putOutCard)  // Jokerが出されたか
+  const judgeNumber = isPutOutJoker ? DOBON_CARD_NUMBER_JOKER : extractCardNum(putOutCard) // Jokerが出された場合は21で判定
+  if (judgeNumber === null) return false
+
+  const cardCnt = hands.length               // 手札の枚数
+  const existJokerInHand = existJoker(hands) // 手札にJokerがあるか
+  const cntJokerInHand = countJoker(hands)   // 手札にあるJokerの枚数
+
+  const judgeMethod = cardCnt === 1 ? 'single' : cardCnt === 2 ? 'sumAndDiff' : 'sum';
+  const handNums = resNumArrayExcludeJoker(hands)
 
   switch (judgeMethod) {
     case 'single':
-      return hand[0] === judgeNumber
+      if (existJokerInHand) {
+        return judgeNumber === DOBON_CARD_NUMBER_JOKER
+      }
+      return handNums[0] === judgeNumber
 
     case 'sumAndDiff':
-      if (isPutOutJoker) {
-        judgeNumber = Number(process.env.NEXT_PUBLIC_JOKER_DOBON_NUMBER) // 上がれる数が21となる
-      }
       if (existJokerInHand) {
-        return judgeWithJokerSumAndDiff(judgeNumber, hand, cntJokerInHand)
+        return judgeWithJokerSumAndDiff(judgeNumber, handNums, cntJokerInHand)
       }
-      return sum(hand) === judgeNumber
+      return sum(handNums) === judgeNumber
         ? true
-        : diff(hand[0], hand[1]) === judgeNumber
+        : diff(handNums[0], handNums[1]) === judgeNumber
 
     case 'sum':
       if (existJokerInHand) {
-        return judgeWithJokerSumAndDiff(judgeNumber, hand, cntJokerInHand)
+        return judgeWithJokerSumAndDiff(judgeNumber, handNums, cntJokerInHand)
       }
-      return sum(hand) === judgeNumber
+      return sum(handNums) === judgeNumber
     default:
       return false
   }
@@ -61,4 +63,16 @@ const judgeWithJokerSumAndDiff = (
   return matcher.includes(sum(hand) - judgeNumber)
 }
 
-export { sum, diff, dobonJudge }
+/**
+ * Jokerを除いた手札のnumArrayを生成する関数
+ * mapの都合上、jokerとregexMatch(null)は0で処理して除外している
+ */
+const resNumArrayExcludeJoker = (hands: HandCards[] | string[]) => {
+  return hands.map(hand => {
+    if (isJoker(hand)) return 0
+    const num = extractCardNum(hand)
+    return Number(num) // If NULL ToBe 0
+  }).filter(num => num !== 0)
+}
+
+export { sum, diff, dobonJudge, resNumArrayExcludeJoker }

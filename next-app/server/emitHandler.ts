@@ -456,12 +456,8 @@ const emitHandler = (io: Socket, socket: any) => {
         io.in(room).emit('updateStateSpecify', reducerPayload)
         await sleep(3000)
 
-        // 数字のみ抜き取り計算に利用する
-        const re = /[0-9]+/gui
-        const trashCard = Number(boardState.trash.card.match(re))
         const lastTrashUser = boardState.trash.user
-        const hand = boardState.hands.flatMap(_ => Number(_.match(re)))
-        const judge = dobonJudge(trashCard, hand)
+        const judge = dobonJudge(boardState.trash.card, boardState.hands)
 
         // ドボン成功ならユーザーデータのwiner/loserを更新させる
         const newUsersState = boardState.users.map(u => {
@@ -482,7 +478,7 @@ const emitHandler = (io: Socket, socket: any) => {
               users: newUsersState,
             },
             result: {
-              dobonHandsCount: hand.length
+              dobonHandsCount: boardState.hands.length
             }
           }
         }
