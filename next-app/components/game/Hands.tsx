@@ -25,7 +25,11 @@ const hands: React.FC<Props> = ({ states, functions}) => {
     <div className={style.slides}>
       <div key={`${card.suit}${card.num}_slide`}>
         <div
-          className={`${style.card} ${card.isPutable ? '' : style.cantPut} ${values.selectedCard === `${card.suit}${card.num}` ? style.selected : '' }`}
+          className={`
+          ${style.card}
+          ${card.isPutable ? undefined : style.cantPut}
+          ${values.selectedCard === `${card.suit}${card.num}` ? style.selected : undefined }
+          `} 
           onClick={() => cardOnClickFn(states, functions)}
         >
           <div className={style.effectEye}>{ card.isOpen && <Image src={`/images/game/effect/eye.png`} width={15} height={15} />}</div>

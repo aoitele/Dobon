@@ -120,7 +120,7 @@ const board = (data: Props) => {
         data: { type:'board', data: { effect: newEffectState } }
       }
     }
-    await handleEmit(boardEmit)
+    handleEmit(boardEmit)
     boardEmit = {
       roomId: room.id,
       userId: me.id,
