@@ -78,6 +78,7 @@ export type InitialBoardState = {
     dobon: boolean
   },
   showAvoidEffectview: boolean
+  loading: boolean // putOut中など処理実行中の場合にtrueとなるフラグ。UI抑制に利用。
 }
 
 export interface GameResult {

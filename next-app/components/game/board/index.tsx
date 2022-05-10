@@ -48,7 +48,8 @@ export const initialState: InitialBoardState = {
     action: false,
     dobon: false
   },
-  showAvoidEffectview: false
+  showAvoidEffectview: false,
+  loading: false
 }
 
 const board = (data: Props) => {
@@ -69,6 +70,7 @@ const board = (data: Props) => {
 
   const putOut = async(card: string) => {
     if (!boardState || !me?.id) return
+    setValues(() => ({ ...values, loading: true }))
     /**
      * PutOut発動時のeffect状態
      * 処理中にboardState.effectは更新されるため、初期状態を取得してturnchangeで利用する
@@ -232,8 +234,8 @@ const board = (data: Props) => {
         }
         { values.selectedWildCard.isSelected
         ? <SelectSuit
-            states={{ values }}
-            functions={{ setValues }}
+            values={values}
+            setValues={setValues}
           />
         : boardState && me &&
           <div className={style.actionBtnWrap}>

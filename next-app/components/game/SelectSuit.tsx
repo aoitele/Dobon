@@ -1,14 +1,10 @@
-import React from 'react'
+import React, { Dispatch, SetStateAction, memo } from 'react'
 import { InitialBoardState } from '../../@types/game'
 import style from './SelectSuit.module.scss'
 
 interface Props {
-  states: {
-    values: InitialBoardState
-  }
-  functions: {
-    setValues: React.Dispatch<React.SetStateAction<InitialBoardState>>
-  }
+  values: InitialBoardState
+  setValues: Dispatch<SetStateAction<InitialBoardState>>
 }
 
 interface SuitValues {
@@ -16,10 +12,8 @@ interface SuitValues {
   text: '♠'| '♣' | '❤️' | '♦'
 }
 
-const selectSuit:React.FC<Props> = ({ states, functions }) => {
-  const { values } = states
-  const { selectedWildCard } = values
-  const { setValues } = functions
+const selectSuit:React.FC<Props> = ({ values, setValues }) => {
+  if (values.loading) return <></>
 
   const suits:SuitValues[] = [
     { suit: 's', text: '♠' },
@@ -30,16 +24,15 @@ const selectSuit:React.FC<Props> = ({ states, functions }) => {
 
   return (
     <div className={style.wrap}>
-      { suits.map(_ =>
+      { suits.map(obj =>
       <span
-        key={_.suit}
-        className={`${style.btn} ${selectedWildCard.suit === _.suit ? style.active : ''}`}
-        onClick={() => setValues({...values, selectedWildCard:{ isSelected:true, suit: _.suit }})}
-      >{_.text}</span>
+        key={obj.suit}
+        className={`${style.btn} ${values.selectedWildCard.suit === obj.suit ? style.active : ''}`}
+        onClick={() => setValues({...values, selectedWildCard:{ isSelected:true, suit: obj.suit }})}
+      >{obj.text}</span>
       )}
     </div>
   )
 }
 
-
-export default selectSuit
+export default memo(selectSuit)
