@@ -20,13 +20,16 @@ export const addEmitArgEvent = (args: Props, event: string) => {
 
 const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitArgs }) => {
 
-  const draw = async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+  const draw = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     if (!emitArgs) return
-    e.currentTarget.innerText === 'デッキセット＆ドロー'
-    ? await emit(addEmitArgEvent(emitArgs, 'drawcard__deckset'))
-    : await emit(addEmitArgEvent(emitArgs, 'drawcard'))
+    if (values.loading) return
+    setValues((prevState) => ({...prevState, loading:true }))
 
-    setValues({
+    e.currentTarget.innerText === 'デッキセット＆ドロー'
+    ? emit(addEmitArgEvent(emitArgs, 'drawcard__deckset'))
+    : emit(addEmitArgEvent(emitArgs, 'drawcard'))
+
+    setValues(() => ({
       ...initialState,
       isBtnActive: {
         action: false,
@@ -36,17 +39,22 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
       isMyTurnConsecutive: values.isMyTurnConsecutive,
       isDrawnCard: true,
       actionBtnStyle: 'skip',
-      dobonBtnStyle: 'disabled'
-    })
+      dobonBtnStyle: 'disabled',
+      loading: false
+    }))
   }
 
-  const turnChange = async() => {
+  const turnChange = () => {
     if (!emitArgs) return
-    await emit(addEmitArgEvent(emitArgs, 'turnchange'))
+    if (values.loading) return
+    setValues((prevState) => ({...prevState, loading:true }))
+    emit(addEmitArgEvent(emitArgs, 'turnchange'))
+    setValues((prevState) => ({...prevState, loading:false }))
   }
 
   const btnFn = async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     if (!emitArgs || styleClass === 'disabled') return
+    setValues((prevState) => ({...prevState, loading:true }))
 
     switch(styleClass) {
       case 'draw':
@@ -62,20 +70,9 @@ const actionBtn: React.FC<Args> = ({ text, styleClass, values, setValues, emitAr
     }
   }
   return (
-    <>
-      { text === 'アクション' && values.isBtnActive.action &&
-        <div className={style.menu}>
-          <span className={style.menuBtn} onClick={(e) => draw(e)}>ドロー</span>
-          { values.isDrawnCard && 
-          <span className={style.menuBtn} onClick={() => turnChange()}>スキップ</span>
-          }
-        </div>
-      }
-      <div
-        className={style[styleClass]}
-        onClick={(e) => btnFn(e)}
-      >{text}</div> 
-    </>
+    <div className={style[styleClass]} onClick={(e) => btnFn(e)}>
+      {text}
+    </div>
   )
 }
 
