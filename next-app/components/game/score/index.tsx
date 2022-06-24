@@ -161,7 +161,6 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
   
   return (
     <div className={styles.wrap}>
-      {/* <ModalBack/> */}
       <div className={styles.winerInfoContainer}>
         <UserScore
           key='userScore-winer'

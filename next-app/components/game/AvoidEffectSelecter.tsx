@@ -2,7 +2,6 @@
  * 解決すべきカード効果が場に発生した時のポップアップ
  */
 import React, { useState } from 'react'
-import ModalBack from '../feedback/ModalBack'
 import { InitialBoardState, Player, SolvableEffects, Board, Effect } from '../../@types/game'
 import { extractShouldBeSolvedEffect, resEffectNumber } from '../../utils/game/effect'
 import { resMyHandsCardNumbers } from '../../utils/game/checkHand'
@@ -93,75 +92,74 @@ const avoidEffectSelecter:React.FC<AvoidEffectProps> = ({ states, functions, emi
 
   return (
     <>
-      <ModalBack />
-        <div className={styles.wrap}>
-          <div className={styles.imageBg}>
-            <div className={styles.inner}>
-            { !localState.cardSelectMode && !localState.handsInspectMode &&
-              <>
-                <p className={styles.attention}>{`${emitter?.nickname}が\n「${effectName[0]}」を発動しました`}</p>
-                <div className={styles.singleCardWrap}>
-                  <SingleCard card={
-                    Object.assign(
-                      spreadCardState([state.game.board.trash.card])[0],
-                      { style: { width:80, height: 120} }
-                    )
-                  }/>
-                </div>
-                <div className={styles.actionBtn}>
-                <span className={styles.acceptEffect} onClick={acceptEffect}>{`効果を受ける\n(${effectDescription(effectName)})`}</span>
-                  <span
-                    className={existCardNumInMyHands ? styles.escapeEffect : styles.noEscapeEffect}
-                    onClick={() => existCardNumInMyHands ? setLocalState({ cardSelectMode: true, handsInspectMode: false }) : undefined}
-                    >{cardNumber}を出して回避する</span>
-                  <span className={styles.inspectOtherHands} onClick={() => setLocalState({ cardSelectMode: false, handsInspectMode: true })}>みんなの手札をみる</span>
-                  { emitArgs &&
-                    <span
-                      className={styles.dobonBtn}
-                      onClick={() => emit(addEmitArgEvent(emitArgs, 'dobon'))}
-                    >どぼんする！</span>
-                  }
-                  </div>
-              </>
-            }
-            { localState.cardSelectMode &&
-              <div>
-                <p className={styles.attention}>カードを選択してください</p>
-                {/* {states.cards:効果回避ができる同数字のカードのみをputableにしてHandsに渡す} */}
-                { cards.map(_ => 
-                  <Hands
-                    key={`${_.num}${_.suit}`}
-                    states={{
-                      card: updatePutableState(_, state.game?.board.trash),
-                      values
-                    }}
-                    functions={{
-                      putOut,
-                      setValues
-                    }}
-                  />
-                )}
-                <span
-                  className={styles.noEscapeEffect}
-                  onClick={() => setLocalState(initialState)}
-                >戻る</span>
+      <div className={styles.wrap}>
+        <div className={styles.imageBg}>
+          <div className={styles.inner}>
+          { !localState.cardSelectMode && !localState.handsInspectMode &&
+            <>
+              <p className={styles.attention}>{`${emitter?.nickname}が\n「${effectName[0]}」を発動しました`}</p>
+              <div className={styles.singleCardWrap}>
+                <SingleCard card={
+                  Object.assign(
+                    spreadCardState([state.game.board.trash.card])[0],
+                    { style: { width:80, height: 120} }
+                  )
+                }/>
               </div>
-            }
-
-            { localState.handsInspectMode &&
+              <div className={styles.actionBtn}>
+              <span className={styles.acceptEffect} onClick={acceptEffect}>{`効果を受ける\n(${effectDescription(effectName)})`}</span>
+                <span
+                  className={existCardNumInMyHands ? styles.escapeEffect : styles.noEscapeEffect}
+                  onClick={() => existCardNumInMyHands ? setLocalState({ cardSelectMode: true, handsInspectMode: false }) : undefined}
+                  >{cardNumber}を出して回避する</span>
+                <span className={styles.inspectOtherHands} onClick={() => setLocalState({ cardSelectMode: false, handsInspectMode: true })}>みんなの手札をみる</span>
+                { emitArgs &&
+                  <span
+                    className={styles.dobonBtn}
+                    onClick={() => emit(addEmitArgEvent(emitArgs, 'dobon'))}
+                  >どぼんする！</span>
+                }
+                </div>
+            </>
+          }
+          { localState.cardSelectMode &&
             <div>
-              <UserHandsInfo
-                users={state.game.board.users}
-                authUser={authUser}
-              />
+              <p className={styles.attention}>カードを選択してください</p>
+              {/* {states.cards:効果回避ができる同数字のカードのみをputableにしてHandsに渡す} */}
+              { cards.map(_ =>
+                <Hands
+                  key={`${_.num}${_.suit}`}
+                  states={{
+                    card: updatePutableState(_, state.game?.board.trash),
+                    values
+                  }}
+                  functions={{
+                    putOut,
+                    setValues
+                  }}
+                />
+              )}
               <span
                 className={styles.noEscapeEffect}
                 onClick={() => setLocalState(initialState)}
               >戻る</span>
-             </div>
-            }
             </div>
+          }
+
+          { localState.handsInspectMode &&
+          <div>
+            <UserHandsInfo
+              users={state.game.board.users}
+              authUser={authUser}
+            />
+            <span
+              className={styles.noEscapeEffect}
+              onClick={() => setLocalState(initialState)}
+            >戻る</span>
+            </div>
+          }
           </div>
+        </div>
       </div>
     </>
   )

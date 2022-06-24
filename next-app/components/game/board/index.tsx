@@ -18,7 +18,6 @@ import { createMsg } from '../../../utils/game/message'
 import useBoardHooks from '../../../hooks/useBoardHooks'
 import { resEffectName, isEffectCard, resNewEffectState, isAddableEffect } from '../../../utils/game/effect'
 import { isModalEvent } from '../../../utils/game/event'
-import ModalBack from '../../feedback/ModalBack'
 import AvoidEffectSelecter from '../AvoidEffectSelecter'
 import { culcBeforeUserTurn } from '../../../utils/game/turnInfo'
 import SelectCardInfo from '../SelectCardInfo'
@@ -281,7 +280,6 @@ const board = (data: Props) => {
       </div>
       { eventUser && state.game && isModalEvent(state.game.event.action) && boardState?.trash &&
         <>
-          <ModalBack />
           <EffectAnimation
             user={eventUser}
             action={state.game.event.action}

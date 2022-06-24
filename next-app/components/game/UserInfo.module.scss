@@ -21,6 +21,30 @@
     margin-top: 10px;
   }
 }
+.otherHandsInfoWrap {
+  text-align: center;
+}
+.title {
+  margin-bottom: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid;
+  padding: 6px;
+}
+.statusTxt {
+  margin-top: 4px;
+  padding: 8px;
+  border-radius: 5px;
+  width: 140px;
+  background-color: bisque;
+}
+.otherHands {
+  display: flex;
+  overflow: scroll;
+  margin: 20px;
+  div {
+    min-width: 80px;
+  }
+}
 
 @keyframes move-y {
   from {
