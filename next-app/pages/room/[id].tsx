@@ -16,6 +16,7 @@ import Board from '../../components/game/board'
 import sleep from '../../utils/game/sleep'
 import { initialState } from '../../utils/game/state'
 import ScoreBoard from '../../components/game/score'
+import { isAuthUserFetching, isNotLoggedIn } from '../../utils/auth/authState'
 
 interface Props {
   room: RoomAPIResponse.RoomInfo
@@ -23,7 +24,7 @@ interface Props {
 
 const Room: React.FC<Props> = ({ room }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
-  const { authUser, fetched } = useContext(AuthStateContext)
+  const { authUser } = useContext(AuthStateContext)
   const router = useRouter()
 
   const handleEmit: HandleEmitFn = async (data: Emit) => {
@@ -38,12 +39,11 @@ const Room: React.FC<Props> = ({ room }) => {
   useEventHooks(state, handleEmit, authUser, room, dispatch)
 
   // Before fetch authUser from context
-  if (!authUser) {
-    return fetched
-    ? <RequireUserRegister />
-    : <Modal handleEmit={handleEmit} loading={true}/>
-  }
+  if (isAuthUserFetching(authUser)) return <Modal handleEmit={handleEmit} loading={true}/>
   
+  // If not LoggedIn, request for register
+  if (isNotLoggedIn(authUser)) return <RequireUserRegister />
+
   // After fetched authUser,rendering depend on game.status
   if (state.game.status === 'playing') {
     return <Board room={room} handleEmit={handleEmit} state={state} authUser={authUser}/>

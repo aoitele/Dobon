@@ -6,25 +6,25 @@ import RoomList from '../../components/data_display/RoomList'
 import { AuthStateContext } from '../../context/authProvider'
 import styles from './index.module.scss'
 import { RoomAPIResponse } from '../../@types/api/roomAPI'
+import { isAuthUserFetching } from '../../utils/auth/authState'
 
 interface Props {
   rooms: RoomAPIResponse.RoomInfo[]
 }
 
 const Index: React.FC<Props> = ({ rooms }) => {
-  const { authUser, fetched } = useContext(AuthStateContext)
+  const { authUser } = useContext(AuthStateContext)
   return (
   <>
     <div className={styles.bg}>
-      <div>RoomList</div>
-        {
-          fetched &&
-          <ul className={styles.ul}>
-          { rooms && rooms.map((room, idx) => (
-            <RoomList key={idx} room={room} authUser={authUser}/>
-          ))}
-          </ul>
-        }
+      <p>開催中のゲーム</p>
+      {!isAuthUserFetching(authUser) &&
+        <ul className={styles.ul}>
+        { rooms && rooms.map((room, idx) => (
+          <RoomList key={idx} room={room} authUser={authUser}/>
+        ))}
+        </ul>
+      }
       <Link href="/room/create">Create Room</Link>
     </div>
   </>

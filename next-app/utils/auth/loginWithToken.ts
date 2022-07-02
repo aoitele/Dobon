@@ -27,6 +27,7 @@ const loginWithToken = async (): Promise<
     if (!data) {
       return { result: false }
     }
+    console.log(data, 'test')
     return { result: true, data }
   } catch (err) {
     return { result: false, err }

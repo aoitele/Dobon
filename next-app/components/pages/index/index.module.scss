@@ -6,31 +6,46 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  // background-color: rgb(255, 254, 199);
-  // background-image: url('/images/background.png');
   .heading1 {
     font-size: 40px;
-    // color: #fff;
   }
   .subTitle {
     font-size: 22px;
-    // color: #fff;
   }
   .logo{ 
     margin: 20px;
   }
   .link {
     display: block;
-    // width: 60%;
-    padding: 6px 40px;
+    padding: 6px 20px;
     margin: 20px;
-    background-color: antiquewhite;
     border-radius: 50px;
     box-shadow: silver;
     font-size: 20px;
     font-weight: bold;
-    .icon {
-      font-size: 30px;
+    &__active {
+      @extend .link;
+      background-color: antiquewhite;
+    }
+    &__disabled {
+      @extend .link;
+      background-color: lightgray;
+      opacity: 0.4;
+    }
+  }
+  .icon {
+    font-size: 20px;
+  }
+  .loginBtn {
+    position: relative;
+    .hint {
+      position: absolute;
+      top: 50px;
+      left: 40px;
+      font-size: 4px;
+      padding: 6px;
+      border-radius: 5px;
+      background-color: rgb(255, 226, 226);
     }
   }
   .bgAnimatedCard {

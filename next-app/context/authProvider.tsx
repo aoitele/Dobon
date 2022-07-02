@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, Dispatch, useReducer } from 'react'
+import { isAuthUserFetching } from '../utils/auth/authState'
 import loginWithToken from '../utils/auth/loginWithToken'
 import hasProperty from '../utils/function/hasProperty'
 
@@ -13,14 +14,12 @@ import hasProperty from '../utils/function/hasProperty'
 
 export type AuthState = {
   authUser: AuthAPIResponse.UserMe | null | undefined
-  fetched?: boolean
 }
 
 type Action =
   | {
       type: 'CREATE'
       authUser: AuthAPIResponse.UserMe | null | undefined
-      fetched: boolean
     }
   | { type: 'REMOVE' }
 
@@ -34,7 +33,6 @@ export type AuthDispatch = Dispatch<Action> | undefined
  */
 const AuthStateContext = createContext<AuthState>({
   authUser: undefined,
-  fetched: false
 })
 const AuthDispatchContext = createContext<AuthDispatch>(undefined)
 
@@ -44,7 +42,7 @@ const AuthDispatchContext = createContext<AuthDispatch>(undefined)
 const authReducer = (state: AuthState, action: Action): AuthState => {
   switch (action.type) {
     case 'CREATE':
-      return { authUser: action.authUser, fetched: action.fetched }
+      return { authUser: action.authUser }
     case 'REMOVE':
       return { authUser: null }
     default:
@@ -52,32 +50,31 @@ const authReducer = (state: AuthState, action: Action): AuthState => {
   }
 }
 
-const initialState = {
+const authUserInitialState = {
   authUser: undefined,
-  fetched: false
 }
 
 const AuthProvider: React.FC = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, initialState)
+  const [state, dispatch] = useReducer(authReducer, authUserInitialState)
 
   useEffect(() => {
-    if (!state.fetched) {
-      const userChk = async () => {
-        try {
-          const userInfo = await loginWithToken()
-          console.log(userInfo, 'userInfo')
-          if (userInfo.result && hasProperty(userInfo, 'data')) {
-            dispatch({ type: 'CREATE', authUser: userInfo.data, fetched: true })
-          } else {
-            dispatch({ type: 'CREATE', authUser: null, fetched: true })
-          }
-        } catch (err) {
-          dispatch({ type: 'CREATE', authUser: null, fetched: true })
+    if (!isAuthUserFetching(state.authUser)) return
+
+    const userChk = async () => {
+      try {
+        const userInfo = await loginWithToken()
+        console.log(userInfo, 'userInfo')
+        if (userInfo.result && hasProperty(userInfo, 'data')) {
+          dispatch({ type: 'CREATE', authUser: userInfo.data })
+        } else {
+          dispatch({ type: 'CREATE', authUser: null })
         }
+      } catch (err) {
+        dispatch({ type: 'CREATE', authUser: null })
       }
-      userChk()
     }
-  }, [state.fetched])
+    userChk()
+  }, [state])
 
   return (
     <AuthDispatchContext.Provider value={dispatch}>
@@ -88,4 +85,4 @@ const AuthProvider: React.FC = ({ children }) => {
   )
 }
 
-export { AuthStateContext, AuthDispatchContext, AuthProvider }
+export { AuthStateContext, AuthDispatchContext, AuthProvider, authUserInitialState }
