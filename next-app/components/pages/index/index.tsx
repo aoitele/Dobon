@@ -21,25 +21,29 @@ const TopPageContent = () => {
               height={140}
             />
           </div>
-          {isLoggedIn(authUser) && <p>Welcome! {authUser.nickname}さん</p>}
+          {isLoggedIn(authUser) && <p>Welcome! <span className={style.nickanme}>{authUser.nickname}</span></p>}
           <div className={style.linkWrap}>
             <div className={style.link__active}>
-              <span className={style.icon}>👨‍👩‍👦‍👦</span>
-              <Link href="/room">{isLoggedIn(authUser) ? ' ゲームに参加' :' ゲームにゲスト参加'}</Link>
+              <span className={style.icon}>🤖 </span>
+              <Link href="/room">with COM</Link>
             </div>
             <div className={authUser ? style.link__active : style.link__disabled}>
-              <span className={style.icon}>🃏</span>
-              <Link href="/room/create"> ゲームを作成</Link>
+              <span className={style.icon}>👨‍👩‍👦‍👦 </span>
+              <Link href="/room">with Friends</Link>
             </div>
             {!authUser &&
               <div className={style.loginBtn}>
                 <div className={style.link__active}>
-                  <span className={style.icon}>👤</span>
-                  <Link href="/user/create"> ユーザー登録/ログイン</Link>
+                  <span className={style.icon}>👤 </span>
+                  <Link href="/user/create">register/login</Link>
                 </div>
-                <span className={style.hint}>ログインするとゲームを作成できるようになります</span>
+                {/* <span className={style.hint}>You can play with friends if LoggedIn!</span> */}
               </div>
             }
+            <div className={style.link__active}>
+              <span className={style.icon}>📖 </span>
+              <Link href="/howto">how to play</Link>
+            </div>
           </div>
         </div>
       }
