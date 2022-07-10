@@ -26,8 +26,11 @@ const axiosInstance = (options?: AxiosRequestConfig) => {
 
   return {
     client,
-    get: <T = any, R = AxiosResponse<T>>(url: string): Promise<R> =>
-      client.get(url),
+    get: <T = any, R = AxiosResponse<T>>(
+      url: string,
+      config?: AxiosRequestConfig | undefined
+    ): Promise<R> =>
+      client.get(url, config),
     post: <T = any, R = AxiosResponse<T>>(
       url: string,
       data: Record<string, unknown>

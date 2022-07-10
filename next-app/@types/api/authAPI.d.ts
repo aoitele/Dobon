@@ -9,5 +9,6 @@ declare namespace AuthAPIResponse {
     updated_at?: Date | null
     create_room_id: number[]
     participate_room_id: number[]
+    access_token: string
   }
 }

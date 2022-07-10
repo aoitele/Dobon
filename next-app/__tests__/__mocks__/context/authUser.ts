@@ -15,6 +15,7 @@ const authUserMock__Normal: AuthAPIResponse.UserMe = {
   nickname: "たろう",
   participate_room_id: [],
   status: 1,
+  access_token: '',
 }
 
 

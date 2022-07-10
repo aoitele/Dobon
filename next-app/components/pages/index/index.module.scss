@@ -29,11 +29,18 @@
     &__active {
       @extend .link;
       background-color: antiquewhite;
+      animation:fadeIn 2s linear;
+    }
+    &__active_emphasis {
+      @extend .link;
+      background-color: rgb(242, 193, 129);
+      animation:fadeIn 2s linear;
     }
     &__disabled {
       @extend .link;
       background-color: lightgray;
       opacity: 0.4;
+      animation:fadeIn 2s linear;
     }
   }
   .icon {
@@ -84,6 +91,14 @@
     bottom: 0;
     right: 0;
   }
+}
+
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  25% {opacity: 0.1;}
+  50% {opacity: 0.3;}
+  75% {opacity: 0.5;}
+  100% {opacity: 1;}
 }
 
 @keyframes rotateY {

@@ -1,0 +1,14 @@
+.tabMenu {
+  height: 50px;
+  border-bottom: 1px solid gray;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  li {
+    width: 50%;
+    border-radius: 5px;
+  }
+  .active {
+    background-color: rgb(244, 206, 148);
+  }
+}

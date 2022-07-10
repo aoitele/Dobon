@@ -5,7 +5,7 @@ import {
   hashedPassword
 } from '../../../utils/function/createHash'
 
-const handle = (req: NextApiRequest, res: NextApiResponse) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id
   const data = req.body
 
@@ -58,4 +58,4 @@ const handlePOST = async (data: any, res: NextApiResponse) => {
   }
 }
 
-export default handle
+export default handler

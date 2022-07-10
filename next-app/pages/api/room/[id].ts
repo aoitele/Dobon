@@ -1,7 +1,7 @@
 import { prisma } from '../../../prisma'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-const handle = (req: NextApiRequest, res: NextApiResponse) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query
 
   switch (req.method) {
@@ -31,4 +31,4 @@ const handlePOST = (req: NextApiRequest, res: NextApiResponse) => {
   res.json({ method: 'update' })
 }
 
-export default handle
+export default handler

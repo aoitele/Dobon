@@ -1,10 +1,11 @@
 import { Prisma, prisma } from '../../../prisma'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { getRooms } from '../../../prisma/model/room'
 
-const handle = (req: NextApiRequest, res: NextApiResponse) => {
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case 'GET':
-      return handleGET(res)
+      return getRooms(req, res)
     case 'POST':
       return handlePOST(req, res)
     default:
@@ -12,23 +13,9 @@ const handle = (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-const handleGET = async (res: NextApiResponse) => {
-  const rooms = await prisma?.room.findMany({
-    include: {
-      user: {
-        select: {
-          nickname: true
-        }
-      }
-    }
-  })
-  res.json({ rooms })  
-}
-
 const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   const { title, status, invitation_code, max_seat, set_count, rate, create_user_id } =
     req.body
-  console.log(req.body,'body')
   const payload: Prisma.RoomUncheckedCreateInput = {
     title,
     status,
@@ -46,4 +33,4 @@ const handlePOST = async (req: NextApiRequest, res: NextApiResponse) => {
   })
 }
 
-export default handle
+export default handler

@@ -75,7 +75,7 @@
     "lint-staged": "^11.0.0",
     "node-filter-async": "^3.0.0",
     "node-mocks-http": "^1.10.1",
-    "nodemon": "^2.0.12",
+    "nodemon": "^2.0.19",
     "prettier": "^2.3.1",
     "prisma": "^2.24.1",
     "react-test-renderer": "^17.0.2",

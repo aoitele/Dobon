@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import Image from 'next/image'
 import style from './index.module.scss'
 import Link from 'next/link'
@@ -6,6 +6,7 @@ import { AuthStateContext } from '../../../context/authProvider'
 import { isAuthUserFetching, isLoggedIn } from '../../../utils/auth/authState'
 
 const TopPageContent = () => {
+  const [isPvP, setIsPvP] = useState(false)
   const { authUser } = useContext(AuthStateContext)
   return (
     <>
@@ -23,27 +24,47 @@ const TopPageContent = () => {
           </div>
           {isLoggedIn(authUser) && <p>Welcome! <span className={style.nickanme}>{authUser.nickname}</span></p>}
           <div className={style.linkWrap}>
-            <div className={style.link__active}>
-              <span className={style.icon}>🤖 </span>
-              <Link href="/room">with COM</Link>
-            </div>
-            <div className={authUser ? style.link__active : style.link__disabled}>
-              <span className={style.icon}>👨‍👩‍👦‍👦 </span>
-              <Link href="/room">with Friends</Link>
-            </div>
+            {isPvP
+            ? <>
+                <div className={style.link__active_emphasis}>
+                  <span className={style.icon}>🃏 </span>
+                  <Link href="/room">ゲームに参加</Link>
+                </div>
+                <div className={authUser ? style.link__active_emphasis : style.link__disabled} onClick={() => setIsPvP(true)}>
+                  <span className={style.icon}>📝 </span>
+                  <Link href="/room/create">ゲームを作成</Link>
+                </div>
+              </>
+            : <>
+                <div className={`${style.link__active} ${style.show}`}>
+                  <span className={style.icon}>🤖 </span>
+                  <Link href="/room">1人で遊ぶ</Link>
+                </div>
+                <div className={authUser ? `${style.link__active} ${style.show}` : style.link__disabled} onClick={() => setIsPvP(true)}>
+                  <span className={style.icon}>👨‍👩‍👦‍👦 </span>
+                  対人で遊ぶ
+                </div>
+              </>
+            }
             {!authUser &&
               <div className={style.loginBtn}>
                 <div className={style.link__active}>
                   <span className={style.icon}>👤 </span>
-                  <Link href="/user/create">register/login</Link>
+                  <Link href="/user/create">登録/ログイン</Link>
                 </div>
                 {/* <span className={style.hint}>You can play with friends if LoggedIn!</span> */}
               </div>
             }
-            <div className={style.link__active}>
-              <span className={style.icon}>📖 </span>
-              <Link href="/howto">how to play</Link>
-            </div>
+            {isPvP
+            ? <div className={style.link__active} onClick={() => setIsPvP(false)}>
+                <span className={style.icon}>↩︎ </span>
+                戻る
+              </div>
+            : <div className={style.link__active}>
+                <span className={style.icon}>📖 </span>
+                <Link href="/howto">ゲームルール</Link>
+              </div>
+            }
           </div>
         </div>
       }
