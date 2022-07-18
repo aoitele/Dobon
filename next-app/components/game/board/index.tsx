@@ -25,7 +25,7 @@ import SelectSuit from '../SelectSuit'
 import HintText from '../HintText'
 
 export interface Props {
-  room: RoomAPIResponse.RoomInfo
+  room: RoomAPIResponse['roomInfo']
   handleEmit: HandleEmitFn
   state: gameInitialState
   authUser: AuthState['authUser']

@@ -19,7 +19,7 @@ import ScoreBoard from '../../components/game/score'
 import { isAuthUserFetching, isNotLoggedIn } from '../../utils/auth/authState'
 
 interface Props {
-  room: RoomAPIResponse.RoomInfo
+  room: RoomAPIResponse['roomInfo']
 }
 
 const Room: React.FC<Props> = ({ room }) => {

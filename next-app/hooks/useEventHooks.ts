@@ -33,7 +33,7 @@ const useEventHooks = (
   state: gameInitialState,
   handleEmit: HandleEmitFn,
   authUser:AuthState['authUser'],
-  room: RoomAPIResponse.RoomInfo,
+  room: RoomAPIResponse['roomInfo'],
   dispatch: Dispatch<Action>
 ) => {
   useEffect(() => {

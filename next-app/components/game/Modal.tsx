@@ -8,7 +8,7 @@ import { AuthState } from '../../context/authProvider'
 import { DOBON_ROOM_STATUS_WAITING } from '../../constant'
 
 interface Props {
-  room?: RoomAPIResponse.RoomInfo
+  room?: RoomAPIResponse['roomInfo']
   game?: Game
   handleEmit: HandleEmitFn
   loading?: boolean
@@ -27,7 +27,7 @@ const modal: React.FC<Props> = ({ room, game, handleEmit, loading, authUser }) =
 }
 
 // Prettier-ignore
-const modalInner = (handleEmit: HandleEmitFn, authUser: AuthAPIResponse.UserMe | null | undefined, game?:Game, room?: RoomAPIResponse.RoomInfo, loading?:boolean) => { // eslint-disable-line no-unused-vars
+const modalInner = (handleEmit: HandleEmitFn, authUser: AuthAPIResponse.UserMe | null | undefined, game?:Game, room?: RoomAPIResponse['roomInfo'], loading?:boolean) => { // eslint-disable-line no-unused-vars
   if (loading) {
     return <div className={style.modalBack}><div className={style.loader} /></div>
   }

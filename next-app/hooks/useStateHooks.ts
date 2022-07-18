@@ -12,7 +12,7 @@ const useStateHooks = (
   state: gameInitialState,
   handleEmit: HandleEmitFn,
   authUser:AuthState['authUser'],
-  room: RoomAPIResponse.RoomInfo,
+  room: RoomAPIResponse['roomInfo'],
   dispatch:Dispatch<Action> ) => {
     // If you are joined room or room owner, join event hooks run
     useEffect(() => {

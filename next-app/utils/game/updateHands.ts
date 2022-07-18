@@ -7,7 +7,7 @@ import { Emit, HandleEmitFn } from '../../@types/socket'
 import { RoomAPIResponse } from '../../@types/api/roomAPI'
 
 interface Props {
-  roomId: RoomAPIResponse.RoomInfo['id'],
+  roomId: RoomAPIResponse['roomInfo']['id'],
   game: gameInitialState['game'],
   authUser: AuthState['authUser'],
   handleEmit: HandleEmitFn

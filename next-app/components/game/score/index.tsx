@@ -12,7 +12,7 @@ import { DOBON_CARD_NUMBER_JOKER } from '../../../constant'
 import { Player } from '../../../@types/game'
 
 export interface Props {
-  room: RoomAPIResponse.RoomInfo
+  room: RoomAPIResponse['roomInfo']
   handleEmit: HandleEmitFn
   state: gameInitialState
   authUser: AuthState['authUser']

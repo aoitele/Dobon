@@ -5,7 +5,7 @@ import { RoomAPIResponse } from '../../@types/api/roomAPI'
 export interface Props {
   emitData: {
     boardState: Board
-    room: RoomAPIResponse.RoomInfo
+    room: RoomAPIResponse['roomInfo']
     user: Player
     userId?: number
     event?: string
