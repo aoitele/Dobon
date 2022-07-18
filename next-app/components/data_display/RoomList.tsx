@@ -1,16 +1,16 @@
 import React from 'react'
 import styles from './RoomList.module.scss'
-import { RoomAPIResponse } from '../../@types/api/roomAPI'
+import { Room } from '../../@types/game'
+import { User } from '../../@types/user'
 
 interface Props {
-  room: RoomAPIResponse.RoomInfo
+  room: Pick<Room, 'id' | 'title' | 'max_seat' | 'set_count' | 'rate' | 'create_user_id' | 'status'> & { user: Pick<User, 'nickname'> }
   authUser: AuthAPIResponse.UserMe | null | undefined
 }
 
 const RoomList:React.FC<Props> = ({ room, authUser }) => {
-  console.log(room, 'room')
   return(
-      <li className={styles.wrap}>
+    <li className={styles.wrap}>
       <a href={`/room/${room.id}`}>
         <p className={styles.title}>{room.title}</p>
         <div className={styles.info}>
@@ -24,7 +24,7 @@ const RoomList:React.FC<Props> = ({ room, authUser }) => {
           room.status === 0 && <p className={styles.txtParticipants}>参加可能</p>
         }
       </a>
-      </li>
+    </li>
   )
 }
 

@@ -2,14 +2,15 @@ import React, { useContext, useEffect, useState, VFC } from 'react'
 import styles from './index.module.scss'
 import MenuTab from './modules/MenuTab'
 import axiosInstance from '../../../../utils/api/axiosInstance'
-import { Room } from '../../../../@types/game'
 import Loading from '../../../feedback/Loading'
 import { AuthState, AuthStateContext } from '../../../../context/authProvider'
-import { isAuthUserFetching, isLoggedIn } from '../../../../utils/auth/authState'
+import { isAuthUserFetching, isLoggedIn, isNotLoggedIn } from '../../../../utils/auth/authState'
 import Link from 'next/link'
+import RoomList from '../../../data_display/RoomList'
+import { RoomAPIResponse } from '../../../../@types/api/roomAPI'
 
 export interface RoomIndexState {
-  data: Room[]
+  data: RoomAPIResponse['rooms'][]
   isActiveOnline: boolean,
   isActiveFriend: boolean,
   loading: boolean
@@ -32,10 +33,11 @@ const RoomIndex:VFC = () => {
 
   useEffect(() => {
     if (!values.loading) return
+    if (isAuthUserFetching(authUser) || isNotLoggedIn(authUser)) return
 
     const fetch = async() => {
-      const query = values.isActiveOnline ? 'online' : 'friend'
-      const data = await fetchData({ query, authUser })
+      const type = values.isActiveOnline ? 'online' : 'friend'
+      const data = await fetchData({ type, authUser })
       if (data) {
         setValues({...values, loading:false, data})
       } else {
@@ -43,14 +45,14 @@ const RoomIndex:VFC = () => {
       }
     }
     fetch()
-  }, [values.loading])
+  }, [values.loading, authUser])
 
   return (
     <div className={styles.wrap}>
       <MenuTab values={values} setValues={setValues}/>
       {values.loading || isAuthUserFetching(authUser)
         ? <Loading/>
-        : values.isActiveFriend && <FriendMode authUser={authUser}/>
+        : values.isActiveFriend && <FriendMode authUser={authUser} data={values.data}/>
       }
       {/* オンライン対戦選択時 */}
       {values.isActiveOnline && <OnlineMode/>}
@@ -58,11 +60,19 @@ const RoomIndex:VFC = () => {
   )
 }
 
-const FriendMode = (props: { authUser: AuthState['authUser']}) => {
-  return isLoggedIn(props.authUser)
+interface FriendModeProps {
+  authUser: AuthState['authUser']
+  data: RoomAPIResponse['rooms'][]
+}
+
+const FriendMode:VFC<FriendModeProps> = ({ authUser, data }) => {
+  return isLoggedIn(authUser)
   ? <>
       <div>
         <p>あなたの開催ゲーム</p>
+        <ul className={styles.listWrap}>
+          {data.map(room => <RoomList key={room.id} authUser={authUser} room={room}/>)}
+        </ul>
       </div>
       <div>
         <p>フレンドの開催ゲーム</p>
@@ -83,20 +93,18 @@ const OnlineMode = () => {
 }
 
 interface FecthDataProps {
-  query: 'online' | 'friend',
-  authUser: AuthState['authUser']
+  type: 'online' | 'friend',
+  authUser: NonNullable<AuthState['authUser']>
 }
 
-const fetchData = async({ query, authUser }: FecthDataProps) => {
-  if (!isLoggedIn(authUser)) return []
-
+const fetchData = async({ type, authUser }: FecthDataProps) => {
   const headers = {
     Authorization: `Bearer ${authUser.access_token}`
   }
   const axios = axiosInstance({ headers })
 
   try {
-    const res = await axios.get<Room[]>('/api/room', { params: { data: query } })
+    const res = await axios.get<RoomAPIResponse['rooms'][]>('/api/room', { params: { type, userId: authUser.id } })
     return res.data
   } catch(e) {
     return []

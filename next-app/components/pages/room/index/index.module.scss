@@ -1,0 +1,9 @@
+.listWrap {
+  display: flex;
+  overflow-x: scroll;
+  white-space: nowrap;
+  li {
+    margin: 5px;
+    min-width: 45vw;
+  }
+}
