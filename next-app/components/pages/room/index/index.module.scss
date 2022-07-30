@@ -1,3 +1,15 @@
+.inner {
+  padding: 10px;
+}
+.section {
+  margin-bottom: 20px;
+}
+.heading {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 10px 0px;
+  text-align: center;
+}
 .listWrap {
   display: flex;
   overflow-x: scroll;
@@ -6,4 +18,26 @@
     margin: 5px;
     min-width: 45vw;
   }
+}
+.invitationCodeTextArea {
+  border: 1px solid #AF8728;
+  border-radius: 10px;
+  padding: 4px;
+  padding-left: 6px;
+  line-height: 1rem;
+  resize: none;
+  textarea {
+    width: 100%;
+  }
+}
+
+.searchSubmit {
+  display: block;
+  padding: 6px 20px;
+  margin: 20px;
+  border-radius: 50px;
+  font-size: 16px;
+  background-color: antiquewhite;
+  text-align: center;
+  box-shadow: silver;
 }

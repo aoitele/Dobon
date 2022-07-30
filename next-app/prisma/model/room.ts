@@ -8,7 +8,25 @@ import { NextApiRequest, NextApiResponse } from "next"
  * を返却する
  */
 const getRooms = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { userId } = req.query // Online | friend
+  const { query } = req // Online | friend
+  const invitaionCode = query.invitationCode
+
+  if (typeof invitaionCode === 'string') {
+    const room = await prisma?.room.findFirst({
+      include: {
+        user: {
+          select: {
+            nickname: true
+          }
+        }
+      },
+      where: {
+        invitation_code: invitaionCode
+      }
+    })
+    res.json([room])
+  }
+
   const rooms = await prisma?.room.findMany({
     include: {
       user: {
@@ -18,7 +36,7 @@ const getRooms = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     },
     where: {
-      create_user_id: Number(userId)
+      create_user_id: Number(query.userId)
     }
   })
   res.json(rooms)
