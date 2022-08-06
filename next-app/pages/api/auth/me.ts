@@ -1,23 +1,20 @@
 import { prisma } from '../../../prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { hashedPassword } from '../../../utils/function/createHash'
 
-const usersMeApiCall = async (req: NextApiRequest, res: NextApiResponse) => {
+const authMeApi = async (req: NextApiRequest, res: NextApiResponse) => {
   if (prisma === null) { return res.status(500).json({ error: 'PrismaClientInitializationError'})}
   
-  const { accesstoken } = req.body
-  if (!accesstoken) {
-    return res.status(500).json({
-      error: true,
-      message: [
-        `ユーザー登録が必要です。${process.env.NEXT_PUBLIC_DOBON_HTTPS_URL}/user/create より登録を行ってください。`
-      ]
-    })
-  }
+  const { accesstoken, nickname, password } = req.body
+  const hpass = hashedPassword(nickname, password)
+  const condition = accesstoken ? { access_token: accesstoken } : { nickname, password: hpass }
+  console.log(nickname, 'nickname')
+  console.log(password, 'password')
+
+  console.log(condition, 'condition')
   // ユーザーデータ取得
   const user = await prisma.user.findFirst({
-    where: {
-      access_token: accesstoken
-    },
+    where: condition,
     select: {
       id: true,
       nickname: true,
@@ -78,4 +75,4 @@ const usersMeApiCall = async (req: NextApiRequest, res: NextApiResponse) => {
   return typeof addInfouser[0] === 'undefined' ? res.json(user) : res.json(addInfouser[0])
 }
 
-export default usersMeApiCall
+export default authMeApi

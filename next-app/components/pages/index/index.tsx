@@ -4,6 +4,7 @@ import style from './index.module.scss'
 import Link from 'next/link'
 import { AuthStateContext } from '../../../context/authProvider'
 import { isAuthUserFetching, isLoggedIn } from '../../../utils/auth/authState'
+import logout from '../../../utils/auth/logout'
 
 const TopPageContent = () => {
   const [isPvP, setIsPvP] = useState(false)
@@ -50,7 +51,7 @@ const TopPageContent = () => {
               <div className={style.loginBtn}>
                 <div className={style.link__active}>
                   <span className={style.icon}>👤 </span>
-                  <Link href="/user/create">登録/ログイン</Link>
+                  <Link href="/user/login">登録/ログイン</Link>
                 </div>
                 {/* <span className={style.hint}>You can play with friends if LoggedIn!</span> */}
               </div>
@@ -66,6 +67,7 @@ const TopPageContent = () => {
               </div>
             }
           </div>
+          {isLoggedIn(authUser) && <span onClick={() => logout()}>ログアウトする</span>}
         </div>
       }
       <div className={`${style.bgAnimatedCard} ${style.card1}`}>

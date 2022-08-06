@@ -1,7 +1,6 @@
+import { parseCookies } from 'nookies'
 import React, { createContext, useEffect, Dispatch, useReducer } from 'react'
-import { isAuthUserFetching } from '../utils/auth/authState'
-import loginWithToken from '../utils/auth/loginWithToken'
-import hasProperty from '../utils/function/hasProperty'
+import { loginWithToken } from '../utils/auth/login'
 
 /**
  **
@@ -58,23 +57,18 @@ const AuthProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, authUserInitialState)
 
   useEffect(() => {
-    if (!isAuthUserFetching(state.authUser)) return
+    const { accesstoken } = parseCookies()
+    if (!accesstoken) {
+      dispatch({ type: 'CREATE', authUser: null })
+      return
+    }
 
     const userChk = async () => {
-      try {
-        const userInfo = await loginWithToken()
-
-        if (userInfo.result && hasProperty(userInfo, 'data')) {
-          dispatch({ type: 'CREATE', authUser: userInfo.data })
-        } else {
-          dispatch({ type: 'CREATE', authUser: null })
-        }
-      } catch (err) {
-        dispatch({ type: 'CREATE', authUser: null })
-      }
+      const userInfo = await loginWithToken(accesstoken)
+      dispatch({ type: 'CREATE', authUser: userInfo.data })
     }
     userChk()
-  }, [state])
+  }, [])
 
   return (
     <AuthDispatchContext.Provider value={dispatch}>

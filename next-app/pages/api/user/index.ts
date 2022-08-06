@@ -41,15 +41,13 @@ const handlePOST = async (data: any, res: NextApiResponse) => {
         access_token: token
       }
     })
-    console.log(response, 'response')
     return res.json(response)
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       if (e.code === 'P2002') {
-        return res.status(500).json({
-          error: true,
-          messages: [
-            `ユーザー名「${nickname}」は既に使用されています。別の名前で登録してください。`
+        return res.json({
+          errors: [
+            { message: `ユーザー名「${nickname}」は既に使用されています。別の名前で登録してください。` }
           ]
         })
       }

@@ -1,26 +1,14 @@
 import React from 'react'
-import axiosInstance from '../../utils/api/axiosInstance'
-import { parseCookies } from 'nookies'
+import HtmlHead from '../../components/foundations/HtmlHead'
+import PageContent from '../../components/pages/user/login'
 
-const login = () => {
-  const handleSubmit = async () => {
-    const { accesstoken } = parseCookies()
-    if (!accesstoken) return
-
-    const axios = axiosInstance()
-    try {
-      const res = await axios.post('/api/auth/me', { accesstoken })
-      console.log(res, 'res')
-    } catch (e: any) {
-      console.log(e, 'error')
-    }
-  }
+const LoginPage: React.FC = () => {
   return (
     <>
-      <div>Send Token</div>
-      <button onClick={() => handleSubmit()}>try Login</button>
+      <HtmlHead title={'ユーザー登録/ログイン'} />
+      <PageContent/>
     </>
   )
 }
-
-export default login
+ 
+export default LoginPage

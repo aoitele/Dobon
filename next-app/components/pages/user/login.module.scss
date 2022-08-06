@@ -1,0 +1,61 @@
+.wrap {
+  text-align: center;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.formInput {
+  width: 80%;
+  margin: 6px;
+  padding: 10px;
+  border: 1px solid #93918f;
+  border-radius: 5px;
+}
+.formPw {
+  position: relative;
+  .showPwBtn {
+    position: absolute;
+    // &:before {
+    //   content: "表示";
+    // }
+  }
+}
+.btnWrap {
+  width: 80%;
+  margin: 10px 0px;
+  display: inline-block;
+}
+.btn {
+  width: 100%;
+  display: block;
+  padding: 6px 20px;
+  border-radius: 50px;
+  box-shadow: silver;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  &__active {
+    @extend .btn;
+    background-color: antiquewhite;
+    animation:fadeIn 2s linear;
+  }
+  &__disabled {
+    @extend .btn;
+    background-color: lightgray;
+    opacity: 0.4;
+    animation:fadeIn 2s linear;
+  }
+}
+.loginBtn_Attention { 
+  font-size: 12px;
+}
+.errorMsg {
+  padding: 10px;
+  margin: 0 20px;
+  text-align: center;
+  border: 1px solid rgba(246, 110, 42, 0.067);
+  border-radius: 10px;
+  color: rgb(247, 106, 106);
+}
