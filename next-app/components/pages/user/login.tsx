@@ -43,29 +43,33 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async(mode: 'login' | 'create') => {
     if (!handleValidate()) return
 
-    setState((prevState)=> ({...prevState, disableBtn:true}))
+    setState((prevState)=> ({...prevState, messages:[], disableBtn:true}))
     const args = {
       nickname: state.nickname,
       password: state.password
     }
-    const res = await (mode === 'login' ? loginWithForm(args) : userCreate(args))
-    const data = res.data
-    if (data && data.errors) {
-      setState((prevState)=> ({...prevState, error:true, messages: data.errors, disableBtn: false}))
-      return
-    }
-    
-    if (data.access_token) {
-      nookies.set(null, 'accesstoken', data.access_token, {
-        maxAge: 30 * 24 * 60 * 60, // 30day
-        path: '/'
-      })
-    }
 
-    if (mode === 'create') {
-      alert(`ユーザー「${data.nickname}」を登録しました`)
+    try {
+      const res = await (mode === 'login' ? loginWithForm(args) : userCreate(args))
+      const data = res.data
+      if (data && data.errors) {
+        setState((prevState)=> ({...prevState, error:true, messages: data.errors, disableBtn: false}))
+        return
+      }
+      if (data.access_token) {
+        nookies.set(null, 'accesstoken', data.access_token, {
+          maxAge: 30 * 24 * 60 * 60, // 30day
+          path: '/'
+        })
+      }
+
+      if (mode === 'create') {
+        alert(`ユーザー「${data.nickname}」を登録しました`)
+      }
+      location.assign('/')
+    } catch(e) {
+      setState((prevState)=> ({...prevState, error:true, messages: [{message:'失敗しました。時間をおいて再度お試しください。'}], disableBtn: false}))
     }
-    location.assign('/')
   } 
   
   return (
