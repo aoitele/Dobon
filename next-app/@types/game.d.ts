@@ -98,3 +98,5 @@ export type Effect = 'joker' | 'draw2'| 'draw4'| 'draw6'| 'draw8' | 'skip' | 'wi
 export type WildEffect = Extract<'wildspade' | 'wildheart' | 'wildclub' | 'wilddia', Effect>
 export type SolvableEffects = Effect[]
 export type AddableEffects = Exclude<Effect, 'skip' | 'wild'>[] // Board.effectsに入れられる効果
+
+export type CPULevel = 'easy' | 'normal' | 'hard'
