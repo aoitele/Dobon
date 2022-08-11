@@ -1,5 +1,5 @@
 import { HandCards } from "../../@types/card"
-import { DOBON_CARD_NUMBER_JOKER } from "../../constant"
+import { DOBON_CARD_NUMBER_DRAW_2, DOBON_CARD_NUMBER_JOKER, DOBON_CARD_NUMBER_OPENCARD } from "../../constant"
 import { countJoker, existJoker, extractCardNum, isJoker } from "./checkCard"
 
 /**
@@ -75,4 +75,73 @@ const resNumArrayExcludeJoker = (hands: HandCards[] | string[]) => {
   }).filter(num => num !== 0)
 }
 
-export { sum, diff, dobonJudge, resNumArrayExcludeJoker }
+/**
+ * 手札から待ち数字を算出する関数
+ */
+const resReachNumbers = (hands: HandCards[] | string[]) => {
+  const handsLen = hands.length
+  const hasJokerCount = countJoker(hands)
+
+  // 手札がジョーカーのみの場合、確定させて返却
+  if (handsLen === hasJokerCount) {
+    return {
+      handsLen,
+      reachNums: hasJokerCount === 1 ? [DOBON_CARD_NUMBER_JOKER] : [DOBON_CARD_NUMBER_DRAW_2]
+    }
+  }
+
+  const nums = resNumArrayExcludeJoker(hands) // Jokerを除いた手札
+  let reachNums: number[] = []
+
+  switch(handsLen) {
+    case 1: {
+      reachNums = nums
+      break
+    }
+    case 2: {
+      const sumNum = sum(nums) + hasJokerCount
+      const sumIsBelow13 = sumNum <= DOBON_CARD_NUMBER_OPENCARD // 手札合計が13以下か
+
+      const diffArg1 = nums[0]
+      const diffArg2 = hasJokerCount === 0 ? nums[1] : 1
+      const diffNum = diff(diffArg1, diffArg2)
+      const diffIsNot0 = diffNum !== 0 // 同じカードを2枚持っていないか
+      if (sumIsBelow13) reachNums.push(sumNum)
+      if (diffIsNot0) reachNums.push(diffNum)
+      break
+    }
+    // 手札が3枚以上の場合
+    default: {
+      // 合計の検証
+      const baseSumNum = sum(nums)
+      const addJokerSum = baseSumNum + hasJokerCount
+      const sumIsBelow13 = addJokerSum <= DOBON_CARD_NUMBER_OPENCARD // 手札合計が13以下か
+      if (sumIsBelow13) reachNums.push(addJokerSum)
+
+      /**
+       * ジョーカーを持つ場合は差分を検証
+       * 1枚の場合:ジョーカー以外のカード合計値 - 1
+       * 2枚の場合:ジョーカー以外のカード合計値 -2, +-0の値
+       * を上がり数値に加える
+       */
+
+      if (hasJokerCount > 0) {
+        const diffNum = diff(baseSumNum, hasJokerCount)
+        const diffIsNot0 = diffNum !== 0
+        if (diffIsNot0) {
+          // Diff関数は-1も1として返すため、もしbaseSumNumと重複していた場合は片方のみ採用している
+          (hasJokerCount === 1 || baseSumNum === diffNum)
+          ? reachNums.push(diffNum)
+          : reachNums.push(baseSumNum, diffNum)
+        }
+      }
+    }
+  }
+
+  return {
+    handsLen,
+    reachNums: reachNums.sort((a, b) => a - b)
+  }
+}
+
+export { sum, diff, dobonJudge, resNumArrayExcludeJoker, resReachNumbers }

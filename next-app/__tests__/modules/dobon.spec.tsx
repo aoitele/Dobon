@@ -1,4 +1,6 @@
-import { dobonJudge } from '../../utils/game/dobonJudge'
+import { HandCards } from '../../@types/card'
+import { DOBON_CARD_NUMBER_DRAW_2, DOBON_CARD_NUMBER_JOKER } from '../../constant'
+import { dobonJudge, resReachNumbers } from '../../utils/game/dobonJudge'
 
 describe('Dobon Judge TestCases', () => {
   it('手札が2枚の時、手札の合計/差分のどちらかが出されたカードと合致すればドボン成功', () => {
@@ -49,3 +51,31 @@ putOutCard     | hand                        | expected
     expect(result).toBe(expected)
   })
 })
+
+/**
+ * myReachNumbers TestCases
+ */
+describe.each`
+handCards                   | expected
+${['s4']}                   | ${{handsLen:1, reachNums:[4]}} // 手札1枚(通常カード)
+${['x0']}                   | ${{handsLen:1, reachNums:[DOBON_CARD_NUMBER_JOKER]}} // 手札1枚(ジョーカー)
+${['s4', 'h5']}             | ${{handsLen:2, reachNums:[1, 9]}} // 手札2枚(通常カード)、合計差分で上がれる場合
+${['s4', 'h4']}             | ${{handsLen:2, reachNums:[8]}} // 手札2枚(通常カード)、合計のみで上がれる場合
+${['s4', 'h11']}            | ${{handsLen:2, reachNums:[7]}} // 手札2枚(通常カード)、差分のみで上がれる場合
+${['s4', 'x0']}             | ${{handsLen:2, reachNums:[3, 5]}} // 手札2枚(ジョーカー1枚)
+${['s1', 'x0']}             | ${{handsLen:2, reachNums:[2]}} // 手札2枚(ジョーカー1枚)、合計のみで上がれる場合
+${['s13', 'x0']}            | ${{handsLen:2, reachNums:[12]}} // 手札2枚(ジョーカー1枚)、差分のみで上がれる場合
+${['x0', 'x1']}             | ${{handsLen:2, reachNums:[2]}} // 手札2枚(ジョーカー)
+${['s4', 'h5', 'd2']}       | ${{handsLen:3, reachNums:[11]}} // 手札3枚(通常カード)
+${['s4', 'x0', 'd2']}       | ${{handsLen:3, reachNums:[5, 7]}} // 手札3枚(ジョーカー1枚)、合計差分で上がれる場合
+${['s10', 'd3', 'x0']}      | ${{handsLen:3, reachNums:[12]}} // 手札3枚(ジョーカー1枚)、差分のみで上がれる場合
+${['s4', 'x0', 'x1']}       | ${{handsLen:3, reachNums:[2, 4, 6]}} // 手札3枚(ジョーカー2枚)、合計差分で上がれる場合
+${['s1', 'x0', 'x1']}       | ${{handsLen:3, reachNums:[1, 3]}} // 手札3枚(ジョーカー2枚)、合計のみで上がれる場合
+${['s4', 'h5', 'd2', 'd5']} | ${{handsLen:4, reachNums:[]}} // 上がり数値がない場合
+`('myReachNumbers TestCases', ({ handCards, expected }) => {
+  test(`${handCards} - returns ${expected}`, () => {
+    let result = resReachNumbers(handCards)
+    expect(result).toEqual(expected)
+  })
+})
+

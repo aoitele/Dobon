@@ -1,13 +1,12 @@
 import { HandCards } from "../../../@types/card"
 import { CPULevel, OtherHands } from "../../../@types/game"
-import { DOBON_CARD_NUMBER_OPENCARD } from "../../../constant"
-import { countJoker } from "../checkCard"
-import { diff, resNumArrayExcludeJoker, sum } from "../dobonJudge"
+import { resReachNumbers } from "../dobonJudge"
+import { canIReverseDobon } from "../reverseDobon"
 import spreadCardState from "../spreadCardState"
 
-const DOBONLISK_MAX = 100
-const DOBONLISK_MEDIAN = 0
-// Const DOBONLISK_MIN = -100
+export const DOBONLISK_MAX = 100
+export const DOBONLISK_MEDIAN = 0
+export const DOBONLISK_MIN = -100
 
 /**
  * https://github.com/aoitele/Dobon/issues/35
@@ -17,8 +16,19 @@ const DOBONLISK_MEDIAN = 0
  *  - 3枚以上のユーザーでも公開カード合計値が低い人ならリスクと考える
  *  - 捨て札で4枚出た数字があれば、その数字は除外して考えられる
  */
-const culcDobonLisk = (card:HandCards, otherHands: OtherHands[], cpuLevel: CPULevel): number => {
+interface CulcDobonLiskProps {
+  card:HandCards
+  ownHands:HandCards[]
+  otherHands: OtherHands[]
+  cpuLevel: CPULevel
+}
+
+const culcDobonLisk = ({card, ownHands, otherHands, cpuLevel}: CulcDobonLiskProps): number => {
   const putOutNum: number = spreadCardState([card])[0].num
+
+  // もしドボン返しを作れる手札構成なら最良リスクで返却する
+  if (canIReverseDobon(card, ownHands)) return DOBONLISK_MIN
+
   /*
    * Let liskUserCnt = 0                // リスクユーザーの数
    * let liskNumCnt = 0                 // 待ち数字と考えられる枚数
@@ -35,55 +45,15 @@ const culcDobonLisk = (card:HandCards, otherHands: OtherHands[], cpuLevel: CPULe
     const handsLen = spreadCard[i].length // 検査対象ユーザーの手札数
     if (openCardCnt !== handsLen) break // 全公開でなければ検査終了
     
-    const ExcludeJokerNums = resNumArrayExcludeJoker(otherHands[i].hands) // Jokerを除いた手札
-    const hasJokerCount = countJoker(otherHands[i].hands)
-
     // 手札枚数により待ち数字を計算する
-    switch(handsLen) {
-      case 1: {
-        if (hasJokerCount === 0) { defineLiskCards.push(ExcludeJokerNums[0]) }
-        break
-      }
-      case 2: {
-        switch(hasJokerCount) {
-          case 0: {
-            const sumNum = sum([...ExcludeJokerNums])
-            const diffNum = diff(ExcludeJokerNums[0], ExcludeJokerNums[1])
-            const sumIsBelow13 = sumNum <= DOBON_CARD_NUMBER_OPENCARD // 手札合計が13以下か
-            const diffIsNot0 = diffNum !== 0 // 手札差分が0でないか
-            if (sumIsBelow13) { defineLiskCards.push(sumNum) } 
-            if (diffIsNot0) { defineLiskCards.push(diffNum) }
-            break
-          }
-          case 1: {
-            const sumNum = ExcludeJokerNums[0] + 1
-            const diffNum = diff(ExcludeJokerNums[0], 1)
-            const sumIsBelow13 = sumNum <= DOBON_CARD_NUMBER_OPENCARD // 手札合計が13以下か
-            const diffIsNot0 = diffNum !== 0 // 手札差分が0でないか
-            if (sumIsBelow13) { defineLiskCards.push(sumNum) }
-            if (diffIsNot0) { defineLiskCards.push(diffNum) }
-            break
-          }
-          case 2: {
-            defineLiskCards.push(2) // ジョーカー2枚の合計となる「2」を追加
-            break
-          }
-          default: break
-        }
-        break;
-      }
-      default: { // 手札が3枚以上
-        const sumNum = sum([...ExcludeJokerNums]) + hasJokerCount
-        const sumIsBelow13 = sumNum <= DOBON_CARD_NUMBER_OPENCARD // 手札合計が13以下か
-        if (sumIsBelow13) { defineLiskCards.push(sumNum) }          
-      }
+    const otherHandsInfo = resReachNumbers(otherHands[i].hands)
+    if (otherHandsInfo.reachNums.length) {
+      defineLiskCards.push(...otherHandsInfo.reachNums)
     }
   }
 
   // もし確定リスクカードに含まれる数字であれば最大リスクを結果として返す
-  if (defineLiskCards.includes(putOutNum)) {
-    return DOBONLISK_MAX
-  }
+  if (defineLiskCards.includes(putOutNum)) return DOBONLISK_MAX
 
   // CPU難易度によってリスク計算ロジックを変える
   switch (cpuLevel) {
