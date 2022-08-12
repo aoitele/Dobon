@@ -17,7 +17,7 @@ import { DeckCards } from "./resRemainingCard"
   remainingCard: DeckCards
 }
 
-const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: CulcRiskProps): DobonRiskReturnValue => {
+const culcDobonRisk = ({ownHands, defineRiskCards}: CulcRiskProps): DobonRiskReturnValue => {
   const res:DobonRiskReturnValue = []
 
   // リスク計算処理
@@ -33,7 +33,7 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
     return { card, dobonRisk: DOBONRISK_MAX }
 
     // どちらでもない場合、ドボンリスク算出に入る
-    return { card, dobonRisk: dobonProbability(card, otherHands, remainingCard) }
+    return { card, dobonRisk: dobonProbability() }
   }
 
   // 全手札のリスクを算出した結果をレスポンスデータに入れて返す
