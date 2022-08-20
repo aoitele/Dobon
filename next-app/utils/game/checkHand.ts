@@ -126,4 +126,21 @@ const resMyHandsCardNumbers = (hands: Board['hands']) => {
   return res
 }
 
-export { isPutOut2or13, hasSameCard, chkAvoidCardEffect, cardsICanPutOut, updateHandsFn, updateMyHandsStatus, resetMyHandsStatus, resMyHandsCardNumbers }
+const cntCloseCard = (hands: string[] | HandCards[]) => {
+  const unknownCardCnt = hands.filter(hand => hand === 'z').length
+  const handsSep = sepalateSuitNum(hands)
+  const cntClose = handsSep.filter(hand => !hand.isOpen).length
+
+  return unknownCardCnt + cntClose
+}
+
+/**
+ * 手札情報を渡して公開カードの数値を返す関数
+ * 重複数字があっても一意にせずそのまま返す
+ */
+const resOpenCardNumbers = (hands: string[] | HandCards[]):number[] => {
+  const handsSep = sepalateSuitNum(hands)
+  return handsSep.filter(hand => hand.isOpen).map(item => Number(item.num))
+}
+
+export { isPutOut2or13, hasSameCard, chkAvoidCardEffect, cardsICanPutOut, updateHandsFn, updateMyHandsStatus, resetMyHandsStatus, resMyHandsCardNumbers, cntCloseCard, sepalateSuitNum, resOpenCardNumbers }

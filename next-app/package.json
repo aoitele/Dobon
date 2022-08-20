@@ -17,6 +17,7 @@
     "prettier:write": "prettier --write '**/*.{js,jsx,ts,tsx}'",
     "test": "jest --collect-coverage",
     "test:watch": "jest --collect-coverage --watch",
+    "test:rmcache": "jest --clearCache",
     "prepare": "cd .. && husky install",
     "lint-staged": "lint-staged",
     "prisma:generate": "npx prisma generate --schema=./prisma/schema.prisma",

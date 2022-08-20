@@ -10,7 +10,8 @@ import {
   isPutOut2or13,
   hasSameCard,
   chkAvoidCardEffect,
-  cardsICanPutOut
+  cardsICanPutOut,
+  resOpenCardNumbers
 } from '../../utils/game/checkHand'
 import { initialState } from '../../utils/game/state'
 
@@ -95,6 +96,27 @@ describe('checkHand TestCases', () => {
     const effect: Effect[] = ['wildclub']
     const result = cardsICanPutOut(hands, trash, effect)
     const expected = ['c2', 'c6', 'h8', 'x0']
+    expect(result).toEqual(expected)
+  })
+})
+
+describe('checkHand TestCases - resOpenCardNumbers', () => {
+  it('open状態のカードがなければ空配列で返却', async () => {
+    const hands:HandCards[] = ['s2', 'c2', 'c6', 'h8', 'x0']
+    const result = resOpenCardNumbers(hands)
+    const expected:number[] = []
+    expect(result).toEqual(expected)
+  })
+  it('open状態のカード数字のみ返却する', async () => {
+    const hands:HandCards[] = ['s2', 'c2o', 'c6', 'h8o', 'x0o']
+    const result = resOpenCardNumbers(hands)
+    const expected = [2, 8, 0]
+    expect(result).toEqual(expected)
+  })
+  it('同じ数字があっても別々に返却する', async () => {
+    const hands:HandCards[] = ['s2o', 'c2o', 'c6', 'h8o', 'x0o']
+    const result = resOpenCardNumbers(hands)
+    const expected = [2, 2, 8, 0]
     expect(result).toEqual(expected)
   })
 })

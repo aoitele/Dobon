@@ -15,7 +15,7 @@ const resRemainingCard = (
   trashedMemory: HandCards[] // 現時点で出されているカードの記憶
 ) => {
   const deck: DeckCards = {
-    0  : 2,
+    0  : 2, // Joker
     1  : 4,
     2  : 4,
     3  : 4,
@@ -32,7 +32,14 @@ const resRemainingCard = (
   }
 
   const otherHandCards = otherHands.map(item => item.hands).flat()
-  const seed = [...trashedMemory, ...otherHandCards]
+  let seed = [...trashedMemory, ...otherHandCards]
+
+  // Joker'x1o'は先に処理しておく
+  if (seed.includes('x1o')) {
+    seed = seed.filter(item => item !== 'x1o')
+    deck[0] -= 1
+  }
+
   const trashNums = spreadCardState(seed).filter(item => item.isOpen).map<keyof DeckCards>(card => card.num)
   for (let i=0; i < trashNums.length; i+=1) {
     const key:keyof DeckCards = trashNums[i]

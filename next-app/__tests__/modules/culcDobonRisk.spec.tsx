@@ -27,10 +27,10 @@ describe('culcDobonRisk TestCases', () => {
     const otherHands: OtherHands[] = [
       {userId: 1, hands:['c1o', 'c10o']}, // 9か11を出すとドボンされる
       {userId: 2, hands:['d2', 'c7']},
-      {userId: 3, hands:['h4o', 'z', 'z', 'c11o']},
+      {userId: 3, hands:['h4o', 'z', 'c11o', 'x1o']},
     ]
     const defineRiskCards: number[] = [9, 11]
-    const trashedMemory:HandCards[] = []
+    const trashedMemory:HandCards[] = ['s4o', 'd4o', 'c4o', 'c5o'] // 4は全て出た状態
     const remainingCard:DeckCards = resRemainingCard(otherHands, trashedMemory)
 
     const expected: DobonRiskReturnValue = [
