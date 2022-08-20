@@ -2,10 +2,9 @@ import { HandCards } from "../../../../../@types/card"
 import { OtherHands } from "../../../../../@types/game"
 // Import { countJoker } from "../../../checkCard"
 import { cntCloseCard } from "../../../checkHand"
-import { resReachNumbers } from "../../../dobonJudge"
 import { canIReverseDobon } from "../../../reverseDobon"
 import spreadCardState from "../../../spreadCardState"
-import { dobonProbability } from "./dobonProbability"
+import { dobonProbability, updatePredictionOneClose } from "./dobonProbability"
 import { DobonRiskReturnValue, DOBONRISK_MIN, DOBONRISK_MAX } from "./main"
 import { DeckCards } from "./resRemainingCard"
 
@@ -26,7 +25,7 @@ interface CardInfo {
   prediction: number // 他ユーザーのマチである確率(1なら100%と考える)
 }
 
-type UsefulInfo = {
+export type UsefulInfo = {
   [key in number]: CardInfo // eslint-disable-line no-unused-vars
 }
 
@@ -38,8 +37,8 @@ type UsefulInfo = {
  */
 const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: CulcRiskProps): DobonRiskReturnValue => {
   const res:DobonRiskReturnValue = []
-  const usefulInfo: UsefulInfo = {}
   const availableNumber: number[] = [] // 待ち数字を算出する組み合わせとして使える数値
+  let usefulInfo: UsefulInfo = {}
   let isJokerAvailable = false // 待ち計算にjokerが利用可能かのフラグ
   let remainingCardCnt = 0 // デッキ&全ユーザーの未公開手札の合計数
   
@@ -74,16 +73,18 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
     const cntClose = cntCloseCard(hands)
     const cntOpen = handsLen - cntClose
     // Const cntJoker = countJoker(hands)
+    const openCard = hands.filter(card => card !== 'z')
 
     /* eslint-disable */
     if (cntClose === 0) continue // 手札全公開ユーザーのマチはdefineRiskCardsで分かっているため考慮しない
     if (handsLen >= 5) continue // 手札が5枚以上のユーザーは考慮しない
     if (handsLen === 4 && cntOpen < 2) continue // 手札が4枚で公開手札が2枚未満のユーザーは考慮しない
     /* eslint-enable */
+    // Console.log(`手札${handsLen}:非公開${cntClose}`)
     
     switch (handsLen) {
       case 1: {
-        // 1枚の時は必ずClose状態である。カード出現率と同じ確率となるので、均等に全数字をスコアリング
+        // 手札1枚の時は必ずClose状態である。カード出現率と同じ確率となるので、均等に全数字をスコアリング
         for (const [k,] of Object.entries(usefulInfo)) {
           usefulInfo[Number(k)].prediction += usefulInfo[Number(k)].incidence
         }
@@ -91,7 +92,7 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
       }
       case 2: {
         /**
-         * 2枚の時はClose/Close、Close/Openの可能性がある。
+         * 手札2枚の時はClose/Close、Close/Openの可能性がある。
          * マチとなる数を算出し、出現率と掛け合わせた値をスコアリングさせる。
          * 
          * 引くカードの組み合わせごとに下記を計算する
@@ -110,31 +111,14 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
          * 
          * カードを引いたときに「その数字がまだ残っているか」によって次の確率計算が変わる 
          */
-        switch (cntOpen) {
-          case 0: {
-            // 2枚ともCloseの場合、availableNumberの全組み合わせでマチ数字を算出する
+        switch (cntClose) {
+          case 1: {
+            // 1枚のみCloseの場合、open状態の1枚とavailableNumberの組み合わせでマチを算出
+            usefulInfo = updatePredictionOneClose({ openCard, availableNumber, usefulInfo })
             break;
           }
-          case 1: {
-            // 1枚はOpenの場合、availableNumberとの全組み合わせでマチ数字を算出する
-            const openCard = hands.filter(card => card !== 'z')
-            for (let j=0; j<availableNumber.length; j+=1) {
-              const culcNum = availableNumber[j]
-              // Const incidence = usefulInfo[culcNum].incidence // 検査カードの出現率
-
-              // マチを算出(jokerはsuitをx、他は仮でhにしている)
-              const addSuitArg = culcNum === 0 ? `x${availableNumber[i]}` : `h${availableNumber[i]}`
-              const result = resReachNumbers([...openCard, addSuitArg])
-
-              /**
-               * ReachNumに数値があればusefulInfoの対象数字にスコアを加算
-               * クローズカードは1枚のため単純に検査カード(culcNum)の出現率(incidence)をスコアとする
-               */
-              for (let k=0; k<result.reachNums.length; k+=1) { // eslint-disable-line max-depth
-                const key = result.reachNums[k]
-                usefulInfo[Number(key)].prediction += usefulInfo[Number(key)].incidence
-              }
-            }
+          case 2: {
+            // 2枚ともCloseの場合、availableNumberの組み合わせでマチを算出
             break;
           }
           default: break;
@@ -142,17 +126,32 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
         break
       }
       case 3: {
-        // 3枚の時はカード出現率と同じ確率となるので、均等に全数字をスコアリング
-
+        // 手札3枚の場合
+        switch (cntClose) {
+          case 1: {
+            // 1枚のみCloseの場合、open状態の2枚とavailableNumberの組み合わせでマチを算出
+            break;
+          }
+          case 2: {
+            // 2枚がCloseの場合、open状態の1枚とavailableNumberの組み合わせでマチを算出
+            usefulInfo = updatePredictionOneClose({ openCard, availableNumber, usefulInfo })
+            break;
+          }
+          case 3: {
+            // 3枚ともCloseの場合、availableNumberの組み合わせでマチを算出
+            break;
+          }
+          default: break;
+        }
         break
       }
       case 4: {
-        // 4枚の時はカード出現率と同じ確率となるので、均等に全数字をスコアリング
-
+        // 手札4枚の場合
         break
       }
       default: break
     }
+    // Console.log(usefulInfo, '結果')
   }
 
   // リスク計算処理
