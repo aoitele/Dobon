@@ -64,6 +64,14 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
    * 調査対象となるケース
    * 1. 手札枚数が1枚/2枚/3枚のいずれか
    * 2. 手札4枚でも公開手札が2枚以上ある時(かつ公開手札の合計値が10以下であれば)
+   *
+   * 方法
+   * openCardの計算値にクローズカード(z)の組み合わせでマチ数字が1〜13に収まればpredictionにスコア加算
+   * 加算されるスコアは出現率(incidence)と掛け合わせた値
+   *
+   * 計算機
+   * 手札枚数で決まる計算ロジックを用いて、zの枚数分だけ全通りのマチ数字を計算
+   * 1〜13に収まればpredictionにスコア加算してusefulInfoを返す関数
    */
 
   for (let i=0; i<otherHands.length; i+=1) {
@@ -130,11 +138,11 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
         switch (cntClose) {
           case 1: {
             // 1枚のみCloseの場合、open状態の2枚とavailableNumberの組み合わせでマチを算出
+            usefulInfo = updatePredictionOneClose({ openCard, availableNumber, usefulInfo })
             break;
           }
           case 2: {
             // 2枚がCloseの場合、open状態の1枚とavailableNumberの組み合わせでマチを算出
-            usefulInfo = updatePredictionOneClose({ openCard, availableNumber, usefulInfo })
             break;
           }
           case 3: {

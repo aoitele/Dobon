@@ -60,6 +60,7 @@
     "@types/redis": "^2.8.31",
     "@typescript-eslint/parser": "^4.26.1",
     "babel-jest": "^27.0.2",
+    "csv-writer": "^1.6.0",
     "deepcopy": "^2.1.0",
     "dotenv": "^16.0.0",
     "enzyme": "^3.11.0",

@@ -45,13 +45,18 @@ interface oneCloseCulcArgs {
  * predictionの値を更新したusefulInfoを返却する
  * 
  * ReachNumに数値があればusefulInfoの対象数字にスコアを加算
- * クローズカードは1枚のため単純に検査カード(culcNum)の出現率(incidence)をスコアとする 
+ * クローズカードは1枚のため単純に検査カード(culcNum)の出現率(incidence)をスコアとする
+ *
+ * 利用が見こまれる手札
+ * (2|c/c, o/c)
+ * (3|c/c/c, o/c/c, o/o/c)
+ * (4|c/c/c/c, o/c/c/c, o/o/c/c, o/o/o/c)
  */
 const updatePredictionOneClose = ({ openCard, availableNumber, usefulInfo }: oneCloseCulcArgs) => {
-  for (let j=0; j<availableNumber.length; j+=1) {
-    const culcNum = availableNumber[j]
+  for (let i=0; i<availableNumber.length; i+=1) {
+    const culcNum = availableNumber[i]
     // マチを算出(jokerはsuitをx、他は仮でhにしている)
-    const addSuitArg = culcNum === 0 ? `x${availableNumber[j]}` : `h${availableNumber[j]}`
+    const addSuitArg = culcNum === 0 ? `x${availableNumber[i]}` : `h${availableNumber[i]}`
     const reachInfo = resReachNumbers([...openCard, addSuitArg])
 
     for (let k=0; k<reachInfo.reachNums.length; k+=1) { // eslint-disable-line max-depth
