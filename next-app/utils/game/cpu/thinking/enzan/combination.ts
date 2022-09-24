@@ -1,17 +1,18 @@
 /**
  * 与えられたカード情報と組み合わせる枚数指定による
  * 組み合わせパターンを返す関数
+ * maisu分カードを選ぶ中でカード情報のremain(残枚数)が0になった場合は、組み合わせパターンとして生成させない
  */
 export interface CombinationProps {
   cards: {
-    number: number
-    remain: number
+    number: number // カードの数字(1〜13)
+    remain: number // 残枚数(0〜4)
   }[]
-  maisu: number
+  maisu: number // 組み合わせる枚数の指定 eg 2 >> [1, 2], 3 >> [1, 2, 3]
 }
 
 export const combination = ({ cards, maisu }: CombinationProps) => {
-  const result: any[] = []
+  const result: number[][] = []
 
   /* eslint-disable no-continue, max-depth */
   for (let i=0; i<cards.length; i+=1) {

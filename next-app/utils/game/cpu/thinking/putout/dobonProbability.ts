@@ -10,7 +10,7 @@
  * import { OtherHands } from "../../../../../@types/game"
  */
 import { resReachNumbers } from "../../../dobonJudge"
-import { UsefulInfo } from "./culcDobonRisk"
+import { CardInfo } from "./culcDobonRisk"
 import { DOBONRISK_MEDIAN } from "./main"
 // Import { DeckCards } from "./resRemainingCard"
 
@@ -37,14 +37,14 @@ const dobonProbability = (
 interface oneCloseCulcArgs {
   openCard: string[]
   availableNumber: number[]
-  usefulInfo: UsefulInfo
+  cardInfo: CardInfo
 }
 
 /**
  * クローズカード1枚時にpredictionを計算させる関数
- * predictionの値を更新したusefulInfoを返却する
+ * predictionの値を更新したcardInfoを返却する
  * 
- * ReachNumに数値があればusefulInfoの対象数字にスコアを加算
+ * ReachNumに数値があればcardInfoの対象数字にスコアを加算
  * クローズカードは1枚のため単純に検査カード(culcNum)の出現率(incidence)をスコアとする
  *
  * 利用が見こまれる手札
@@ -52,7 +52,7 @@ interface oneCloseCulcArgs {
  * (3|c/c/c, o/c/c, o/o/c)
  * (4|c/c/c/c, o/c/c/c, o/o/c/c, o/o/o/c)
  */
-const updatePredictionOneClose = ({ openCard, availableNumber, usefulInfo }: oneCloseCulcArgs) => {
+const updatePredictionOneClose = ({ openCard, availableNumber, cardInfo }: oneCloseCulcArgs) => {
   for (let i=0; i<availableNumber.length; i+=1) {
     const culcNum = availableNumber[i]
     // マチを算出(jokerはsuitをx、他は仮でhにしている)
@@ -61,10 +61,10 @@ const updatePredictionOneClose = ({ openCard, availableNumber, usefulInfo }: one
 
     for (let k=0; k<reachInfo.reachNums.length; k+=1) { // eslint-disable-line max-depth
       const key = reachInfo.reachNums[k]
-      usefulInfo[Number(key)].prediction += usefulInfo[Number(key)].incidence
+      cardInfo[Number(key)].prediction += cardInfo[Number(key)].incidence
     }
   }
-  return usefulInfo
+  return cardInfo
 }
 
 export { dobonProbability, updatePredictionOneClose }

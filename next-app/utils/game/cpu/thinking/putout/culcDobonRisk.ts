@@ -19,14 +19,12 @@ import { DeckCards } from "./resRemainingCard"
   remainingCard: DeckCards
 }
 
-interface CardInfo {
-  remain: number // 捨て札や公開手札に出ていない残り枚数
-  incidence: number // 1枚引く時の出現率(1なら100%と考える)
-  prediction: number // 他ユーザーのマチである確率(1なら100%と考える)
-}
-
-export type UsefulInfo = {
-  [key in number]: CardInfo // eslint-disable-line no-unused-vars
+export type CardInfo = {
+  [key in string]: { // eslint-disable-line no-unused-vars
+    remain: number // 捨て札や公開手札に出ていない残り枚数
+    incidence: number // 1枚引く時の出現率(1なら100%と考える)
+    prediction: number // 他ユーザーのマチである確率(1なら100%と考える)
+  }
 }
 
 /**
@@ -38,7 +36,7 @@ export type UsefulInfo = {
 const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: CulcRiskProps): DobonRiskReturnValue => {
   const res:DobonRiskReturnValue = []
   const availableNumber: number[] = [] // 待ち数字を算出する組み合わせとして使える数値
-  let usefulInfo: UsefulInfo = {}
+  let cardInfo: CardInfo = {}
   let isJokerAvailable = false // 待ち計算にjokerが利用可能かのフラグ
   let remainingCardCnt = 0 // デッキ&全ユーザーの未公開手札の合計数
   
@@ -48,7 +46,7 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
   }
   // 数字ごとに出現率(incidence)を算出、出現率0でないカードはマチ計算利用カードに追加
   for (const [key, value] of Object.entries(remainingCard)) {
-    usefulInfo[Number(key)] = { remain: value, incidence: value / remainingCardCnt, prediction: 0 }
+    cardInfo[Number(key)] = { remain: value, incidence: value / remainingCardCnt, prediction: 0 }
     if (value > 0) {
       availableNumber.push(Number(key))
     }
@@ -71,7 +69,7 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
    *
    * 計算機
    * 手札枚数で決まる計算ロジックを用いて、zの枚数分だけ全通りのマチ数字を計算
-   * 1〜13に収まればpredictionにスコア加算してusefulInfoを返す関数
+   * 1〜13に収まればpredictionにスコア加算してcardInfoを返す関数
    */
 
   for (let i=0; i<otherHands.length; i+=1) {
@@ -93,8 +91,8 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
     switch (handsLen) {
       case 1: {
         // 手札1枚の時は必ずClose状態である。カード出現率と同じ確率となるので、均等に全数字をスコアリング
-        for (const [k,] of Object.entries(usefulInfo)) {
-          usefulInfo[Number(k)].prediction += usefulInfo[Number(k)].incidence
+        for (const [k,] of Object.entries(cardInfo)) {
+          cardInfo[Number(k)].prediction += cardInfo[Number(k)].incidence
         }
         break
       }
@@ -122,7 +120,7 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
         switch (cntClose) {
           case 1: {
             // 1枚のみCloseの場合、open状態の1枚とavailableNumberの組み合わせでマチを算出
-            usefulInfo = updatePredictionOneClose({ openCard, availableNumber, usefulInfo })
+            cardInfo = updatePredictionOneClose({ openCard, availableNumber, cardInfo })
             break;
           }
           case 2: {
@@ -138,7 +136,7 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
         switch (cntClose) {
           case 1: {
             // 1枚のみCloseの場合、open状態の2枚とavailableNumberの組み合わせでマチを算出
-            usefulInfo = updatePredictionOneClose({ openCard, availableNumber, usefulInfo })
+            cardInfo = updatePredictionOneClose({ openCard, availableNumber, cardInfo })
             break;
           }
           case 2: {
@@ -159,7 +157,7 @@ const culcDobonRisk = ({ownHands, otherHands, defineRiskCards, remainingCard}: C
       }
       default: break
     }
-    // Console.log(usefulInfo, '結果')
+    // Console.log(cardInfo, '結果')
   }
 
   // リスク計算処理
