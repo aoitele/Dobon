@@ -8,7 +8,7 @@ import UserScore from './UserScore'
 import WinCardInfo from './WinCardInfo'
 import { culcBonus, culcGetScore } from '../../../utils/game/score'
 import sleep from '../../../utils/game/sleep'
-import { DOBON_CARD_NUMBER_JOKER } from '../../../constant'
+import { DOBON_JUDGE_NUMBER_JOKER } from '../../../constant'
 import { Player } from '../../../@types/game'
 
 export interface Props {
@@ -227,7 +227,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
  * 上がり計算のドボン値に利用する数字を算出させる
  */
 const resDobonNum = (dobonCard: string) => {
-  if (['x0o', 'x1o'].includes(dobonCard)) return DOBON_CARD_NUMBER_JOKER
+  if (['x0o', 'x1o'].includes(dobonCard)) return DOBON_JUDGE_NUMBER_JOKER
   const num = dobonCard.match(/\d+/gu)
   if (num === null) return null
   return Number(num[0])

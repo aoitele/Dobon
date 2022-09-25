@@ -1,6 +1,6 @@
 import React, { VFC, useState, useEffect } from 'react'
 import { Board } from "../../@types/game";
-import { DOBON_CARD_NUMBER_JOKER, DOBON_CARD_NUMBER_OPENCARD } from '../../constant';
+import { DOBON_JUDGE_NUMBER_JOKER, DOBON_CARD_NUMBER_OPENCARD } from '../../constant';
 import { isJoker, countJoker } from '../../utils/game/checkCard';
 import { sum, diff, resNumArrayExcludeJoker } from '../../utils/game/dobonJudge';
 import style from './HintText.module.scss'
@@ -24,7 +24,7 @@ const HintText:VFC<Props> = ({ boardState }) => {
     if (hands.length === 0) return
     // Jokerが場に出た時は優先してヒントを表示
     if (effect.includes('joker')) {
-      setValues(`手札合計：${DOBON_CARD_NUMBER_JOKER}ならドボン成功！`)
+      setValues(`手札合計：${DOBON_JUDGE_NUMBER_JOKER}ならドボン成功！`)
       return
     }
     const hasJokerCount = countJoker(hands)

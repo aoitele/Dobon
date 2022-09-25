@@ -1,5 +1,5 @@
 import { HandCards } from "../../@types/card"
-import { DOBON_CARD_NUMBER_DRAW_2, DOBON_CARD_NUMBER_JOKER, DOBON_CARD_NUMBER_OPENCARD } from "../../constant"
+import { DOBON_CARD_NUMBER_DRAW_2, DOBON_CARD_NUMBER_JOKER, DOBON_JUDGE_NUMBER_JOKER, DOBON_CARD_NUMBER_OPENCARD } from "../../constant"
 import { countJoker, existJoker, extractCardNum, isJoker } from "./checkCard"
 
 /**
@@ -14,7 +14,7 @@ import { countJoker, existJoker, extractCardNum, isJoker } from "./checkCard"
  */
 const dobonJudge = (putOutCard: HandCards | string, hands: HandCards[] | string[]): boolean => {
   const isPutOutJoker = isJoker(putOutCard)  // Jokerが出されたか
-  const judgeNumber = isPutOutJoker ? DOBON_CARD_NUMBER_JOKER : extractCardNum(putOutCard) // Jokerが出された場合は21で判定
+  const judgeNumber = isPutOutJoker ? DOBON_JUDGE_NUMBER_JOKER : extractCardNum(putOutCard) // Jokerが出された場合は21で判定
   if (judgeNumber === null) return false
 
   const cardCnt = hands.length               // 手札の枚数
@@ -27,7 +27,7 @@ const dobonJudge = (putOutCard: HandCards | string, hands: HandCards[] | string[
   switch (judgeMethod) {
     case 'single':
       if (existJokerInHand) {
-        return judgeNumber === DOBON_CARD_NUMBER_JOKER
+        return judgeNumber === DOBON_JUDGE_NUMBER_JOKER
       }
       return handNums[0] === judgeNumber
 
@@ -101,12 +101,14 @@ const resReachNumbers = (hands: HandCards[] | string[]) => {
     case 2: {
       const sumNum = sum(nums) + hasJokerCount
       const sumIsBelow13 = sumNum <= DOBON_CARD_NUMBER_OPENCARD // 手札合計が13以下か
+      const sumIsNumberJoker = sumNum === DOBON_JUDGE_NUMBER_JOKER // 手札合計が21か
 
       const diffArg1 = nums[0]
       const diffArg2 = hasJokerCount === 0 ? nums[1] : 1
       const diffNum = diff(diffArg1, diffArg2)
       const diffIsNot0 = diffNum !== 0 // 同じカードを2枚持っていないか
       if (sumIsBelow13) reachNums.push(sumNum)
+      if (sumIsNumberJoker) reachNums.push(DOBON_CARD_NUMBER_JOKER)
       if (diffIsNot0) reachNums.push(diffNum)
       break
     }
@@ -116,7 +118,10 @@ const resReachNumbers = (hands: HandCards[] | string[]) => {
       const baseSumNum = sum(nums)
       const addJokerSum = baseSumNum + hasJokerCount
       const sumIsBelow13 = addJokerSum <= DOBON_CARD_NUMBER_OPENCARD // 手札合計が13以下か
+      const sumIsNumberJoker = addJokerSum === DOBON_JUDGE_NUMBER_JOKER // 手札合計が21か
+
       if (sumIsBelow13) reachNums.push(addJokerSum)
+      if (sumIsNumberJoker) reachNums.push(DOBON_CARD_NUMBER_JOKER)
 
       /**
        * ジョーカーを持つ場合は差分を検証
