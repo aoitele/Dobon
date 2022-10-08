@@ -1,3 +1,4 @@
+import deepcopy from 'deepcopy'
 import { updatePrediction, UpdatePredictionArgs } from '../../utils/game/cpu/thinking/putout/updatePrediction'
 
 const CARD_INFO_INIT: UpdatePredictionArgs['cardInfo'] = {
@@ -17,11 +18,24 @@ const CARD_INFO_INIT: UpdatePredictionArgs['cardInfo'] = {
   13: { remain:4, incidence: 0, prediction:0 },
 }
 
+// 指定したキーの残枚数を0にする関数
+const remain2Zero = (keyNumbers: number[]) => {
+  const res = deepcopy(CARD_INFO_INIT)
+  for (let [k, v] of Object.entries(res)) {
+    if (keyNumbers.includes(+k)) {
+      v.remain = 0
+    }
+  }
+  return res
+}
+
 /**
  * 数字ごとに被ドボン確率を算出する関数(updatePrediction)のテスト
  * 
  * テストケース
- * - 
+ * - 予測を行わない場合(全てオープンカードで予測する必要がないため)
+ * - 全ての数字に予測値が加算される場合
+ * - 一部の数字は予測が加算されない場合(手札と残カードで待ちとして成立しないため)
  */
 describe('updatePrediction TestCases', () => {
   it('全てオープンカードの場合は情報を更新しない', () => {
@@ -34,7 +48,7 @@ describe('updatePrediction TestCases', () => {
     const result = updatePrediction(args)
     expect(result).toEqual(CARD_INFO_INIT)
   })
-  it('全てクローズカード（手札2枚、の場合）', () => {
+  it('全てクローズカード（手札2枚の場合） - 全数字にprediction値が入る', () => {
     const args: UpdatePredictionArgs = {
       otherHandsArray:[
         { userId: 1, hands: ['z', 'z']}
@@ -42,6 +56,42 @@ describe('updatePrediction TestCases', () => {
       cardInfo: CARD_INFO_INIT,
     }
     const result = updatePrediction(args)
-    expect(result).toEqual(CARD_INFO_INIT)
+    // 全数字のpredictionが0以上になっているか
+    const test = (obj: UpdatePredictionArgs['cardInfo']) => {
+      for (const [_, v] of Object.entries(obj)) {
+        if (v.prediction <= 0) {
+          return false
+        }
+      }
+      return true
+    }
+    expect(test(result)).toBe(true)
+  })
+  it('クローズ1枚、オープン1枚 - マチとなる数字のみprediction値が入る', () => {
+    const cardInfo = remain2Zero([0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]) // 1, 2, 3のカードのみ残っている状態に
+    const args: UpdatePredictionArgs = {
+      otherHandsArray:[
+        { userId: 1, hands: ['c10o', 'z']}
+      ],
+      cardInfo,
+    }
+    const expected = {
+      0: { remain: 0, incidence: 0, prediction: 0 },
+      1: { remain: 4, incidence: 0, prediction: 0 },
+      2: { remain: 4, incidence: 0, prediction: 0 },
+      3: { remain: 4, incidence: 0, prediction: 0 },
+      4: { remain: 0, incidence: 0, prediction: 0 },
+      5: { remain: 0, incidence: 0, prediction: 0 },
+      6: { remain: 0, incidence: 0, prediction: 0 },
+      7: { remain: 0, incidence: 0, prediction: 0.6666666666666666 }, // 4(remain)/12(全remain) = 0.666となる
+      8: { remain: 0, incidence: 0, prediction: 0.6666666666666666 },
+      9: { remain: 0, incidence: 0, prediction: 0.6666666666666666 },
+      10: { remain: 0, incidence: 0, prediction: 0 },
+      11: { remain: 0, incidence: 0, prediction: 0.6666666666666666 },
+      12: { remain: 0, incidence: 0, prediction: 0.6666666666666666 },
+      13: { remain: 0, incidence: 0, prediction: 0.6666666666666666 }
+    }
+    const result = updatePrediction(args)
+    expect(result).toEqual(expected)
   })
 })

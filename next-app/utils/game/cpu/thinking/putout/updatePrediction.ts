@@ -22,7 +22,7 @@ export interface UpdatePredictionArgs {
  * - カード出現率を掛け合わせ、マチとなる数字のスコアに加算していく
  */
 const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): CardInfo => {
-  const availableNumber: number[] = []
+  const result = deepcopy(cardInfo) // 元データを書き換えないようにレスポンスデータを定義
   const combinationArgs: CombinationProps = { cards:[], maisu:0 }
   let remainingCardCnt = 0 // デッキ&全ユーザーの未公開手札の合計数
 
@@ -30,26 +30,33 @@ const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): 
   for (const [key, value] of Object.entries(cardInfo)) {
     combinationArgs.cards.push({ number: Number(key), remain: value.remain }) // 掛け合わせ生成関数で利用する情報をセット
     if (value.remain > 0) {
-      availableNumber.push(Number(key)) // 掛け合わせに利用できる数字をセット
       remainingCardCnt += value.remain // 確率計算に利用する残枚数を加算
     }
   }
 
-  // ユーザーごとに手札情報を使って予測値を算出していく
+  // ここからユーザーごとに手札情報を使って予測値を算出していく
   /* eslint-disable no-continue */
   for (let i=0; i<otherHandsArray.length; i+=1) {
     const hands = otherHandsArray[i].hands // 検証する手札
     const cntClose = cntCloseCard(hands)
     if (cntClose === 0) continue  // 手札が全て公開状態であれば検証しない
 
-    // 組み合わせとしてあり得る数字を算出する
+    // 公開カード情報を定義
+    const openCard = hands.filter(hand => hand !== 'z')
+    const openCardNums = sepalateSuitNum(openCard).map(card => Number(card.num))
+
+    /**
+     * 組み合わせとしてあり得る数字を算出
+     * 公開手札の数字も組み合わせ算出に考慮させるため、remainに追加しておく
+     */
     combinationArgs.maisu = hands.length
+    for (let n=0; n<openCardNums.length; n+=1) {
+      combinationArgs.cards[openCardNums[n]].remain += 1
+    }
     let combinationPattern = combination(combinationArgs)
-    
+
     // 公開カードがあれば、その数字を含む組み合わせだけ利用するためフィルタリングしておく
     if (hands.length !== cntClose) {
-      const openCard = hands.filter(hand => hand !== 'z')
-      const openCardNums = sepalateSuitNum(openCard).map(card => Number(card.num))
       const uniqueNums = Array.from(new Set(openCardNums))
       // UniqueNumsの値を全て持つパターンのみ予測に使用するために残す
       combinationPattern = combinationPattern.filter(pattern => {
@@ -62,17 +69,27 @@ const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): 
 
     // 組み合わせパターンごとにマチを計算。確率を算出しpredictionにスコアとして加算する
     for (let k=0; k<combinationPattern.length; k+=1) {
-      const pattern = combinationPattern[k]
+      let pattern = combinationPattern[k] // 検証する手札のパターン
       const reachNumArg = pattern.map(number => number === 0 ? 'x0o' : `c${number}o`)
-      const { reachNums } = resReachNumbers(reachNumArg)
-      if (reachNums.length === 0) continue
+      const { reachNums } = resReachNumbers(reachNumArg) // マチとなる数字
+      if (reachNums.length === 0) continue // マチがなければ次のパターン検証へ
 
-      // テストパターンが出現する確率を計算
+      /**
+       * テストパターンが出現する確率を計算
+       * 検証している手札が
+       *  - 全て非公開カードの場合：組み合わせパターンの各数字の出現率の積
+       *  - 公開カードがある場合：非公開カードの出現率の積
+       * 上記をスコアとして、reachNumsで決まったマチ数字に加算していく
+       */
       const pbVals: number[] = [] // 出現確率値の配列を入れる
       let tmpCardCnt = remainingCardCnt // 計算に使うカード枚数
       const tmpCardInfo = deepcopy(cardInfo) // 計算に使うカード情報のコピー
 
-      // パターン内の数値をループ。出現率をpbValsに格納していく。
+      /**
+       * パターン内の数値をループ。出現率をpbValsに格納していく
+       * 出現率を計算する段階では公開手札を考慮させないため、公開数字は除外する
+       */
+      pattern = pattern.filter(cardNum => !openCardNums.includes(cardNum))
       for (let l=0; l<pattern.length; l+=1) {
         const cardNum = pattern[l]
         const incidence = tmpCardInfo[cardNum].remain / tmpCardCnt
@@ -84,12 +101,12 @@ const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): 
       // パターンとしての出現率をreachNumが含む数字のスコアとして加算する
       const score = pbVals.reduce((acc, cur) => acc * cur)
       for (let m=0; m<reachNums.length; m+=1) {
-        cardInfo[reachNums[m]].prediction += score
+        result[reachNums[m]].prediction += score
       }
     }
   }
   /* eslint-enable no-continue */
-  return cardInfo
+  return result
 }
 
 export { updatePrediction }
