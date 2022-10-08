@@ -18,12 +18,27 @@ const CARD_INFO_INIT: UpdatePredictionArgs['cardInfo'] = {
   13: { remain:4, incidence: 0, prediction:0 },
 }
 
-// 指定したキーの残枚数を0にする関数
-const remain2Zero = (keyNumbers: number[]) => {
+/**
+ * 指定したキーの残枚数を0にする関数
+ * optionで指定した数字は指定枚数にできる
+ */
+interface Remain2ZeroProps {
+  zeroNumbers: number[],
+  options?: {
+    [key in string]: { remain: number }
+  }
+}
+
+const updateRemain = ({ zeroNumbers, options }: Remain2ZeroProps) => {
   const res = deepcopy(CARD_INFO_INIT)
   for (let [k, v] of Object.entries(res)) {
-    if (keyNumbers.includes(+k)) {
+    if (zeroNumbers.includes(+k)) {
       v.remain = 0
+    }
+  }
+  if (options) {
+    for (let [k, v] of Object.entries(options)) {
+      res[k].remain = v.remain
     }
   }
   return res
@@ -68,7 +83,9 @@ describe('updatePrediction TestCases', () => {
     expect(test(result)).toBe(true)
   })
   it('クローズ1枚、オープン1枚 - マチとなる数字のみprediction値が入る', () => {
-    const cardInfo = remain2Zero([0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]) // 1, 2, 3のカードのみ残っている状態に
+    const cardInfo = updateRemain({
+      zeroNumbers: [0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    }) // 1, 2, 3のカードのみ残っている状態に
     const args: UpdatePredictionArgs = {
       otherHandsArray:[
         { userId: 1, hands: ['c10o', 'z']}
