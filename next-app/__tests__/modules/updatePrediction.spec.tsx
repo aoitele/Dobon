@@ -2,20 +2,20 @@ import deepcopy from 'deepcopy'
 import { updatePrediction, UpdatePredictionArgs } from '../../utils/game/cpu/thinking/putout/updatePrediction'
 
 const CARD_INFO_INIT: UpdatePredictionArgs['cardInfo'] = {
-  0: { remain:2, incidence: 0, prediction:0 },
-  1: { remain:4, incidence: 0, prediction:0 },
-  2: { remain:4, incidence: 0, prediction:0 },
-  3: { remain:4, incidence: 0, prediction:0 },
-  4: { remain:4, incidence: 0, prediction:0 },
-  5: { remain:4, incidence: 0, prediction:0 },
-  6: { remain:4, incidence: 0, prediction:0 },
-  7: { remain:4, incidence: 0, prediction:0 },
-  8: { remain:4, incidence: 0, prediction:0 },
-  9: { remain:4, incidence: 0, prediction:0 },
-  10: { remain:4, incidence: 0, prediction:0 },
-  11: { remain:4, incidence: 0, prediction:0 },
-  12: { remain:4, incidence: 0, prediction:0 },
-  13: { remain:4, incidence: 0, prediction:0 },
+  0: { remain:2, prediction:0 },
+  1: { remain:4, prediction:0 },
+  2: { remain:4, prediction:0 },
+  3: { remain:4, prediction:0 },
+  4: { remain:4, prediction:0 },
+  5: { remain:4, prediction:0 },
+  6: { remain:4, prediction:0 },
+  7: { remain:4, prediction:0 },
+  8: { remain:4, prediction:0 },
+  9: { remain:4, prediction:0 },
+  10: { remain:4, prediction:0 },
+  11: { remain:4, prediction:0 },
+  12: { remain:4, prediction:0 },
+  13: { remain:4, prediction:0 },
 }
 
 /**
@@ -38,7 +38,7 @@ const updateRemain = ({ zeroNumbers, options }: Remain2ZeroProps) => {
   }
   if (options) {
     for (let [k, v] of Object.entries(options)) {
-      res[k].remain = v.remain
+      res[+k].remain = v.remain
     }
   }
   return res
@@ -55,7 +55,7 @@ const updateRemain = ({ zeroNumbers, options }: Remain2ZeroProps) => {
 describe('updatePrediction TestCases', () => {
   it('全てオープンカードの場合は情報を更新しない', () => {
     const args: UpdatePredictionArgs = {
-      otherHandsArray:[
+      otherHands:[
         { userId: 1, hands: ['c10o', 'c11o']}
       ],
       cardInfo: CARD_INFO_INIT,
@@ -65,7 +65,7 @@ describe('updatePrediction TestCases', () => {
   })
   it('全てクローズカード（手札2枚の場合） - 全数字にprediction値が入る', () => {
     const args: UpdatePredictionArgs = {
-      otherHandsArray:[
+      otherHands:[
         { userId: 1, hands: ['z', 'z']}
       ],
       cardInfo: CARD_INFO_INIT,
@@ -74,7 +74,7 @@ describe('updatePrediction TestCases', () => {
     // 全数字のpredictionが0以上になっているか
     const test = (obj: UpdatePredictionArgs['cardInfo']) => {
       for (const [_, v] of Object.entries(obj)) {
-        if (v.prediction <= 0) {
+        if (typeof v.prediction === 'undefined' || v.prediction <= 0) {
           return false
         }
       }
@@ -87,26 +87,26 @@ describe('updatePrediction TestCases', () => {
       zeroNumbers: [0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     }) // 1, 2, 3のカードのみ残っている状態に
     const args: UpdatePredictionArgs = {
-      otherHandsArray:[
+      otherHands:[
         { userId: 1, hands: ['c10o', 'z']}
       ],
       cardInfo,
     }
     const expected = {
-      0: { remain: 0, incidence: 0, prediction: 0 },
-      1: { remain: 4, incidence: 0, prediction: 0 },
-      2: { remain: 4, incidence: 0, prediction: 0 },
-      3: { remain: 4, incidence: 0, prediction: 0 },
-      4: { remain: 0, incidence: 0, prediction: 0 },
-      5: { remain: 0, incidence: 0, prediction: 0 },
-      6: { remain: 0, incidence: 0, prediction: 0 },
-      7: { remain: 0, incidence: 0, prediction: 0.6666666666666666 }, // 4(remain)/12(全remain) = 0.666となる
-      8: { remain: 0, incidence: 0, prediction: 0.6666666666666666 },
-      9: { remain: 0, incidence: 0, prediction: 0.6666666666666666 },
-      10: { remain: 0, incidence: 0, prediction: 0 },
-      11: { remain: 0, incidence: 0, prediction: 0.6666666666666666 },
-      12: { remain: 0, incidence: 0, prediction: 0.6666666666666666 },
-      13: { remain: 0, incidence: 0, prediction: 0.6666666666666666 }
+      0: { remain: 0,  prediction: 0 },
+      1: { remain: 4,  prediction: 0 },
+      2: { remain: 4,  prediction: 0 },
+      3: { remain: 4,  prediction: 0 },
+      4: { remain: 0,  prediction: 0 },
+      5: { remain: 0,  prediction: 0 },
+      6: { remain: 0,  prediction: 0 },
+      7: { remain: 0,  prediction: 0.6666666666666666 }, // 4(remain)/12(全remain) = 0.666となる
+      8: { remain: 0,  prediction: 0.6666666666666666 },
+      9: { remain: 0,  prediction: 0.6666666666666666 },
+      10: { remain: 0,  prediction: 0 },
+      11: { remain: 0,  prediction: 0.6666666666666666 },
+      12: { remain: 0,  prediction: 0.6666666666666666 },
+      13: { remain: 0,  prediction: 0.6666666666666666 }
     }
     const result = updatePrediction(args)
     expect(result).toEqual(expected)

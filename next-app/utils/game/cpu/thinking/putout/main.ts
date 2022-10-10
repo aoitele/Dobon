@@ -1,8 +1,10 @@
 import { HandCards } from "../../../../../@types/card"
 import { CPULevel, OtherHands } from "../../../../../@types/game"
-import { culcDobonRisk } from "./culcDobonRisk"
-import { resRemainingCard } from "./resRemainingCard"
-import { resRiskCard } from "./resRiskCard"
+/*
+ * Import { resRemainingCard } from "./resRemainingCard"
+ * import { resRiskCard } from "./resRiskCard"
+ * import { updatePrediction } from "./updatePrediction"
+ */
 
 export const DOBONRISK_MAX = 101
 export const DOBONRISK_MEDIAN = 0
@@ -24,20 +26,30 @@ interface CulcDobonRiskProps {
 
 export type DobonRiskReturnValue = { card:HandCards, dobonRisk: number }[]
 
-const main = ({ownHands, otherHands}: CulcDobonRiskProps): DobonRiskReturnValue => {
-  // 手札全公開のユーザーが存在する場合、リスクナンバーを取得
-  const defineRiskCards = resRiskCard(otherHands)
+const main = ({ownHands, otherHands}: CulcDobonRiskProps): DobonRiskReturnValue => { // eslint-disable-line no-unused-vars
+  /*
+   * 手札全公開のユーザーが存在する場合、リスクナンバーを取得
+   * const defineRiskCards = resRiskCard(otherHands)
+   */
 
-  // これまで場に出されたカード情報を取得
-  const trashedMemory:HandCards[] = []
+  /*
+   * これまで場に出されたカード情報を取得
+   * const trashedMemory:HandCards[] = []
+   */
 
-  // 場に出されたカードと他ユーザーの公開手札から 数字毎にデッキor手札に残っている枚数を計算
-  const remainingCard = resRemainingCard(otherHands, trashedMemory)
+  /*
+   * 場に出されたカードと他ユーザーの公開手札から 数字毎にデッキor手札に残っている枚数を計算
+   * const remainingCard = resRemainingCard(otherHands, trashedMemory)
+   */
 
-  // カード数字ごとに被ドボン率を算出
+  /*
+   * カード数字ごとに被ドボン率を算出
+   * const test = updatePrediction({
+   *   otherHands,
+   *   cardInfo: {}
+   * })
+   */
 
-  // 自分の手札カード全てについて被ドボンリスクを算出する
-  const risk = culcDobonRisk({ownHands, otherHands, defineRiskCards, remainingCard})
   /*
    * Let riskUserCnt = 0                // リスクユーザーの数
    * let riskNumCnt = 0                 // 待ち数字と考えられる枚数
@@ -48,7 +60,7 @@ const main = ({ownHands, otherHands}: CulcDobonRiskProps): DobonRiskReturnValue 
    * const positiveProbability = 0        // ポジティブ値(自分が出すことによって今後有利になる度合い)
    */
 
-  return risk
+  return []
   /*
    * CPU難易度によってリスク計算ロジックを変える
    * switch (cpuLevel) {

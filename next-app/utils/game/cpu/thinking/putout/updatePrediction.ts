@@ -2,11 +2,17 @@ import { OtherHands } from "../../../../../@types/game"
 import { cntCloseCard, sepalateSuitNum } from "../../../checkHand"
 import { resReachNumbers } from "../../../dobonJudge"
 import { combination, CombinationProps } from "../enzan/combination"
-import { CardInfo } from "./culcDobonRisk"
 import deepcopy from 'deepcopy';
 
+export type CardInfo = {
+  [key in number]: { // eslint-disable-line no-unused-vars
+    remain: number // 捨て札や公開手札に出ていない残り枚数
+    prediction?: number
+  }
+}
+
 export interface UpdatePredictionArgs {
-  otherHandsArray: OtherHands[]
+  otherHands: OtherHands[]
   cardInfo: CardInfo
 }
 
@@ -21,13 +27,14 @@ export interface UpdatePredictionArgs {
  * - 非公開状態のカードがあれば、あり得る数字の組み合わせを算出
  * - カード出現率を掛け合わせ、マチとなる数字のスコアに加算していく
  */
-const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): CardInfo => {
+const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardInfo => {
   const result = deepcopy(cardInfo) // 元データを書き換えないようにレスポンスデータを定義
   const combinationArgs: CombinationProps = { cards:[], maisu:0 }
   let remainingCardCnt = 0 // デッキ&全ユーザーの未公開手札の合計数
 
   // CardInfoから各関数で利用する引数を準備する前処理
   for (const [key, value] of Object.entries(cardInfo)) {
+    result[Number(key)].prediction = 0 // レスポンスの予測値を初期化
     combinationArgs.cards.push({ number: Number(key), remain: value.remain }) // 掛け合わせ生成関数で利用する情報をセット
     if (value.remain > 0) {
       remainingCardCnt += value.remain // 確率計算に利用する残枚数を加算
@@ -36,8 +43,8 @@ const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): 
 
   // ここからユーザーごとに手札情報を使って予測値を算出していく
   /* eslint-disable no-continue */
-  for (let i=0; i<otherHandsArray.length; i+=1) {
-    const hands = otherHandsArray[i].hands // 検証する手札
+  for (let i=0; i<otherHands.length; i+=1) {
+    const hands = otherHands[i].hands // 検証する手札
     const cntClose = cntCloseCard(hands)
     if (cntClose === 0) continue  // 手札が全て公開状態であれば検証しない
 
@@ -57,11 +64,12 @@ const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): 
 
     // 公開カードがあれば、その数字を含む組み合わせだけ利用するためフィルタリングしておく
     if (hands.length !== cntClose) {
-      const uniqueNums = Array.from(new Set(openCardNums))
-      // UniqueNumsの値を全て持つパターンのみ予測に使用するために残す
       combinationPattern = combinationPattern.filter(pattern => {
-        for (let j=0; j<uniqueNums.length; j+=1) {
-          if (!pattern.includes(uniqueNums[j])) return false
+        const buf = deepcopy(pattern) // 検証用のコピー
+        for (let j=0; j<openCardNums.length; j+=1) {
+          const idx = buf.indexOf(openCardNums[j])
+          if (idx === -1) return false
+          buf.splice(idx, 1)
         }
         return true
       })
@@ -69,7 +77,7 @@ const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): 
 
     // 組み合わせパターンごとにマチを計算。確率を算出しpredictionにスコアとして加算する
     for (let k=0; k<combinationPattern.length; k+=1) {
-      let pattern = combinationPattern[k] // 検証する手札のパターン
+      const pattern = combinationPattern[k] // 検証する手札のパターン
       const reachNumArg = pattern.map(number => number === 0 ? 'x0o' : `c${number}o`)
       const { reachNums } = resReachNumbers(reachNumArg) // マチとなる数字
       if (reachNums.length === 0) continue // マチがなければ次のパターン検証へ
@@ -84,12 +92,17 @@ const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): 
       const pbVals: number[] = [] // 出現確率値の配列を入れる
       let tmpCardCnt = remainingCardCnt // 計算に使うカード枚数
       const tmpCardInfo = deepcopy(cardInfo) // 計算に使うカード情報のコピー
+      
+      // 公開手札のカードは出現率計算で考慮させないために除外する
+      for (let t=0; t<openCardNums.length; t+=1) {
+        const cardNum = openCardNums[t]
+        if (pattern.includes(cardNum)) {
+          const idx = pattern.indexOf(cardNum)
+          pattern.splice(idx, 1)
+        }
+      }
 
-      /**
-       * パターン内の数値をループ。出現率をpbValsに格納していく
-       * 出現率を計算する段階では公開手札を考慮させないため、公開数字は除外する
-       */
-      pattern = pattern.filter(cardNum => !openCardNums.includes(cardNum))
+      // パターン内の数値をループ。出現率をpbValsに格納していく
       for (let l=0; l<pattern.length; l+=1) {
         const cardNum = pattern[l]
         const incidence = tmpCardInfo[cardNum].remain / tmpCardCnt
@@ -101,7 +114,10 @@ const updatePrediction = ({ otherHandsArray, cardInfo }: UpdatePredictionArgs): 
       // パターンとしての出現率をreachNumが含む数字のスコアとして加算する
       const score = pbVals.reduce((acc, cur) => acc * cur)
       for (let m=0; m<reachNums.length; m+=1) {
-        result[reachNums[m]].prediction += score
+        const target = result[reachNums[m]]
+        if (typeof target.prediction === 'number') {
+          target.prediction += score
+        }
       }
     }
   }
