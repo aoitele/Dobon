@@ -24,7 +24,7 @@ const TopPageContent = () => {
             />
           </div>
           {isLoggedIn(authUser) && <p>Welcome! <span className={style.nickanme}>{authUser.nickname}</span></p>}
-          <div className={style.linkWrap}>
+          <div>
             {isPvP
             ? <>
                 <div className={style.link__active_emphasis}>

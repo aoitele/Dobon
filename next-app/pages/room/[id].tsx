@@ -17,6 +17,7 @@ import sleep from '../../utils/game/sleep'
 import { initialState } from '../../utils/game/state'
 import ScoreBoard from '../../components/game/score'
 import { isAuthUserFetching, isNotLoggedIn } from '../../utils/auth/authState'
+import { throwServerSideError404 } from '../../server/throwServerSideError404'
 
 interface Props {
   room: RoomAPIResponse['roomInfo']
@@ -61,19 +62,24 @@ const Room: React.FC<Props> = ({ room }) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  if (ctx.params) {
-    const axios = axiosInstance()
-    const url = `/api/room/${ctx.params.id}`
-    try {
-      const res = await axios.get(url)
-      const { room } = res.data
-      const title = room.title
-      return room ? {props: {room, title}} : {props: {}}
-    } catch (e) {
-      throw new Error('room api request failed')
-    }
+  const roomId = ctx.params?.id
+  if (typeof roomId === 'undefined') {
+    return throwServerSideError404(ctx)
   }
-  return { props: {} }
+
+  const axios = axiosInstance()
+  const url = `/api/room/${roomId}`
+  try {
+    const res = await axios.get(url)
+    const { room } = res.data
+    const title = room.title
+    if (room) {
+      return { props: { room, title } }
+    }
+  } catch (e) {
+    return throwServerSideError404(ctx)
+  }
+  return throwServerSideError404(ctx)
 }
 
 export default Room

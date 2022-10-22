@@ -1,0 +1,29 @@
+.wrap {
+  height: 100vh;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  .content {
+    width: 100%;
+    .heading {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    p {
+      margin-bottom: 10px;
+    }
+    .link {
+      display: block;
+      padding: 6px 20px;
+      margin: 20px;
+      border-radius: 50px;
+      box-shadow: silver;
+      font-size: 16px;
+      font-weight: bold;
+      &__active {
+        @extend .link;
+        background-color: antiquewhite;
+      }
+    }
+  }
+}
