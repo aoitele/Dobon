@@ -104,6 +104,7 @@ const board = (data: Props) => {
      * 盤面に残っている効果と出したカードの効果を相殺し、更新版のeffectを送る
      * 対象となる効果は「draw(2/4/6)」「wild」「reverse」「opencard」
      */
+    let shouldUpdateEffect = false
     const existsEffect = boardState.effect.length > 0
     if (!existsEffect && isAddableEffect(effectName)) {
       boardEmit = {
@@ -111,6 +112,7 @@ const board = (data: Props) => {
         event: 'effectupdate',
         data: { type:'board', data: { effect: [effectName] } }
       }
+      shouldUpdateEffect = true
     }
 
     if (existsEffect) {
@@ -120,8 +122,12 @@ const board = (data: Props) => {
         event: 'effectupdate',
         data: { type:'board', data: { effect: newEffectState } }
       }
+      shouldUpdateEffect = true
     }
-    handleEmit(boardEmit)
+    if (shouldUpdateEffect) {
+      handleEmit(boardEmit)
+    }
+
     boardEmit = {
       roomId: room.id,
       userId: me.id,
