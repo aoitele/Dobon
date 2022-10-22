@@ -1,4 +1,4 @@
-import { prisma } from '../../../prisma'
+import { prisma, prismaInitializeError } from '../../../prisma'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 const handler = (req: NextApiRequest, res: NextApiResponse) => {
@@ -15,7 +15,11 @@ const handler = (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const handleGET = async (id: string | string[], res: NextApiResponse) => {
-  const room = await prisma?.room.findUnique({
+  if (prisma === null) {
+    throw prismaInitializeError()
+  }
+
+  const roomData = await prisma.room.findUnique({
     where: {
       id: Number(id)
     },
@@ -23,7 +27,7 @@ const handleGET = async (id: string | string[], res: NextApiResponse) => {
       user: true
     }
   })
-  res.json({ room })
+  res.json({ room: roomData })
 }
 
 const handlePOST = (req: NextApiRequest, res: NextApiResponse) => {

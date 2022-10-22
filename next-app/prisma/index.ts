@@ -1,7 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 
 /**
- **
  * HMRが作動しコネクション数が増えるため
  * 開発モードではprismaをglobalにセットして単一インスタンスで扱う
  */
