@@ -1,17 +1,30 @@
-import React, { useContext, useState } from 'react'
+import React, { FC, useContext, useState } from 'react'
 import Image from 'next/image'
 import style from './index.module.scss'
 import Link from 'next/link'
 import { AuthStateContext } from '../../../context/authProvider'
 import { isAuthUserFetching, isLoggedIn } from '../../../utils/auth/authState'
 import logout from '../../../utils/auth/logout'
+import PVESelecterModal from './modules/PVESelecterModal'
 
-const TopPageContent = () => {
-  const [isPvP, setIsPvP] = useState(false)
+export interface TopPageState {
+  selectedPvP: boolean,
+  selectedPvE: boolean,
+}
+
+export const initialState: TopPageState = {
+  selectedPvP: false, // 対人戦を選択したか
+  selectedPvE: false, // 対COM戦を選択したか
+}
+
+const TopPageContent:FC = () => {
+  const [values, setValues] = useState(initialState)
   const { authUser } = useContext(AuthStateContext)
+
   return (
     <>
     <div className={style.wrap}>
+      {values.selectedPvE && <PVESelecterModal setValues={setValues}/>}
       {!isAuthUserFetching(authUser) &&
         <div className={style.content}>
           <h1 className={style.heading1}>Dobon</h1>
@@ -25,13 +38,13 @@ const TopPageContent = () => {
           </div>
           {isLoggedIn(authUser) && <p>Welcome! <span className={style.nickanme}>{authUser.nickname}</span></p>}
           <div>
-            {isPvP
+            {values.selectedPvP
             ? <>
                 <div className={style.link__active_emphasis}>
                   <span className={style.icon}>🃏 </span>
                   <Link href="/room">ゲームに参加</Link>
                 </div>
-                <div className={authUser ? style.link__active_emphasis : style.link__disabled} onClick={() => setIsPvP(true)}>
+                <div className={authUser ? style.link__active_emphasis : style.link__disabled} onClick={() => setValues({ ...values, selectedPvP:true })}>
                   <span className={style.icon}>📝 </span>
                   <Link href="/room/create">ゲームを作成</Link>
                 </div>
@@ -39,9 +52,9 @@ const TopPageContent = () => {
             : <>
                 <div className={`${style.link__active} ${style.show}`}>
                   <span className={style.icon}>🤖 </span>
-                  <Link href="/room">1人で遊ぶ</Link>
+                  <button onClick={() => setValues({ ...values, selectedPvE: true })}>1人で遊ぶ</button>
                 </div>
-                <div className={authUser ? `${style.link__active} ${style.show}` : style.link__disabled} onClick={() => setIsPvP(true)}>
+                <div className={authUser ? `${style.link__active} ${style.show}` : style.link__disabled} onClick={() => setValues({ ...values, selectedPvP:true })}>
                   <span className={style.icon}>👨‍👩‍👦‍👦 </span>
                   対人で遊ぶ
                 </div>
@@ -56,8 +69,8 @@ const TopPageContent = () => {
                 {/* <span className={style.hint}>You can play with friends if LoggedIn!</span> */}
               </div>
             }
-            {isPvP
-            ? <div className={style.link__active} onClick={() => setIsPvP(false)}>
+            {values.selectedPvP
+            ? <div className={style.link__active} onClick={() => setValues(initialState)}>
                 <span className={style.icon}>↩︎ </span>
                 戻る
               </div>

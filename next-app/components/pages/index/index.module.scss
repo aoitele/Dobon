@@ -30,6 +30,10 @@
       @extend .link;
       background-color: antiquewhite;
       animation:fadeIn 2s linear;
+      button {
+        font-size: inherit;
+        font-weight: inherit;
+      }
     }
     &__active_emphasis {
       @extend .link;
