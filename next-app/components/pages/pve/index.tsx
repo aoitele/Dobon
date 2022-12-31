@@ -1,17 +1,10 @@
-import React, { useContext } from "react"
-import { WebSocketStateContext } from "../../../context/wsProvider"
-import { establishWsForPve } from "./hooks/useWsConnect"
+import React from "react"
 
 const PveContent = () => {
-  const values = useContext(WebSocketStateContext)
-
-  if (!values.client) {
-    establishWsForPve()
-  }
 
   return (
     <>
-      {values.client && <div>PveContent</div>}
+      <div>PveContent</div>
     </>
   )
 }

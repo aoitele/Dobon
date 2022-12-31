@@ -1,15 +1,19 @@
-import React, { FC } from "react"
+import React, { FC, useContext } from "react"
 import HtmlHead from "../../components/foundations/HtmlHead"
 import PveContent from "../../components/pages/pve"
-import { WsProvider } from "../../context/wsProvider"
+import { establishWsForPve } from "../../components/pages/pve/hooks/useWsConnect"
+import { WebSocketStateContext } from "../../context/wsProvider"
 
 const PvePage:FC = () => {
+  const values = useContext(WebSocketStateContext)
+  if (!values.client) {
+    establishWsForPve()
+  }
+
   return (
     <>
       <HtmlHead title='vsCom' />
-      <WsProvider>
-        <PveContent />
-      </WsProvider>
+      {values.client && <PveContent />}
     </>
   )
 }
