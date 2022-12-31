@@ -1,6 +1,7 @@
 import React, { useState, Dispatch, FC, SetStateAction } from 'react'
 import { initialState, TopPageState } from '../index'
 import styles from './PVESelecterModal.module.scss'
+import { useRouter } from 'next/router'
 
 const defaultValues = {
   users: [
@@ -18,11 +19,21 @@ interface Props {
 const PVESelecterModal:FC<Props> = ({ setValues }) => {
   const [pveValues, setPveValues] = useState(defaultValues)
   const gameSet = [10, 20, 30]
+  const router = useRouter()
 
   const setUserMode = (e: React.ChangeEvent<HTMLSelectElement>, index:number) => {
     const users = pveValues.users
     users[index].mode = e.currentTarget.value
     setPveValues({...pveValues, users})    
+  }
+
+  const toPVEQueryString = () => {
+    let qs = ''
+    qs += `setCount=${pveValues.set_count}`
+    pveValues.users.forEach(user => {
+      qs += `&${user.name}=${user.mode}`
+    })
+    return qs
   }
 
   return (
@@ -77,7 +88,15 @@ const PVESelecterModal:FC<Props> = ({ setValues }) => {
               })}
             </div>
           </div>
-          <button type="submit" className={styles.submitBtn}>ゲームを始める</button>
+          <button 
+            onClick={() => {
+              router.push({
+                pathname: '/pve',
+                query: toPVEQueryString()
+              }, '/'
+            )}}
+            className={styles.submitBtn}
+          >ゲームを始める</button>
         </div>
       </div>
       <div className={styles.modalBack} onClick={() => setValues(initialState)}/>

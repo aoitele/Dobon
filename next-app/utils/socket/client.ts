@@ -8,11 +8,12 @@ class SocketClient {
     this._socket = null
   }
 
-  async connect(roomId: string): Promise<void> {
+  async connect(roomId?: string): Promise<void> {
     await this.disconnect()
-    this._socket = io(
-      `${process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN}?roomId=${roomId}`
-    )
+    const socketIoUri = roomId
+    ? `${process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN}?roomId=${roomId}`
+    : process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN ?? ''
+    this._socket = io(socketIoUri)
   }
   
   disconnect(): Promise<void> {
