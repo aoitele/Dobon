@@ -1,7 +1,7 @@
 import { Card } from './card'
 import { Action, Order, Board, Player, Effect, InitialBoardState } from './game'
 import { LiteralUnion } from 'type-fest'
-import { NestedPartial } from '../@types/utility'
+import { NestedPartial, PartiallyPartial } from '../@types/utility'
 
 type Event =
   | 'drawcard'
@@ -68,5 +68,7 @@ export type Emit = {
   event: Event
   data?: EmitCard | EmitAction | EmitBoard
 }
+
+export type EmitForPVE = PartiallyPartial<Emit, 'roomId'>
 
 export type HandleEmitFn = (data: Emit) => Promise<any> // eslint-disable-line no-unused-vars

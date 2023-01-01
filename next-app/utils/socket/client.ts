@@ -12,7 +12,7 @@ class SocketClient {
     await this.disconnect()
     const socketIoUri = roomId
     ? `${process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN}?roomId=${roomId}`
-    : process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN ?? ''
+    : `${process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN}` ?? ''
     this._socket = io(socketIoUri)
   }
   

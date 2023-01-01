@@ -1,7 +1,7 @@
 import React, { createContext, Dispatch, FC, ReactNode, useState } from "react"
 import { SocketClient } from "../utils/socket/client"
 
-interface WSProviderState {
+export interface WSProviderState {
   client: SocketClient | null
 }
 export type WSProviderStateDispatch = Dispatch<WSProviderState> | undefined

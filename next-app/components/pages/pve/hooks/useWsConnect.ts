@@ -1,11 +1,20 @@
-import { useContext } from "react"
-import { WebSocketDispathContext } from "../../../../context/wsProvider"
-import { resSocketClient } from "../../../../utils/socket/client"
+import { resSocketClient, SocketClient } from "../../../../utils/socket/client"
+
+interface EstablishWsForPveResponse {
+  client: SocketClient | null
+}
+
+const response: EstablishWsForPveResponse = {
+  client: null
+}
 
 const establishWsForPve = async() => {
-  const dispatch = useContext(WebSocketDispathContext)
   const wsClient = await resSocketClient()
-  if (!wsClient || typeof dispatch === 'undefined') return
+
+  if (!wsClient) {
+    console.log('wsClient is null')
+    return response
+  }
 
   await wsClient.connect()
 
@@ -14,12 +23,13 @@ const establishWsForPve = async() => {
       wsClient._reset()
       console.log('Socket is closed.')
     })
+    response.client = wsClient
     /*
      * WsClient._socket.on('updateStateSpecify', (data) => {
      * })
      */
-    dispatch({ client:wsClient })
-  }
+  } 
+  return response
 }
 
 export { establishWsForPve }

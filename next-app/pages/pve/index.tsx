@@ -1,21 +1,44 @@
-import React, { FC, useContext } from "react"
+import React, { FC, useContext, useEffect, useState } from "react"
+import { EmitForPVE } from "../../@types/socket"
 import HtmlHead from "../../components/foundations/HtmlHead"
 import PveContent from "../../components/pages/pve"
 import { establishWsForPve } from "../../components/pages/pve/hooks/useWsConnect"
-import { WebSocketStateContext } from "../../context/wsProvider"
+import { WebSocketDispathContext, WebSocketStateContext, WSProviderState } from "../../context/wsProvider"
+import { handleEmit } from "../../utils/socket/emit"
+
+const initialState = {
+  isReady: false
+}
 
 const PvePage:FC = () => {
-  const values = useContext(WebSocketStateContext)
-  if (!values.client) {
-    establishWsForPve()
-  }
+  const [values, setValues] = useState(initialState)
+  const wsState = useContext(WebSocketStateContext)
+  const dispatch = useContext(WebSocketDispathContext)
+
+  useEffect(() => {
+    if (!wsState.client && !values.isReady) {
+      establishWsForPve().then(res => {
+        if (res.client && dispatch) {
+          prepare(res.client)
+          dispatch({ client: res.client })
+          setValues({ isReady:true })
+        }
+      })
+    }
+  }, [])
 
   return (
     <>
       <HtmlHead title='vsCom' />
-      {values.client && <PveContent />}
+      {wsState.client && values.isReady && <PveContent />}
     </>
   )
+}
+
+const prepare = (wsClient: WSProviderState['client']) => {
+  if (!wsClient) return
+  const data: EmitForPVE = { event: 'prepare' }
+  handleEmit(wsClient, data)
 }
 
 export default PvePage

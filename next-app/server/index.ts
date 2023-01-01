@@ -3,6 +3,7 @@ import { createAdapter } from 'socket.io-redis'
 import { fastifyWithSocketIO } from './fastifyWithSocketIO'
 import { pubClient, subClient, initData } from './redisClient'
 import emitHandler from './emitHandler'
+import { cpuModeHandler } from './cpuModeHandler'
 
 const port = process.env.PORT || 3000
 const host = '0.0.0.0'
@@ -23,6 +24,8 @@ app.prepare().then(async () => {
       socket.join(room)
       fastify.io.in(room).emit('hello', 'new user comming!!')
       emitHandler(io, socket)
+    } else {
+      cpuModeHandler(io, socket)
     }
     // Await adapterPubClient.xread("block", 0, "STREAMS", "myStream", 0);
   })
