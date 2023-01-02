@@ -2,6 +2,7 @@ import { Card } from './card'
 import { Action, Order, Board, Player, Effect, InitialBoardState } from './game'
 import { LiteralUnion } from 'type-fest'
 import { NestedPartial, PartiallyPartial } from '../@types/utility'
+import { ParsedUrlQuery } from 'querystring'
 
 type Event =
   | 'drawcard'
@@ -69,6 +70,6 @@ export type Emit = {
   data?: EmitCard | EmitAction | EmitBoard
 }
 
-export type EmitForPVE = PartiallyPartial<Emit, 'roomId'>
+export type EmitForPVE = PartiallyPartial<Emit, 'roomId'> & { query?: ParsedUrlQuery }
 
 export type HandleEmitFn = (data: Emit) => Promise<any> // eslint-disable-line no-unused-vars

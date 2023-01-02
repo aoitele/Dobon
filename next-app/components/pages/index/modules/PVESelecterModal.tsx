@@ -1,9 +1,22 @@
-import React, { useState, Dispatch, FC, SetStateAction } from 'react'
+import React, { useState, Dispatch, FC, SetStateAction, useContext } from 'react'
 import { initialState, TopPageState } from '../index'
 import styles from './PVESelecterModal.module.scss'
 import { useRouter } from 'next/router'
+import { AuthStateContext } from '../../../../context/authProvider'
+import { isLoggedIn } from '../../../../utils/auth/authState'
+import { CPULevel, CPUName } from '../../../../@types/game'
+import { isCpuLevelValue } from '../../../../utils/game/cpu/utils/isCPULevelValue'
 
-const defaultValues = {
+interface SelecterValues {
+  users: {
+    name: CPUName
+    mode: CPULevel
+    icon: '🐰' | '🐶' | '😾'
+  }[],
+  set_count: number
+}
+
+const defaultValues: SelecterValues = {
   users: [
     { name: 'com1', mode: 'normal', icon: '🐰' },
     { name: 'com2', mode: 'normal', icon: '🐶' },
@@ -18,18 +31,24 @@ interface Props {
 
 const PVESelecterModal:FC<Props> = ({ setValues }) => {
   const [pveValues, setPveValues] = useState(defaultValues)
+  const { authUser } = useContext(AuthStateContext)
   const gameSet = [10, 20, 30]
   const router = useRouter()
 
   const setUserMode = (e: React.ChangeEvent<HTMLSelectElement>, index:number) => {
     const users = pveValues.users
-    users[index].mode = e.currentTarget.value
-    setPveValues({...pveValues, users})    
+    if (isCpuLevelValue(e.currentTarget.value)) {
+      users[index].mode = e.currentTarget.value
+      setPveValues({...pveValues, users })
+    }
   }
 
   const toPVEQueryString = () => {
     let qs = ''
     qs += `setCount=${pveValues.set_count}`
+    if (isLoggedIn(authUser)) {
+      qs += `&me=${authUser.nickname}`
+    }
     pveValues.users.forEach(user => {
       qs += `&${user.name}=${user.mode}`
     })
@@ -61,9 +80,9 @@ const PVESelecterModal:FC<Props> = ({ setValues }) => {
                           value={user.mode}
                           onChange={(e) => setUserMode(e, index)}
                         >
-                          <option value="hard">強い</option>
-                          <option value="normal">ふつう</option>
-                          <option value="easy">弱い</option>
+                          <option value='hard'>強い</option>
+                          <option value='normal'>ふつう</option>
+                          <option value='easy'>弱い</option>
                         </select>
                       </div>
                     </li>

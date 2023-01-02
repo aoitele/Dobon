@@ -25,6 +25,7 @@ module.exports = {
   },
   testMatch: [
     '<rootDir>/__tests__/modules/*.spec.tsx',
+    '<rootDir>/__tests__/cpu/*.spec.tsx',
     '<rootDir>/__tests__/api/*.spec.tsx'
   ]
 }

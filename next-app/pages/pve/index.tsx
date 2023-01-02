@@ -1,3 +1,4 @@
+import { NextRouter, useRouter } from "next/router"
 import React, { FC, useContext, useEffect, useState } from "react"
 import { EmitForPVE } from "../../@types/socket"
 import HtmlHead from "../../components/foundations/HtmlHead"
@@ -14,12 +15,13 @@ const PvePage:FC = () => {
   const [values, setValues] = useState(initialState)
   const wsState = useContext(WebSocketStateContext)
   const dispatch = useContext(WebSocketDispathContext)
+  const router = useRouter()
 
   useEffect(() => {
     if (!wsState.client && !values.isReady) {
       establishWsForPve().then(res => {
         if (res.client && dispatch) {
-          prepare(res.client)
+          prepare(res.client, router.query)
           dispatch({ client: res.client })
           setValues({ isReady:true })
         }
@@ -35,9 +37,9 @@ const PvePage:FC = () => {
   )
 }
 
-const prepare = (wsClient: WSProviderState['client']) => {
+const prepare = (wsClient: WSProviderState['client'], query: NextRouter['query']) => {
   if (!wsClient) return
-  const data: EmitForPVE = { event: 'prepare' }
+  const data: EmitForPVE = { event: 'prepare', query }
   handleEmit(wsClient, data)
 }
 

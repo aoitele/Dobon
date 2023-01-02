@@ -40,6 +40,7 @@ export type Player = {
   score: number
   isWinner: boolean
   isLoser: boolean
+  mode?: CPULevel // for PVE
 }
 export type OtherHands = {
   userId: number
@@ -99,4 +100,5 @@ export type WildEffect = Extract<'wildspade' | 'wildheart' | 'wildclub' | 'wildd
 export type SolvableEffects = Effect[]
 export type AddableEffects = Exclude<Effect, 'skip' | 'wild'>[] // Board.effectsに入れられる効果
 
+export type CPUName = 'com1' | 'com2' | 'com3'
 export type CPULevel = 'easy' | 'normal' | 'hard'
