@@ -3,6 +3,7 @@ import { Socket } from "socket.io-client"
 import { Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
+import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 
 /**
  * CPU対戦におけるサーバー側の処理
@@ -19,6 +20,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
     switch (event) {
       /**
        * ゲーム開始時の処理
+       * nextGameでgame.idが切り替わる時もここから処理が行われる
        */
       case 'prepare': {
         const deckKey = `pve:${socket.id}:deck`
@@ -33,6 +35,15 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           const mode = isCom ? query?.[users[i]] : undefined
           userData.push({ id: 0, nickname: users[i], turn: 0, score: 0, isWinner: false, isLoser: false, mode: (typeof mode === 'string' && isCpuLevelValue(mode)) ? mode : undefined })
         }
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              users: userData
+            },
+            status: 'playing'
+          }
+        }
+        socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
         break
       }
       default: return {}

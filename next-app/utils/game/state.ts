@@ -64,11 +64,13 @@ const updateState = (
   state: AnotateState,
   payload: AnotatePayload | AnotatePayloadSpecify
 ) => {
-  for (const key of Object.keys(payload)) {
+  if (state) {
     // 子プロパティを持つオブジェクトがきた時は再起的にupdateStateを呼び出し、stateにセットしていく
-    isObjectType(payload[key]) && Object.keys(payload[key]).length !== 0
-    ? updateState(state[key], payload[key])
-    : state[key] = payload[key] // Stateを更新
+    for (const key of Object.keys(payload)) {
+      isObjectType(payload?.[key]) && Object.keys(payload[key]).length !== 0
+      ? updateState(state[key], payload[key])
+      : state[key] = payload[key] // Stateを更新
+    }
   }
   return state
 }

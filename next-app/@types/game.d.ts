@@ -15,22 +15,15 @@ export type Room = {
   modified: Date
 }
 
+export type GameStatus = | 'join' | 'created' | 'prepare' | 'playing' | 'ended' | 'showScore' | 'loading' | 'connection loss' | undefined
+
 export type Game = {
   id: number | null
-  status:
-    | 'join'
-    | 'created'
-    | 'playing'
-    | 'ended'
-    | 'showScore'
-    | 'loading'
-    | 'connection loss'
-    | undefined
+  status: GameStatus
   event: ModalEffect
   board: Board
   result: GameResult
 }
-export type GameStatus = Game['status']
 
 export type Player = {
   id: number
