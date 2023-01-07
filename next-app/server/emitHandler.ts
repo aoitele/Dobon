@@ -67,7 +67,6 @@ const emitHandler = (io: Socket, socket: any) => {
             params: { roomId }
           })
         )
-        console.log(participants, 'pat')
 
         // Game.board.usersにユーザーを追加
         let reducerPayload: reducerPayloadSpecify = {
