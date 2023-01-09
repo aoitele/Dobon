@@ -2,5 +2,5 @@
     "watch": ["server"],
     "ext": "ts",
     "ignore": ["__tests__/**/*.spec.ts*"],
-    "exec": "ts-node server/index.ts"
+    "exec": "ts-node server/fastify/index.ts"
   }

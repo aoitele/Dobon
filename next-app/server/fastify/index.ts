@@ -1,9 +1,10 @@
 import next from 'next'
 import { createAdapter } from 'socket.io-redis'
 import { fastifyWithSocketIO } from './fastifyWithSocketIO'
-import { pubClient, subClient, initData } from './redisClient'
-import emitHandler from './emitHandler'
-import { cpuModeHandler } from './cpuModeHandler'
+import { pubClient, subClient, initData } from '../redisClient'
+import emitHandler from '../emitHandler'
+import { cpuModeHandler } from '../cpuModeHandler'
+import { fastifyAPIRouteSet } from './api'
 
 const port = process.env.PORT || 3000
 const host = '0.0.0.0'
@@ -17,6 +18,8 @@ app.prepare().then(async () => {
   const io = fastify.io
   
   fastify.all('*', (req: any, res: any) => handle(req.raw, res.raw))
+  fastifyAPIRouteSet(fastify)
+  
   fastify.io.on('connection', (socket: any) => {
     const { roomId } = socket.handshake.query
     if (roomId) {

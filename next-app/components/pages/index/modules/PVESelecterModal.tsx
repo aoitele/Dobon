@@ -6,6 +6,7 @@ import { AuthStateContext } from '../../../../context/authProvider'
 import { isLoggedIn } from '../../../../utils/auth/authState'
 import { CPULevel, CPUName } from '../../../../@types/game'
 import { isCpuLevelValue } from '../../../../utils/game/cpu/utils/isCPULevelValue'
+import axiosInstance from '../../../../utils/api/axiosInstance'
 
 interface SelecterValues {
   users: {
@@ -43,9 +44,10 @@ const PVESelecterModal:FC<Props> = ({ setValues }) => {
     }
   }
 
-  const toPVEQueryString = () => {
+  const toPVEQueryString = (pveKey: string) => {
     let qs = ''
-    qs += `setCount=${pveValues.set_count}`
+    qs += `pveKey=${pveKey}`
+    qs += `&setCount=${pveValues.set_count}`
     if (isLoggedIn(authUser)) {
       qs += `&me=${authUser.nickname}`
     }
@@ -53,6 +55,28 @@ const PVESelecterModal:FC<Props> = ({ setValues }) => {
       qs += `&${user.name}=${user.mode}`
     })
     return qs
+  }
+
+  const handleSubmit = async() => {
+    let pveKey = localStorage.getItem('pveKey')
+    if (!pveKey) {
+      try {
+        const res = await axiosInstance().get<{'pveKey': string}>('/pve-key')
+        if (!res.data.pveKey) {
+          throw new Error('pveKey not provided')
+        }
+        pveKey = res.data.pveKey
+        localStorage.setItem('pveKey', pveKey)
+      } catch(e) {
+        alert('通信に失敗しました。時間をおいて再度お試しください。')
+      }
+    }
+
+    if (!pveKey) return
+    router.push({
+      pathname: '/pve',
+      query: toPVEQueryString(pveKey)
+    }, '/')
   }
 
   return (
@@ -108,12 +132,7 @@ const PVESelecterModal:FC<Props> = ({ setValues }) => {
             </div>
           </div>
           <button 
-            onClick={() => {
-              router.push({
-                pathname: '/pve',
-                query: toPVEQueryString()
-              }, '/'
-            )}}
+            onClick={() => handleSubmit()}
             className={styles.submitBtn}
           >ゲームを始める</button>
         </div>
@@ -121,6 +140,6 @@ const PVESelecterModal:FC<Props> = ({ setValues }) => {
       <div className={styles.modalBack} onClick={() => setValues(initialState)}/>
     </>
   )
-} 
+}
 
 export default PVESelecterModal
