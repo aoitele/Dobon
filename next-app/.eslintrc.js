@@ -48,7 +48,8 @@ module.exports = {
     'complexity': 'off',
     'no-underscore-dangle': 'off',
     'no-unused-expressions': ['error', { 'allowTernary': true }], // 結果の代入を行わない三項演算子を許可
-    'max-lines': 'off'
+    'max-lines': 'off',
+    'no-warning-comments': 'off'
   },
   settings: {
     react: {

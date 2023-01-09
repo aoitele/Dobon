@@ -1,6 +1,7 @@
 /**
  * ゲーム実施状態のHooks
  */
+import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { GameDispathContext, GameStateContext } from '../../../../context/gameProvider'
 import { useUpdateStateFn } from '../../../../utils/game/state'
@@ -10,6 +11,7 @@ import { establishWsForPve } from '../utils/webSocket'
 const useGameCycles = () => {
   const state = useContext(GameStateContext)
   const dispatch = useContext(GameDispathContext)
+  const router = useRouter()
 
   useEffect(() => {
     console.log('useGameCycles useEffect')
@@ -25,8 +27,8 @@ const useGameCycles = () => {
             const newState = useUpdateStateFn(state, { wsClient: client })
             if (newState) {
               dispatch({...newState})
+              handleEmit(client, { event: 'prepare', query: router.query })
             }
-            handleEmit(client, { event: 'prepare' })
             console.log('status undefined end...')
           }
           break

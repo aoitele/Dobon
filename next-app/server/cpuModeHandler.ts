@@ -17,6 +17,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
     console.log(socket.id, 'socket.id')
     const { event, query } = payload
     console.log(event, 'event')
+    console.log(query, 'query')
     switch (event) {
       /**
        * ゲーム開始時の処理
@@ -33,7 +34,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         for (let i = 0; i < users.length; i += 1) {
           const isCom = comUsers.includes(users[i])
           const mode = isCom ? query?.[users[i]] : undefined
-          userData.push({ id: 0, nickname: users[i], turn: 0, score: 0, isWinner: false, isLoser: false, mode: (typeof mode === 'string' && isCpuLevelValue(mode)) ? mode : undefined })
+          userData.push({ id: 0, nickname: users[i], turn: i + 1, score: 0, isWinner: false, isLoser: false, mode: (typeof mode === 'string' && isCpuLevelValue(mode)) ? mode : undefined })
         }
         const reducerPayload: reducerPayloadSpecify = {
           game: {

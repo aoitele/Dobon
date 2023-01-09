@@ -1,7 +1,8 @@
 import React, { FC, useContext } from "react"
 import HtmlHead from "../../components/foundations/HtmlHead"
-import PveContent from "../../components/pages/pve"
+import { Board } from "../../components/pages/pve/components/Board"
 import { useGameCycles } from "../../components/pages/pve/hooks/useGameCycles"
+import { BoardProvider } from "../../context/boardProver"
 import { GameStateContext } from "../../context/gameProvider"
 
 const PvePage:FC = () => {  
@@ -10,11 +11,10 @@ const PvePage:FC = () => {
 
   return (
     <>
-
       <HtmlHead title='vsCom' />
-      {gameState.wsClient && <PveContent />}
-      <span>status: {gameState.game.status}</span><br/>
-      {gameState.game.board.users.map(user => <span key={user.nickname}>{user.nickname}</span>)}
+      <BoardProvider>
+        {gameState.game.status === 'playing' && <Board />}
+      </BoardProvider>
     </>
   )
 }
