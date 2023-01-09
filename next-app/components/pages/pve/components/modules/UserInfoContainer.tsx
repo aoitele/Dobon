@@ -13,8 +13,8 @@ const UserInfoContainer:FC<Props> = ({ board }) => {
   return (
     <div className={styles.wrap}>
       { board.users.map(
-        user => user.mode &&
-        <>
+        (user, idx) => user.mode &&
+        <div key={idx}>
           <UserInfo
             key={`user_${user.id}_info`}
             user={user}
@@ -23,7 +23,7 @@ const UserInfoContainer:FC<Props> = ({ board }) => {
           />
           {/* TODO 強さラベルの表示 */}
           {/* <span>{user.mode}</span> */}
-        </>
+        </div>
       )}
     </div>
   )
