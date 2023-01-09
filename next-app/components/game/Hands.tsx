@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
 import Image from 'next/image'
 import { SingleCard } from './SingleCard'
 import { HaveAllPropertyCard } from '../../@types/card'
@@ -13,7 +13,7 @@ interface Props {
   }
   functions: {
     putOut: (card: string) => Promise<void> // eslint-disable-line no-unused-vars
-    setValues: React.Dispatch<React.SetStateAction<InitialBoardState>>
+    setValues: Dispatch<SetStateAction<InitialBoardState>> | Dispatch<InitialBoardState>
   }
 }
   

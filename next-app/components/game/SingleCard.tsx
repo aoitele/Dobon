@@ -13,7 +13,7 @@ type Props = {
     }
   }
   values?: InitialBoardState
-  setValues?: Dispatch<SetStateAction<InitialBoardState>>
+  setValues?: Dispatch<SetStateAction<InitialBoardState>> | Dispatch<InitialBoardState>
 }
 
 export const SingleCard: React.FC<Props> = ({ card, values, setValues }) => {
