@@ -1,11 +1,13 @@
 import { Redis } from "ioredis"
 import { Socket } from "socket.io-client"
-import { Player } from "../@types/game"
+import { Board, Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
+import { initialState } from "../utils/game/state"
+import { redisHandsInit, redisTrashInit } from "./redis/gameProcess"
 
 /**
  * CPU対戦におけるサーバー側の処理
@@ -43,6 +45,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const yourName = typeof query?.me === 'string' ? query.me : PVE_UNREGISTERED_NAMES // Using nickname if you LoggedIn
         const users = [yourName, ...PVE_COM_USER_NAMES]
         const userData:Player[] = []
+        let myHands:Board['hands'] = []
+        const otherHands: Board['otherHands'] = []
 
         for (let i = 0; i < users.length; i += 1) {
           const isCom = PVE_COM_USER_NAMES.includes(users[i])
@@ -51,9 +55,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           // Hands initialize
           const nameKey = isCom ? users[i] : 'me'
           const userHandsKey = `pve:${query.pveKey}:user:${nameKey}:hands`
-          adapterPubClient.del(userHandsKey) // eslint-disable-line no-await-in-loop
-          const hands = await adapterPubClient.spop(deckKey, 5) // eslint-disable-line no-await-in-loop
-          adapterPubClient.sadd(userHandsKey, hands)
+          const hands = await redisHandsInit(adapterPubClient, deckKey, userHandsKey)
+          isCom ? otherHands.push({ userId: 0, hands }) : myHands = hands
 
           // Score update
           let score = 0
@@ -69,12 +72,29 @@ const cpuModeHandler = (io: Socket, socket: any) => {
 
           userData.push({ id: 0, nickname: users[i], turn: i + 1, score, isWinner: false, isLoser: false, mode: (typeof mode === 'string' && isCpuLevelValue(mode)) ? mode : undefined })
         }
+
+        // Trash initialize
+        const trashKey = `pve:${query.pveKey}:trash`
+        const initialTrash = await redisTrashInit(adapterPubClient, deckKey, trashKey)
+        const deckCount = await adapterPubClient.scard(deckKey)
+
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             board: {
-              users: userData
+              users: userData,
+              hands: myHands,
+              otherHands,
+              turn: 1,
+              deckCount,
+              trash: {
+                card: initialTrash,
+                user: initialState.game.board.trash.user,
+              },
+              effect: initialState.game.board.effect,
+              bonusCards: initialState.game.board.bonusCards,
             },
-            status: 'playing'
+            status: 'playing',
+            result: initialState.game.result,
           }
         }
         socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
