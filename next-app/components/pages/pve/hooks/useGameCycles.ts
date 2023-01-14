@@ -27,7 +27,7 @@ const useGameCycles = () => {
             const newState = useUpdateStateFn(state, { wsClient: client })
             if (newState) {
               dispatch({...newState})
-              handleEmit(client, { event: 'prepare', query: router.query })
+              handleEmit(client, { event: 'prepare', gameId: 1, query: router.query })
             }
             console.log('status undefined end...')
           }
