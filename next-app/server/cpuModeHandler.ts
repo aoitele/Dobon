@@ -49,7 +49,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           const mode = isCom ? query?.[users[i]] : undefined
 
           // Hands initialize
-          const nameKey = isCom ? users[i] : encodeURIComponent(yourName) // encode for MultiByte char
+          const nameKey = isCom ? users[i] : 'me'
           const userHandsKey = `pve:${query.pveKey}:user:${nameKey}:hands`
           adapterPubClient.del(userHandsKey) // eslint-disable-line no-await-in-loop
           const hands = await adapterPubClient.spop(deckKey, 5) // eslint-disable-line no-await-in-loop
