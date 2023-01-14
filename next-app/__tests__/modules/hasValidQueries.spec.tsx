@@ -1,19 +1,19 @@
-import { hasValidQueries, HasValidQueriesProps as Props } from '../../utils/function/hasValidQueries'
+import { hasValidQueries, HasValidQueriesArgs as Args } from '../../utils/function/hasValidQueries'
 
-const QUERY_EMPTY: Props['query']                              = {}
-const QUERY_ONE_VALUE: Props['query']                          = { name: 'suzuki' }
-const QUERY_ONE_VALUE_AGE: Props['query']                      = { age: '20' }
-const QUERY_ONE_VALUE_ARRAY: Props['query']                    = { name: ['suzuki', 'tanaka'] }
-const QUERY_MULTI_VALUE: Props['query']                        = { name: 'suzuki', age: '20' }
+const QUERY_EMPTY: Args['query']                              = {}
+const QUERY_ONE_VALUE: Args['query']                          = { name: 'suzuki' }
+const QUERY_ONE_VALUE_AGE: Args['query']                      = { age: '20' }
+const QUERY_ONE_VALUE_ARRAY: Args['query']                    = { name: ['suzuki', 'tanaka'] }
+const QUERY_MULTI_VALUE: Args['query']                        = { name: 'suzuki', age: '20' }
 
-const TARGET_EMPTY: Props['target']                            = []
-const TARGET_ONE: Props['target']                              = [{ key: 'name', forceString: true }]
-const TARGET_ONE_SPECIFY: Props['target']                      = [{ key: 'name', forceString: true, specifyValue: 'suzuki' }]
-const TARGET_ONE_SPECIFY_ARRAY: Props['target']                = [{ key: 'name', forceString: false, specifyValue: ['suzuki', 'tanaka'] }]
-const TARGET_ONE_SPECIFY_ARRAY_INCORRECT_NAME: Props['target'] = [{ key: 'name', forceString: false, specifyValue: ['suzuki', 'tana'] }]
-const TARGET_ONE_SPECIFY_INCORRECT_NAME: Props['target']       = [{ key: 'name', forceString: true, specifyValue: 'suzu' }]
-const TARGET_MULTI: Props['target']                            = [{ key: 'name', forceString: true }, { key: 'age', forceString: true }]
-const TARGET_MULTI_NAME_VALUE_ARRAY: Props['target']           = [{ key: 'name', forceString: false }, { key: 'age', forceString: true }]
+const TARGET_EMPTY: Args['target']                            = []
+const TARGET_ONE: Args['target']                              = [{ key: 'name', forceString: true }]
+const TARGET_ONE_SPECIFY: Args['target']                      = [{ key: 'name', forceString: true, specifyValue: 'suzuki' }]
+const TARGET_ONE_SPECIFY_ARRAY: Args['target']                = [{ key: 'name', forceString: false, specifyValue: ['suzuki', 'tanaka'] }]
+const TARGET_ONE_SPECIFY_ARRAY_INCORRECT_NAME: Args['target'] = [{ key: 'name', forceString: false, specifyValue: ['suzuki', 'tana'] }]
+const TARGET_ONE_SPECIFY_INCORRECT_NAME: Args['target']       = [{ key: 'name', forceString: true, specifyValue: 'suzu' }]
+const TARGET_MULTI: Args['target']                            = [{ key: 'name', forceString: true }, { key: 'age', forceString: true }]
+const TARGET_MULTI_NAME_VALUE_ARRAY: Args['target']           = [{ key: 'name', forceString: false }, { key: 'age', forceString: true }]
 
 describe('unit: hasValidQueries TestCases', () => {
   describe.each`

@@ -2,6 +2,7 @@ import { Redis } from "ioredis"
 import { Socket } from "socket.io-client"
 import { Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
+import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 
@@ -15,15 +16,20 @@ const cpuModeHandler = (io: Socket, socket: any) => {
   socket.on('emit', async (payload: EmitForPVE) => {
     console.log(payload, 'payload')
     console.log(socket.id, 'socket.id')
-    const { event, query } = payload
+    const { event } = payload
+    const payloadQuery = payload.query
     console.log(event, 'event')
-    console.log(query, 'query')
+    console.log(payloadQuery, 'payloadQuery')
+
     switch (event) {
       /**
        * ゲーム開始時の処理
        * nextGameでgame.idが切り替わる時もここから処理が行われる
        */
       case 'prepare': {
+        const hasValidQueriesArgs: HasValidQueriesArgs = { query: payloadQuery, target: [{ key: 'pveKey', forceString: true }] }
+        if (!hasValidQueries(hasValidQueriesArgs)) return {} // queryを検証
+        const { query } = hasValidQueriesArgs
         const deckKey = `pve:${socket.id}:deck`
         await adapterPubClient.sunionstore(deckKey, 'deck') // Redis copy deck for pve
         const comUsers = ['com1', 'com2', 'com3']

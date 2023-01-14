@@ -1,21 +1,25 @@
 import { ParsedUrlQuery } from 'querystring'
 
-export interface HasValidQueriesProps {
-  query: ParsedUrlQuery
+export interface HasValidQueriesArgs {
+  query?: ParsedUrlQuery
   target: {
     key: string
     forceString: boolean
     specifyValue?: string | string[]
   }[]
 }
+
 /**
  * @param query queryデータ
  * @param target.key 調べるキー名
  * @param target.forceString 同keyで複数値がきた時はstring配列になるためstringで強制するか
  * @param target.specifyValue 特定の値かどうかチェックする場合に指定
  */
-const hasValidQueries = ({ query, target }: HasValidQueriesProps) => {
-  const queryKeys = Object.keys(query)
+const hasValidQueries = (args: HasValidQueriesArgs): args is Required<HasValidQueriesArgs> => {
+  const { query, target } = args
+  const queryKeys = Object.keys(query ?? {})
+
+  if (typeof query === 'undefined') return false
   if (queryKeys.length === 0) return false
   if (target.length === 0) return false
 
