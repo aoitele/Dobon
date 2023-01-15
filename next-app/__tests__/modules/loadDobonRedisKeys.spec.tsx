@@ -11,10 +11,10 @@ const REQ_HANDS:ReqS    = { mode: 'pve', type: 'hands', firstKey: 'key-1', secon
 const REQ_DECK_PVP:ReqF = { mode: 'pvp', type: 'deck', firstKey: 'key-1' }
 const REQ_USER_PVP:ReqS = { mode: 'pvp', type: 'user', firstKey: 'key-1', secondKey: 'key-2' }
 
-const EXPECTED_DECK = 'pve:key-1:deck'
-const EXPECTED_TRASH = 'pve:key-1:trash'
-const EXPECTED_USER = 'pve:key-1:user:key-2'
-const EXPECTED_HANDS = 'pve:key-1:user:key-2:hands'
+const EXPECTED_DECK     = 'pve:key-1:deck'
+const EXPECTED_TRASH    = 'pve:key-1:trash'
+const EXPECTED_USER     = 'pve:key-1:user:key-2'
+const EXPECTED_HANDS    = 'pve:key-1:user:key-2:hands'
 const EXPECTED_DECK_PVP = 'pvp:key-1:deck'
 const EXPECTED_USER_PVP = 'pvp:key-1:user:key-2'
 
