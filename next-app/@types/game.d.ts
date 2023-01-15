@@ -23,6 +23,7 @@ export type Game = {
   event: ModalEffect
   board: Board
   result: GameResult
+  setCount?: number | null
 }
 
 export type Player = {

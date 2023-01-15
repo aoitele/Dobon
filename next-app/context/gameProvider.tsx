@@ -17,6 +17,7 @@ const gameInitialState: GameProviderState = {
   userId: null,
   game: {
     id: null,
+    setCount: null,
     status: undefined,
     event: {
       user: { nickname:'', turn:0 },
@@ -44,7 +45,7 @@ const gameInitialState: GameProviderState = {
       allowDobon: true,
       bonusCards: []
     },
-    result: {}
+    result: {},
   },
   connected: false,
   wsClient: null

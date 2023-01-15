@@ -1,0 +1,13 @@
+.wrap {
+  display: flex;
+  justify-content: center;
+  .slides {
+    display: flex;
+    max-width: 100%;
+    margin: 20px 0px;
+    padding: 8px;
+    z-index: 1500;
+    overflow-x: scroll;
+    text-align: center;
+  }
+}

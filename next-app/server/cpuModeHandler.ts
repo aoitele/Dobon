@@ -33,7 +33,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
       case 'prepare': {
         const hasValidQueriesArgs: HasValidQueriesArgs = {
           query: payloadQuery,
-          target: [{ key: 'pveKey', forceString: true }]
+          target: [{ key: 'pveKey', forceString: true }, { key: 'setCount', forceString: true }]
         }
         if (!hasValidQueries(hasValidQueriesArgs)) return {} // queryを検証
         if (typeof gameId !== 'number') return {} // gameIdを検証
@@ -106,7 +106,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             },
             status: 'playing',
             result: initialState.game.result,
-          }
+            setCount: typeof query.setCount === 'string' ? Number(query.setCount) : null
+          },
         }
         socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
         break

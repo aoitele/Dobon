@@ -3,4 +3,70 @@
   background-image:  url(/images/game/backGround/bg1.png);
   background-repeat: repeat;
   position: relative;
+  .hint{
+    text-align: center;
+    position: fixed;
+    bottom: 3px;
+    right: 10px;
+    background-color:burlywood;
+    border-radius: 5px;
+    animation: light .8s infinite alternate ease-in-out;
+    .hintTxt {
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+  }
+  .myInfo {
+    display: flex;
+    justify-content: center;
+  }
+  .actionBtnWrap {
+    display: flex;
+    justify-content: space-evenly;
+    text-align: center;
+    width: 100%;
+    height: 80px;
+    align-items: center;
+    position: fixed;
+    bottom: 15px;
+    z-index: 2100;
+  }
+  .stateResetArea {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.2;
+    transition: 0.6s ease-in-out;
+  }
+  .bg_black {
+    z-index: 2000;
+    background: black;
+  }
+  .bg_transparent {
+    background: transparent;
+  }
+}
+
+.modalBack {
+  position: absolute;
+  z-index: 2500;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0.2;
+  transition: 0.6s ease-in-out;
+}
+
+@keyframes light {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.6;
+  }
 }
