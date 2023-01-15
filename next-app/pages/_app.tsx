@@ -4,7 +4,7 @@ import '../styles/scss/foundation/reset.scss'
 import type { AppProps } from 'next/app'
 import { AuthProvider } from '../context/authProvider'
 import dynamic from 'next/dynamic'
-import { GameProvider } from '../context/gameProvider'
+import { GameProvider } from '../context/GameProvider'
 
 const ErrorPage = dynamic(() => import('./_error'))
 

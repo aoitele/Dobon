@@ -1,5 +1,5 @@
 import { Dispatch } from "react"
-import { GameProviderState } from "../../../../context/gameProvider"
+import { GameProviderState } from "../../../../context/GameProvider"
 import { gameInitialState } from "../../../../utils/game/roomStateReducer"
 import { useUpdateStateFn } from "../../../../utils/game/state"
 import { resSocketClient, SocketClient } from "../../../../utils/socket/client"

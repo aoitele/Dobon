@@ -1,5 +1,5 @@
 import React, { FC, useContext } from "react"
-import { GameStateContext } from "../../../../context/gameProvider"
+import { GameStateContext } from "../../../../context/GameProvider"
 import styles from './Board.module.scss'
 import { ActionsContainer } from "./container/ActionsContainer"
 import { BoardInfoContainer } from "./container/BoardInfoContainer"

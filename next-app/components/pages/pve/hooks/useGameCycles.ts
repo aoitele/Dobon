@@ -3,7 +3,7 @@
  */
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
-import { GameDispathContext, GameStateContext } from '../../../../context/gameProvider'
+import { GameDispathContext, GameStateContext } from '../../../../context/GameProvider'
 import { useUpdateStateFn } from '../../../../utils/game/state'
 import { handleEmit } from '../../../../utils/socket/emit'
 import { establishWsForPve } from '../utils/webSocket'

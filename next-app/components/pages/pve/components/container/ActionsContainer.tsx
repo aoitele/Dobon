@@ -1,6 +1,6 @@
 import React, { FC, useContext } from "react"
-import { BoardDispathContext, BoardStateContext } from "../../../../../context/boardProver"
-import { GameStateContext } from "../../../../../context/gameProvider"
+import { BoardDispathContext, BoardStateContext } from "../../../../../context/BoardProvider"
+import { GameStateContext } from "../../../../../context/GameProvider"
 import ActionBtn from "../modules/ActionBtn"
 import SelectSuit from "../../../../game/SelectSuit"
 import styles from './ActionsContainer.module.scss'

@@ -3,7 +3,7 @@ import { Board } from "../../../../../@types/game"
 import styles from './HandsContainer.module.scss'
 import spreadCardState from "../../../../../utils/game/spreadCardState"
 import Hands from "../../../../game/Hands"
-import { BoardDispathContext, BoardStateContext } from "../../../../../context/boardProver"
+import { BoardDispathContext, BoardStateContext } from "../../../../../context/BoardProvider"
 import { putOut } from "../../utils/putOut"
 
 interface Props {
