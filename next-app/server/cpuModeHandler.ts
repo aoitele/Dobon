@@ -8,6 +8,7 @@ import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 import { initialState } from "../utils/game/state"
 import { redisHandsInit, redisTrashInit } from "./redis/gameProcess"
+import { loadDobonRedisKeys } from "./redis/loadDobonRedisKeys"
 
 /**
  * CPU対戦におけるサーバー側の処理
@@ -40,8 +41,16 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const { query } = hasValidQueriesArgs
         const isFirstGame = gameId === 1
 
-        const deckKey = `pve:${query.pveKey}:deck`
+        const loadRedisKey = loadDobonRedisKeys([
+          {mode:'pve', type: 'deck', firstKey: `${query.pveKey}`},
+          {mode:'pve', type: 'trash', firstKey: `${query.pveKey}`}
+        ])
+        const deckKey = loadRedisKey[0]
+        const trashKey = loadRedisKey[1]
+
+        // deck initialize
         await adapterPubClient.sunionstore(deckKey, 'deck') // Redis copy deck for pve
+
         const yourName = typeof query?.me === 'string' ? query.me : PVE_UNREGISTERED_NAMES // Using nickname if you LoggedIn
         const users = [yourName, ...PVE_COM_USER_NAMES]
         const userData:Player[] = []
@@ -53,18 +62,21 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           const mode = isCom ? query?.[users[i]] : undefined
 
           // Hands initialize
-          const nameKey = isCom ? users[i] : 'me'
-          const userHandsKey = `pve:${query.pveKey}:user:${nameKey}:hands`
-          const hands = await redisHandsInit(adapterPubClient, deckKey, userHandsKey)
+          const nickname = isCom ? users[i] : 'me'
+          const redisKeys = loadDobonRedisKeys([
+            {mode:'pve', type: 'hands', firstKey: `${query.pveKey}`, secondKey: nickname},
+            {mode:'pve', type: 'user', firstKey: `${query.pveKey}`, secondKey: nickname},
+          ])
+
+          const hands = await redisHandsInit(adapterPubClient, deckKey, redisKeys[0])
           isCom ? otherHands.push({ userId: 0, hands }) : myHands = hands
 
           // Score update
           let score = 0
-          const userKey = `pve:${query.pveKey}:user:${nameKey}`
           if (isFirstGame) {
-            adapterPubClient.hset(userKey, 'score', score)
+            adapterPubClient.hset(redisKeys[1], 'score', score)
           } else {
-            const latestScore = await adapterPubClient.hget(userKey, 'score') // eslint-disable-line no-await-in-loop
+            const latestScore = await adapterPubClient.hget(redisKeys[1], 'score') // eslint-disable-line no-await-in-loop
             if (latestScore) {
               score = Number(latestScore)
             }
@@ -74,7 +86,6 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         }
 
         // Trash initialize
-        const trashKey = `pve:${query.pveKey}:trash`
         const initialTrash = await redisTrashInit(adapterPubClient, deckKey, trashKey)
         const deckCount = await adapterPubClient.scard(deckKey)
 
