@@ -1,7 +1,7 @@
-import React, { createContext, Dispatch, FC, ReactNode, useState } from "react"
+import React, { createContext, Dispatch, FC, ReactNode, SetStateAction, useState } from "react"
 import { InitialBoardState } from "../@types/game"
 
-export type BoardProviderDispatch = Dispatch<InitialBoardState> | undefined
+export type BoardProviderDispatch = Dispatch<SetStateAction<InitialBoardState>> | undefined
 
 const initialState: InitialBoardState = {
   selectedCard: '',

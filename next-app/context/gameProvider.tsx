@@ -1,4 +1,4 @@
-import React, { createContext, Dispatch, FC, ReactNode, useState } from "react"
+import React, { createContext, Dispatch, FC, ReactNode, SetStateAction, useState } from "react"
 import { Game } from "../@types/game"
 import { SocketClient } from "../utils/socket/client"
 
@@ -10,7 +10,7 @@ export type GameProviderState = {
   wsClient: SocketClient | null
 }
 
-export type GameProviderDispatch = Dispatch<GameProviderState> | undefined
+export type GameProviderDispatch = Dispatch<SetStateAction<GameProviderState>> | undefined
 
 const gameInitialState: GameProviderState = {
   roomId: null,

@@ -1,10 +1,11 @@
 import React, { FC, useContext } from "react"
 import { GameStateContext } from "../../../../context/gameProvider"
 import styles from './Board.module.scss'
-import { BoardInfoContainer } from "./modules/BoardInfoContainer"
-import { HandsContainer } from "./modules/HandsContainer"
-import { RoomInfoContainer } from "./modules/RoomInfoContainer"
-import { UserInfoContainer } from "./modules/UserInfoContainer"
+import { ActionsContainer } from "./container/ActionsContainer"
+import { BoardInfoContainer } from "./container/BoardInfoContainer"
+import { HandsContainer } from "./container/HandsContainer"
+import { RoomInfoContainer } from "./container/RoomInfoContainer"
+import { UserInfoContainer } from "./container/UserInfoContainer"
 
 const Board:FC = () => {
   const { game } = useContext(GameStateContext)
@@ -15,6 +16,7 @@ const Board:FC = () => {
       <UserInfoContainer board={game.board}/>
       <BoardInfoContainer board={game.board}/>
       <HandsContainer board={game.board}/>
+      <ActionsContainer />
     </div>
   )
 }
