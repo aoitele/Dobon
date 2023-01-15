@@ -1,12 +1,10 @@
 import React, { FC, useContext } from "react"
 import { BoardDispathContext, BoardStateContext } from "../../../../../context/BoardProvider"
-import { GameStateContext } from "../../../../../context/GameProvider"
 import ActionBtn from "../modules/ActionBtn"
 import SelectSuit from "../../../../game/SelectSuit"
 import styles from './ActionsContainer.module.scss'
 
 const ActionsContainer:FC = () => {
-  const gameState = useContext(GameStateContext)
   const boardState = useContext(BoardStateContext)
   const boardDispatch = useContext(BoardDispathContext)
 
