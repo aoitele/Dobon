@@ -3,7 +3,7 @@ import { Board, Action } from '../../@types/game'
 import { HandCards } from '../../@types/card'
 import { useUpdateStateFn } from './state'
 import { gameInitialState, Action as StateAction } from './roomStateReducer'
-import { AuthState } from '../../context/authProvider'
+import { AuthState } from '../../context/AuthProvider'
 import hasProperty from '../function/hasProperty'
 import { extractPutableSuitStr } from './effect'
 

@@ -4,7 +4,7 @@ import { Game } from '../../@types/game'
 import { HandleEmitFn } from '../../@types/socket'
 import { RoomAPIResponse } from '../../@types/api/roomAPI'
 import Link from 'next/link'
-import { AuthState } from '../../context/authProvider'
+import { AuthState } from '../../context/AuthProvider'
 import { DOBON_ROOM_STATUS_WAITING } from '../../constant'
 
 interface Props {

@@ -1,6 +1,6 @@
 // Context関連のモックデータを返す
 import { authStateMockInit, userNotLogedIn, userLogedIn } from './authUser'
-import { authUserInitialState } from '../../../context/authProvider'
+import { authUserInitialState } from '../../../context/AuthProvider'
 
 type AuthStateMockRequest = 
 'authStateMockInit' |

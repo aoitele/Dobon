@@ -4,7 +4,7 @@
  * isLoggedIn          - 確定(ログイン)かどうか
  * isNotLoggedIn       - 確定(非ログイン)かどうか
  */
-import { AuthState } from '../../context/authProvider'
+import { AuthState } from '../../context/AuthProvider'
 
 const isAuthUserFetching = (authUser: AuthState['authUser']): authUser is undefined =>
   typeof authUser === 'undefined'

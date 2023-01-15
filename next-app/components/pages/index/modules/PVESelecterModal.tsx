@@ -2,7 +2,7 @@ import React, { useState, Dispatch, FC, SetStateAction, useContext } from 'react
 import { initialState, TopPageState } from '../index'
 import styles from './PVESelecterModal.module.scss'
 import { useRouter } from 'next/router'
-import { AuthStateContext } from '../../../../context/authProvider'
+import { AuthStateContext } from '../../../../context/AuthProvider'
 import { isLoggedIn } from '../../../../utils/auth/authState'
 import { CPULevel, CPUName } from '../../../../@types/game'
 import { isCpuLevelValue } from '../../../../utils/game/cpu/utils/isCPULevelValue'

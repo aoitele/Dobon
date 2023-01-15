@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { RoomAPIResponse } from '../../../@types/api/roomAPI'
 import { Emit, HandleEmitFn } from '../../../@types/socket'
-import { AuthState } from '../../../context/authProvider'
+import { AuthState } from '../../../context/AuthProvider'
 import { gameInitialState } from '../../../utils/game/roomStateReducer'
 import styles from './index.module.scss'
 import UserScore from './UserScore'

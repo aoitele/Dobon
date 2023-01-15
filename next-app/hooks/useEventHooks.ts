@@ -7,7 +7,7 @@
 import { useEffect, Dispatch } from 'react'
 import { HandleEmitFn, Emit, Event } from '../@types/socket'
 import { gameInitialState, Action, reducerPayloadSpecify } from '../utils/game/roomStateReducer'
-import { AuthState } from '../context/authProvider'
+import { AuthState } from '../context/AuthProvider'
 import { RoomAPIResponse } from '../@types/api/roomAPI'
 import { useUpdateStateFn } from '../utils/game/state'
 import { updateHandsFn } from '../utils/game/checkHand'

@@ -2,7 +2,7 @@
  * Context関連のユーザーパターン定義 (テスト用)
  */
 import deepcopy from 'deepcopy';
-import { AuthState } from "../../../context/authProvider";
+import { AuthState } from "../../../context/AuthProvider";
 
 /**
 * authUserのデータパターン　

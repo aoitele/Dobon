@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import axiosInstance from '../../utils/api/axiosInstance'
-import { AuthStateContext } from '../../context/authProvider'
+import { AuthStateContext } from '../../context/AuthProvider'
 import { RoomCreateForm, RoomCreateResponse } from '../../@types/api/roomAPI'
 import { useForm } from 'react-hook-form';
 

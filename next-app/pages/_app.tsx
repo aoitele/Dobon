@@ -2,7 +2,7 @@ import React from 'react'
 import '../styles/globals.css'
 import '../styles/scss/foundation/reset.scss'
 import type { AppProps } from 'next/app'
-import { AuthProvider } from '../context/authProvider'
+import { AuthProvider } from '../context/AuthProvider'
 import dynamic from 'next/dynamic'
 import { GameProvider } from '../context/GameProvider'
 

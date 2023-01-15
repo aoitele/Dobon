@@ -1,6 +1,6 @@
 import { Dispatch } from 'react'
 import { updateMyHandsStatus } from "./checkHand"
-import { AuthState } from '../../context/authProvider'
+import { AuthState } from '../../context/AuthProvider'
 import hasProperty from '../function/hasProperty'
 import { gameInitialState,Action } from "./roomStateReducer"
 import { Emit, HandleEmitFn } from '../../@types/socket'
