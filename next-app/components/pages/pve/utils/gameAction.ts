@@ -10,13 +10,16 @@ class GameAction {
     this._state = null
     this._dispatch = dispatch
   }
-  static draw() {
+  draw() {
     console.log('draw')
   }
-  static skip() {
+  deckSet() {
+    console.log('deckSet')
+  }
+  skip() {
     console.log('skip')
   }
-  static dobon() {
+  dobon() {
     console.log('dobon')
   }
 }
