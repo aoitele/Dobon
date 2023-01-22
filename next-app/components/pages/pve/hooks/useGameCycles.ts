@@ -10,11 +10,7 @@ import { handleEmit } from '../../../../utils/socket/emit'
 import { establishWsForPve } from '../utils/webSocket'
 
 const useGameCycles = () => {
-  const gameState = useContext(GameStateContext)
-  const boardState = useContext(BoardStateContext)
-  const gameDispatch = useContext(GameDispathContext)
-  const boardDispatch = useContext(BoardDispathContext)
-
+  const [gameState, boardState, gameDispatch, boardDispatch] = [useContext(GameStateContext), useContext(BoardStateContext), useContext(GameDispathContext), useContext(BoardDispathContext)]
   const router = useRouter()
 
   useEffect(() => {

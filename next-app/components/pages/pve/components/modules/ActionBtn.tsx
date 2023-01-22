@@ -18,12 +18,11 @@ interface BtnStateProps {
 }
 
 const ActionBtn: FC<Props> = ({ type }) => {
-  const gameState = useContext(GameStateContext)
-  const boardState = useContext(BoardStateContext)
-  const dispatch = useContext(GameDispathContext)
-  if (!dispatch) return <></>
+  const [gameState, boardState, gameDispatch] = [useContext(GameStateContext), useContext(BoardStateContext), useContext(GameDispathContext)]
 
-  const action = new GameAction(dispatch)
+  if (!gameDispatch) return <></>
+
+  const action = new GameAction(gameDispatch)
   console.log(action, 'action')
 
   const props: BtnStateProps = { gameState, boardState, type }

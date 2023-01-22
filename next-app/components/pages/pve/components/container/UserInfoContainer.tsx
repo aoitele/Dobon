@@ -1,13 +1,11 @@
-import React, { FC } from "react"
-import { Board } from "../../../../../@types/game"
+import React, { FC, useContext } from "react"
+import { GameStateContext } from "../../../../../context/GameProvider"
 import UserInfo from "../../../../game/UserInfo"
 import styles from './UserInfoContainer.module.scss'
 
-interface Props {
-  board: Board
-}
+const UserInfoContainer:FC = () => {
+  const { board } = useContext(GameStateContext).game
 
-const UserInfoContainer:FC<Props> = ({ board }) => {
   const turnUser = board.users.filter(user => user.turn === board.turn)[0]
 
   return (

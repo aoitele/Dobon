@@ -5,10 +5,8 @@ import SelectSuit from "../../../../game/SelectSuit"
 import styles from './ActionsContainer.module.scss'
 
 const ActionsContainer:FC = () => {
-  const boardState = useContext(BoardStateContext)
-  const boardDispatch = useContext(BoardDispathContext)
-
-  if(!boardDispatch) return <></>
+  const [boardState, boardDispatch] = [useContext(BoardStateContext), useContext(BoardDispathContext)]
+  if (!boardDispatch) return <></>
   
   return (
     <div className={styles.wrap}>

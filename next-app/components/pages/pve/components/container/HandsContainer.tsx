@@ -1,19 +1,15 @@
 import React, { FC, useContext } from "react"
-import { Board } from "../../../../../@types/game"
 import styles from './HandsContainer.module.scss'
 import spreadCardState from "../../../../../utils/game/spreadCardState"
 import Hands from "../../../../game/Hands"
 import { BoardDispathContext, BoardStateContext } from "../../../../../context/BoardProvider"
 import { putOut } from "../../utils/putOut"
+import { GameDispathContext, GameStateContext } from "../../../../../context/GameProvider"
 
-interface Props {
-  board: Board
-}
-
-const HandsContainer:FC<Props> = ({ board }) => {
-  const state = useContext(BoardStateContext)
-  const dispatch = useContext(BoardDispathContext)
-  if (!dispatch) return <></>
+const HandsContainer:FC = () => {
+  const [gameState, boardState, gameDispatch, boardDispatch] = [useContext(GameStateContext), useContext(BoardStateContext), useContext(GameDispathContext), useContext(BoardDispathContext)]
+  if (!boardDispatch || !gameDispatch) return <></>
+  const { board } = gameState.game
 
   return (
     <div className={styles.wrap}>
@@ -23,9 +19,9 @@ const HandsContainer:FC<Props> = ({ board }) => {
             key={`${card.num}${card.suit}`}
             states={{
               card,
-              values: state
+              values: boardState
             }}
-            functions={{putOut, setValues: dispatch}}
+            functions={{putOut, setValues: boardDispatch}}
           />
         )}
       </div>

@@ -1,15 +1,12 @@
-import React, { FC } from "react"
-import { Board } from "../../../../../@types/game"
+import React, { FC, useContext } from "react"
 import spreadCardState from "../../../../../utils/game/spreadCardState"
 import { SingleCard } from "../../../../game/SingleCard"
 import styles from './BoardInfoContainer.module.scss'
 import Image from 'next/image'
+import { GameStateContext } from "../../../../../context/GameProvider"
 
-interface Props {
-  board: Board
-}
-
-const BoardInfoContainer:FC<Props> = ({ board }) => {
+const BoardInfoContainer:FC = () => {
+  const { board } = useContext(GameStateContext).game
   const turnUser = board.users.filter(user => user.turn === board.turn)[0]
 
   return (
