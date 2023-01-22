@@ -5,6 +5,7 @@ import type { AppProps } from 'next/app'
 import { AuthProvider } from '../context/AuthProvider'
 import dynamic from 'next/dynamic'
 import { GameProvider } from '../context/GameProvider'
+import { BoardProvider } from '../context/BoardProvider'
 
 const ErrorPage = dynamic(() => import('./_error'))
 
@@ -14,7 +15,9 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
     <AuthProvider>
       <GameProvider>
-        <Component {...pageProps} />
+        <BoardProvider>
+          <Component {...pageProps} />
+        </BoardProvider>
       </GameProvider>
     </AuthProvider>
   )

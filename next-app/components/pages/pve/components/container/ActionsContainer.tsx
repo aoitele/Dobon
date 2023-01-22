@@ -18,8 +18,8 @@ const ActionsContainer:FC = () => {
           setValues={boardDispatch}
           />
       : <div className={styles.actionBtnWrap}>
-          <ActionBtn/>
-          <ActionBtn/>
+          <ActionBtn type='action' />
+          <ActionBtn type='dobon' />
         </div>
       }
     </div>

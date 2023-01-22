@@ -1,0 +1,34 @@
+.btn {
+  width: 45%;
+  height: 60%;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 0 #aaaaaa;
+  transition: 0.3s;
+  font-weight: bold;
+}
+
+.action {
+  @extend .btn;
+  background-color: lightgreen;
+}
+.dobon {
+  @extend .btn;
+  background-color: orange;
+}
+.skip {
+  @extend .btn;
+  background-color:lightsalmon;
+}
+.draw {
+  @extend .btn;
+  background-color:lightgreen;
+}
+.active {
+  @extend .btn;
+  background-color:lawngreen;
+}
+.disabled {
+  @extend .btn;
+  background-color: gray;
+}
