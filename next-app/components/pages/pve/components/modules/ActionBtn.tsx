@@ -16,7 +16,7 @@ const ActionBtn: FC<Props> = ({ type }) => {
 
   if (!gameDispatch) return <></>
 
-  const Action = new GameAction(gameDispatch)
+  const Action = new GameAction(gameState.wsClient, gameDispatch)
   console.log(Action, 'Action')
   const btnType = checkActionBtnType({ gameState, boardState, type })
 

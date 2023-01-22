@@ -1,5 +1,5 @@
 import { io, Socket } from 'socket.io-client'
-import { Emit } from '../../@types/socket'
+import { Emit, EmitForPVE } from '../../@types/socket'
 
 class SocketClient {
   _socket: Socket | null
@@ -23,7 +23,7 @@ class SocketClient {
     })
   }
 
-  emit(data: Emit): Promise<any> {
+  emit(data: Emit | EmitForPVE): Promise<any> {
     if (!this._socket) return Promise.reject(new Error('WS is not established'))
     return Promise.resolve(this._socket.emit('emit', data))
   }

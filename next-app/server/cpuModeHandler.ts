@@ -112,6 +112,36 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
         break
       }
+      case 'draw': {
+        const hasValidQueriesArgs: HasValidQueriesArgs = {
+          query: payloadQuery,
+          target: [{ key: 'pveKey', forceString: true }]
+        }
+        if (!hasValidQueries(hasValidQueriesArgs)) return {} // queryを検証
+
+        const { query } = hasValidQueriesArgs
+
+        const loadRedisKey = loadDobonRedisKeys([
+          {mode:'pve', type: 'deck', firstKey: `${query.pveKey}`},
+          {mode:'pve', type: 'hands', firstKey: `${query.pveKey}`, secondKey: 'me' },
+        ])
+        const deckKey = loadRedisKey[0]
+        const handsKey = loadRedisKey[1]
+        const newCard = await adapterPubClient.spop(deckKey, 1)
+        await adapterPubClient.sadd(handsKey, newCard)
+        const hands = await adapterPubClient.smembers(handsKey)
+
+        // 手札を更新
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              hands
+            }
+          }
+        }
+        socket.emit('updateStateSpecify', reducerPayload)
+        break
+      }
       default: return {}
     }
     return {}

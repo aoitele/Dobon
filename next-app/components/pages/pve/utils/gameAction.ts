@@ -1,18 +1,21 @@
 import { Dispatch, SetStateAction } from "react"
 import { InitialBoardState } from "../../../../@types/game"
 import { GameProviderState } from "../../../../context/GameProvider"
+import { handleEmit } from "../../../../utils/socket/emit"
 
 class GameAction {
+  _wsClient: GameProviderState['wsClient']
   _state: InitialBoardState | null
   _dispatch: Dispatch<SetStateAction<GameProviderState>>
 
-  constructor(dispatch: Dispatch<SetStateAction<GameProviderState>>) {
+  constructor(wsClient: GameProviderState['wsClient'], dispatch: Dispatch<SetStateAction<GameProviderState>>) {
+    this._wsClient = wsClient
     this._state = null
     this._dispatch = dispatch
   }
   draw() {
     console.log('draw')
-    this._dispatch(prevState => prevState)
+    handleEmit(this._wsClient, { event:'draw' })
   }
   deckSet() {
     console.log('deckSet')
