@@ -1,19 +1,17 @@
-import { Dispatch } from "react"
+import { Dispatch, SetStateAction } from "react"
 import { GameProviderState } from "../../../../context/GameProvider"
-import { gameInitialState } from "../../../../utils/game/roomStateReducer"
 import { useUpdateStateFn } from "../../../../utils/game/state"
 import { resSocketClient, SocketClient } from "../../../../utils/socket/client"
 
 interface Props {
-  state: gameInitialState
-  dispatch: Dispatch<GameProviderState>
+  dispatch: Dispatch<SetStateAction<GameProviderState>>
 }
 
 interface EstablishWsForPveResponse {
   client: SocketClient | null
 }
 
-const establishWsForPve = async({state, dispatch}: Props) => {
+const establishWsForPve = async({ dispatch }: Props) => {
   const response: EstablishWsForPveResponse = { client: null }
   const wsClient = await resSocketClient()
 
@@ -31,10 +29,7 @@ const establishWsForPve = async({state, dispatch}: Props) => {
     })
 
     wsClient._socket.on('updateStateSpecify', (data) => {
-      const newState = useUpdateStateFn(state, data)
-      if (newState) {
-        dispatch({...newState})
-      }
+      dispatch(prevState => ({ ...useUpdateStateFn(prevState, data) }))
     })
     response.client = wsClient
   }

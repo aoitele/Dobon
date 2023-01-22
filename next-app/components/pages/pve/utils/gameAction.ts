@@ -12,15 +12,19 @@ class GameAction {
   }
   draw() {
     console.log('draw')
+    this._dispatch(prevState => prevState)
   }
   deckSet() {
     console.log('deckSet')
+    this._dispatch(prevState => prevState)
   }
   skip() {
     console.log('skip')
+    this._dispatch(prevState => prevState)
   }
   dobon() {
     console.log('dobon')
+    this._dispatch(prevState => prevState)
   }
 }
 
