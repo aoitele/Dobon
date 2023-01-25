@@ -1,9 +1,9 @@
 import { Dispatch, SetStateAction } from "react"
-import { InitialBoardState } from "../../../../@types/game"
 import { BoardProviderState } from "../../../../context/BoardProvider"
 import { GameProviderState } from "../../../../context/GameProvider"
 import { handleEmit } from "../../../../utils/socket/emit"
 
+/* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
 class GameAction {
   constructor(
     private wsClient: GameProviderState['wsClient'],
@@ -29,5 +29,6 @@ class GameAction {
     this.gameDispatch(prevState => prevState)
   }
 }
+/* eslint-enable no-unused-vars, no-useless-constructor, no-empty-function */
 
 export { GameAction }
