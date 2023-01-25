@@ -1,5 +1,5 @@
 import React, { FC, useContext } from 'react'
-import { BoardStateContext } from '../../../../../context/BoardProvider'
+import { BoardDispathContext, BoardStateContext } from '../../../../../context/BoardProvider'
 import { GameDispathContext, GameStateContext } from '../../../../../context/GameProvider'
 import { ActionBtnTypeResponse, checkActionBtnType } from '../../../../../utils/game/checkActionBtnType'
 import { GameAction } from '../../utils/gameAction'
@@ -12,11 +12,11 @@ interface Props {
 }
 
 const ActionBtn: FC<Props> = ({ type }) => {
-  const [gameState, boardState, gameDispatch] = [useContext(GameStateContext), useContext(BoardStateContext), useContext(GameDispathContext)]
+  const [gameState, boardState, gameDispatch, boardDispatch] = [useContext(GameStateContext), useContext(BoardStateContext), useContext(GameDispathContext), useContext(BoardDispathContext)]
 
-  if (!gameDispatch) return <></>
+  if (!gameDispatch || !boardDispatch) return <></>
 
-  const Action = new GameAction(gameState.wsClient, gameDispatch)
+  const Action = new GameAction(gameState.wsClient, gameDispatch, boardDispatch)
   console.log(Action, 'Action')
   const btnType = checkActionBtnType({ gameState, boardState, type })
 
@@ -32,11 +32,11 @@ const ActionBtn: FC<Props> = ({ type }) => {
 
 const onClickFnExec = (btnType: ActionBtnTypeResponse, Action: GameAction) => {
   switch(btnType.type) {
-    case 'deckSet': return Action.deckSet()
-    case 'dobon': return Action.dobon()
-    case 'draw': return Action.draw()
-    case 'skip': return Action.skip()
-    default: return undefined
+    case 'deckSet'    : return Action.deckSet()
+    case 'dobon'      : return Action.dobon()
+    case 'draw'       : return Action.draw()
+    case 'turnChange' : return Action.turnChange()
+    default           : return undefined
   }
 }
 

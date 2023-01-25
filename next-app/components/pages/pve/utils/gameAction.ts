@@ -1,33 +1,32 @@
 import { Dispatch, SetStateAction } from "react"
 import { InitialBoardState } from "../../../../@types/game"
+import { BoardProviderState } from "../../../../context/BoardProvider"
 import { GameProviderState } from "../../../../context/GameProvider"
 import { handleEmit } from "../../../../utils/socket/emit"
 
 class GameAction {
-  _wsClient: GameProviderState['wsClient']
-  _state: InitialBoardState | null
-  _dispatch: Dispatch<SetStateAction<GameProviderState>>
-
-  constructor(wsClient: GameProviderState['wsClient'], dispatch: Dispatch<SetStateAction<GameProviderState>>) {
-    this._wsClient = wsClient
-    this._state = null
-    this._dispatch = dispatch
-  }
+  constructor(
+    private wsClient: GameProviderState['wsClient'],
+    private gameDispatch: Dispatch<SetStateAction<GameProviderState>>,
+    private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
+  ){}
   draw() {
     console.log('draw')
-    handleEmit(this._wsClient, { event:'draw' })
+    handleEmit(this.wsClient, { event: 'draw' })
+    this.boardDispatch(prevState => ({ ...prevState, isDrawnCard:true }))
   }
   deckSet() {
     console.log('deckSet')
-    this._dispatch(prevState => prevState)
+    this.gameDispatch(prevState => prevState)
   }
-  skip() {
-    console.log('skip')
-    this._dispatch(prevState => prevState)
+  turnChange() {
+    console.log('turnChange')
+    handleEmit(this.wsClient, { event: 'turnchange' })
+    this.gameDispatch(prevState => prevState)
   }
   dobon() {
     console.log('dobon')
-    this._dispatch(prevState => prevState)
+    this.gameDispatch(prevState => prevState)
   }
 }
 

@@ -142,6 +142,18 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         socket.emit('updateStateSpecify', reducerPayload)
         break
       }
+      case 'turnchange': {
+        const nextTurn = 2
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              turn: nextTurn,
+            }
+          }
+        }
+        socket.emit('updateStateSpecify', reducerPayload)
+        break
+      }
       default: return {}
     }
     return {}

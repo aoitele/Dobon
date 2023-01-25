@@ -7,18 +7,18 @@ export interface ActionBtnTypeArg {
   type: 'action' | 'dobon'
 }
 
-type BtnType = 'dobon' | 'skip' | 'draw' | 'deckSet' | 'disabled' // 表示するボタンパターン
+type BtnType = 'dobon' | 'turnChange' | 'draw' | 'deckSet' | 'disabled' // 表示するボタンパターン
 
 export interface ActionBtnTypeResponse {
   type: BtnType
   text: string
 }
 
-const TYPE_DOBON    : ActionBtnTypeResponse = { type: 'dobon', text: 'どぼん！'}
-const TYPE_SKIP     : ActionBtnTypeResponse = { type: 'skip', text: 'スキップ'}
-const TYPE_DRAW     : ActionBtnTypeResponse = { type: 'draw', text: 'ドロー'}
-const TYPE_DECKSET  : ActionBtnTypeResponse = { type: 'deckSet', text: 'デッキセット＆ドロー'}
-const TYPE_DISABLED : ActionBtnTypeResponse = { type: 'disabled', text: ''}
+const TYPE_DOBON      : ActionBtnTypeResponse = { type: 'dobon',      text: 'どぼん！'}
+const TYPE_TURNCHANGE : ActionBtnTypeResponse = { type: 'turnChange', text: 'スキップ'}
+const TYPE_DRAW       : ActionBtnTypeResponse = { type: 'draw',       text: 'ドロー'}
+const TYPE_DECKSET    : ActionBtnTypeResponse = { type: 'deckSet',    text: 'デッキセット＆ドロー'}
+const TYPE_DISABLED   : ActionBtnTypeResponse = { type: 'disabled',   text: ''}
 
 const checkActionBtnType = (arg: ActionBtnTypeArg): ActionBtnTypeResponse => {
   const { gameState, boardState, type } = arg
@@ -27,7 +27,7 @@ const checkActionBtnType = (arg: ActionBtnTypeArg): ActionBtnTypeResponse => {
 
   switch (type) {
     case 'action': {
-      if (boardState.isDrawnCard) return TYPE_SKIP
+      if (boardState.isDrawnCard) return TYPE_TURNCHANGE
       return gameState.game.board.deckCount === 0 ? TYPE_DECKSET : TYPE_DRAW
     }
     case 'dobon': {
