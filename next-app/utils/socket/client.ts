@@ -1,6 +1,11 @@
 import { io, Socket } from 'socket.io-client'
 import { Emit, EmitForPVE } from '../../@types/socket'
 
+interface ConnectArgs {
+  roomId?: string
+  pveKey?: string
+}
+
 class SocketClient {
   _socket: Socket | null
 
@@ -8,11 +13,17 @@ class SocketClient {
     this._socket = null
   }
 
-  async connect(roomId?: string): Promise<void> {
+  async connect(args?: ConnectArgs): Promise<void> {
     await this.disconnect()
-    const socketIoUri = roomId
-    ? `${process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN}?roomId=${roomId}`
-    : `${process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN}` ?? ''
+    let socketIoUri = process.env.NEXT_PUBLIC_SERVER_SOCKETIO_ALLOW_ORIGIN
+    if (!socketIoUri) return
+
+    if (args) {
+      const { roomId, pveKey } = args
+      if (roomId) socketIoUri += `?roomId=${roomId}`
+      if (pveKey) socketIoUri += `?pveKey=${pveKey}`
+    }
+
     this._socket = io(socketIoUri)
   }
   

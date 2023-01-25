@@ -21,13 +21,14 @@ app.prepare().then(async () => {
   fastifyAPIRouteSet(fastify)
   
   fastify.io.on('connection', (socket: any) => {
-    const { roomId } = socket.handshake.query
+    const { roomId, pveKey } = socket.handshake.query
     if (roomId) {
       const room = `room${roomId}`
       socket.join(room)
       fastify.io.in(room).emit('hello', 'new user comming!!')
       emitHandler(io, socket)
-    } else {
+    } else if (pveKey) {
+      socket.join(pveKey)
       cpuModeHandler(io, socket)
     }
     // Await adapterPubClient.xread("block", 0, "STREAMS", "myStream", 0);

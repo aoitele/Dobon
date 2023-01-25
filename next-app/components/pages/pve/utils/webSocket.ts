@@ -20,7 +20,7 @@ const establishWsForPve = async({ dispatch }: Props) => {
     return response
   }
 
-  await wsClient.connect()
+  await wsClient.connect({ pveKey: localStorage.getItem('pveKey') ?? undefined })
 
   if (wsClient._socket) {
     wsClient._socket.on('close', () => {

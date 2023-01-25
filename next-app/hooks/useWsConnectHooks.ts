@@ -20,7 +20,7 @@ const useWsConnectHooks = (
           const wsClient = await resSocketClient()
           if (!wsClient) return
           const rid = typeof roomId === 'string' ? roomId : roomId[0] // 同じクエリパラメータから取得する値が複数あると配列が返るため
-          await wsClient.connect(rid)
+          await wsClient.connect({ roomId: rid })
           if (wsClient._socket) {
             wsClient._socket.on('close', () => {
               wsClient._reset()
