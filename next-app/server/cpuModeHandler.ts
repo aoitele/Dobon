@@ -1,12 +1,14 @@
 import { Redis } from "ioredis"
-import { Socket } from "socket.io-client"
+import { Socket } from 'socket.io'
 import { Board, Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
+import { resEffectName } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 import { initialState } from "../utils/game/state"
+import { culcNextUserTurn } from "../utils/game/turnInfo"
 import { redisHandsInit, redisTrashInit } from "./redis/gameProcess"
 import { loadDobonRedisKeys } from "./redis/loadDobonRedisKeys"
 
@@ -143,15 +145,47 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'turnchange': {
-        const nextTurn = 2
-        const reducerPayload: reducerPayloadSpecify = {
-          game: {
-            board: {
-              turn: nextTurn,
+        const hasValidQueriesArgs: HasValidQueriesArgs = {
+          query: payloadQuery,
+          target: [{ key: 'pveKey', forceString: true }]
+        }
+        if (!hasValidQueries(hasValidQueriesArgs)) return {} // queryを検証
+
+        const { query } = hasValidQueriesArgs
+        const { data } = payload
+
+        if (data?.type !== 'board') break
+
+        // 実行経路(putOut or actionBtn)により処理を分ける
+        const byPutout = data.option?.triggered === 'putOut'
+        const byActionBtn = data.option?.triggered === 'actionBtn'
+
+        // ボードデータ取得、連続した自分のターンかどうかの判定(=skip効果によるturnchange?)
+        const { users, turn, trash, effect } = data.data
+        const isMyTurnConsecutive = data.option?.values.isMyTurnConsecutive
+
+        if (users && turn && trash?.card) {
+          // Skipカード効果で得た自分の連続ターンでない、純粋に自分のターンが来てカードを出した場合のみeffectNameを取得する
+          const effectName = (!isMyTurnConsecutive && byPutout) ? resEffectName({ card: [trash.card], selectedWildCard: null }) : ''
+          const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
+          const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed)
+          const reducerPayload: reducerPayloadSpecify = {
+            game: {
+              board: {
+                turn: nextTurn,
+              }
             }
           }
+          /**
+           * どぼんボタンを有効にするかの状態制御
+           * actionBtnでスキップされた場合、全員どぼん実行は許可しない
+           */
+          if (byActionBtn && reducerPayload.game?.board) {
+            reducerPayload.game.board.allowDobon = false
+          }
+
+          io.in(`${query.pveKey}`).emit('updateStateSpecify', reducerPayload) // Roomのターンを更新
         }
-        socket.emit('updateStateSpecify', reducerPayload)
         break
       }
       default: return {}

@@ -23,10 +23,10 @@ const TYPE_DISABLED   : ActionBtnTypeResponse = { type: 'disabled',   text: ''}
 const checkActionBtnType = (arg: ActionBtnTypeArg): ActionBtnTypeResponse => {
   const { gameState, boardState, type } = arg
 
-  if (!boardState.isMyTurn) return TYPE_DISABLED
 
   switch (type) {
     case 'action': {
+      if (!boardState.isMyTurn) return {...TYPE_DISABLED, text: 'ドロー'}
       if (boardState.isDrawnCard) return TYPE_TURNCHANGE
       return gameState.game.board.deckCount === 0 ? TYPE_DECKSET : TYPE_DRAW
     }

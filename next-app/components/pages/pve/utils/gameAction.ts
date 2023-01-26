@@ -7,6 +7,7 @@ import { handleEmit } from "../../../../utils/socket/emit"
 class GameAction {
   constructor(
     private wsClient: GameProviderState['wsClient'],
+    private gameState: GameProviderState,
     private gameDispatch: Dispatch<SetStateAction<GameProviderState>>,
     private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
   ){}
@@ -21,8 +22,13 @@ class GameAction {
   }
   turnChange() {
     console.log('turnChange')
-    handleEmit(this.wsClient, { event: 'turnchange' })
-    this.gameDispatch(prevState => prevState)
+    handleEmit(
+      this.wsClient, {
+        event: 'turnchange',
+        data: { type: 'board', data: this.gameState.game.board, option:{ values: {}, triggered: 'actionBtn' }}
+      }
+    )
+    this.boardDispatch(prevState => ({ ...prevState, isMyTurn: false }))
   }
   dobon() {
     console.log('dobon')
