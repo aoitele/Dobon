@@ -51,6 +51,7 @@ module.exports = {
     'max-lines': 'off',
     'no-warning-comments': 'off',
     'lines-between-class-members': 'off',
+    'capitalized-comments': 'off',
   },
   settings: {
     react: {

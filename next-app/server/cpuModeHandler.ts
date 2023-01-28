@@ -23,9 +23,21 @@ const cpuModeHandler = (io: Socket, socket: any) => {
     console.log(payload, 'payload')
     console.log(socket.id, 'socket.id')
     const { event, gameId } = payload
-    const payloadQuery = payload.query
     console.log(event, 'event')
-    console.log(payloadQuery, 'payloadQuery')
+
+    // payload.queryを検証、pveKeyが存在しない場合は後続処理を行わない。 
+    const hasValidQueriesArgs: HasValidQueriesArgs = {
+      query: payload.query,
+      target: [{ key: 'pveKey', forceString: true }]
+    }
+
+    // イベント毎に必須とするプロパティを追加して検証させる
+    if (event === 'prepare') {
+      hasValidQueriesArgs.target.push({ key: 'setCount', forceString: true })
+    }
+
+    if (!hasValidQueries(hasValidQueriesArgs)) return {}
+    const { query } = hasValidQueriesArgs
 
     switch (event) {
       /**
@@ -33,14 +45,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
        * nextGameでgame.idが切り替わる時もここから処理が行われる
        */
       case 'prepare': {
-        const hasValidQueriesArgs: HasValidQueriesArgs = {
-          query: payloadQuery,
-          target: [{ key: 'pveKey', forceString: true }, { key: 'setCount', forceString: true }]
-        }
-        if (!hasValidQueries(hasValidQueriesArgs)) return {} // queryを検証
         if (typeof gameId !== 'number') return {} // gameIdを検証
-
-        const { query } = hasValidQueriesArgs
         const isFirstGame = gameId === 1
 
         const loadRedisKey = loadDobonRedisKeys([
@@ -115,14 +120,6 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'draw': {
-        const hasValidQueriesArgs: HasValidQueriesArgs = {
-          query: payloadQuery,
-          target: [{ key: 'pveKey', forceString: true }]
-        }
-        if (!hasValidQueries(hasValidQueriesArgs)) return {} // queryを検証
-
-        const { query } = hasValidQueriesArgs
-
         const loadRedisKey = loadDobonRedisKeys([
           {mode:'pve', type: 'deck', firstKey: `${query.pveKey}`},
           {mode:'pve', type: 'hands', firstKey: `${query.pveKey}`, secondKey: 'me' },
@@ -145,13 +142,6 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'turnchange': {
-        const hasValidQueriesArgs: HasValidQueriesArgs = {
-          query: payloadQuery,
-          target: [{ key: 'pveKey', forceString: true }]
-        }
-        if (!hasValidQueries(hasValidQueriesArgs)) return {} // queryを検証
-
-        const { query } = hasValidQueriesArgs
         const { data } = payload
 
         if (data?.type !== 'board') break
@@ -184,8 +174,23 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             reducerPayload.game.board.allowDobon = false
           }
 
-          io.in(`${query.pveKey}`).emit('updateStateSpecify', reducerPayload) // Roomのターンを更新
+          io.in(`${query.pveKey}`).emit('updateStateSpecify', reducerPayload) // Roomのターンを更新          
         }
+        break
+      }
+      case 'cpuTurn': {
+        /**
+         * 本イベントはCPUターンになったタイミングで呼び出す
+         * boardからユーザー情報を取得してCPU処理を実行していく
+         */
+        // const redisKeys = loadDobonRedisKeys([
+        //   {mode:'pve', type: 'user', firstKey: `${query.pveKey}`, secondKey: nickname},
+        // ])
+        const { data } = payload
+        if (data?.type !== 'board') break
+
+        const user = data.data.users?.find(user => user.turn === data.data.turn)
+        if(!user) break
         break
       }
       default: return {}

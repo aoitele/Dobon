@@ -33,6 +33,7 @@ type Event =
   | 'effectupdate'
   | 'avoidEffect'
   | 'notAvoidEffect'
+  | 'cpuTurn'
   | Effect
   | null
 
@@ -59,6 +60,8 @@ export type EmitBoard = {
     triggered: 'putOut' | 'actionBtn' | undefined
   }
 }
+
+export type EmitDataType = EmitCard['type'] | EmitAction['type'] | EmitBoard['type']
 
 export type Emit = {
   roomId: number

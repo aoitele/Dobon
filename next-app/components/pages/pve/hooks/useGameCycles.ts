@@ -40,6 +40,19 @@ const useGameCycles = () => {
     }
     gameStatusHandler()
   },[gameState.game.status])
+
+  useEffect(() => {
+    console.log('turnChanged')
+    if (gameState.game.board.turn !== 1) {
+      handleEmit(
+        gameState.wsClient, {
+          event: 'cpuTurn',
+          data:{ type:'board', data: gameState.game.board },
+          query: router.query
+        }
+      )
+    }
+  },[gameState.game.board.turn])
 }
 
 export { useGameCycles }
