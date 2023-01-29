@@ -4,6 +4,7 @@ import { Board, Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
+import { cpuMainProcess } from "../utils/game/cpu/main"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { resEffectName } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
@@ -38,6 +39,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
 
     if (!hasValidQueries(hasValidQueriesArgs)) return {}
     const { query } = hasValidQueriesArgs
+    const pveKey = `${query.pveKey}`
 
     switch (event) {
       /**
@@ -49,8 +51,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const isFirstGame = gameId === 1
 
         const loadRedisKey = loadDobonRedisKeys([
-          {mode:'pve', type: 'deck', firstKey: `${query.pveKey}`},
-          {mode:'pve', type: 'trash', firstKey: `${query.pveKey}`}
+          {mode:'pve', type: 'deck', firstKey: pveKey},
+          {mode:'pve', type: 'trash', firstKey: pveKey}
         ])
         const deckKey = loadRedisKey[0]
         const trashKey = loadRedisKey[1]
@@ -71,12 +73,12 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           // Hands initialize
           const nickname = isCom ? users[i] : 'me'
           const redisKeys = loadDobonRedisKeys([
-            {mode:'pve', type: 'hands', firstKey: `${query.pveKey}`, secondKey: nickname},
-            {mode:'pve', type: 'user', firstKey: `${query.pveKey}`, secondKey: nickname},
+            {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: nickname},
+            {mode:'pve', type: 'user', firstKey: pveKey, secondKey: nickname},
           ])
 
           const hands = await redisHandsInit(adapterPubClient, deckKey, redisKeys[0])
-          isCom ? otherHands.push({ userId: 0, hands }) : myHands = hands
+          isCom ? otherHands.push({ userId: 0, hands, nickname }) : myHands = hands
 
           // Score update
           let score = 0
@@ -121,8 +123,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
       }
       case 'draw': {
         const loadRedisKey = loadDobonRedisKeys([
-          {mode:'pve', type: 'deck', firstKey: `${query.pveKey}`},
-          {mode:'pve', type: 'hands', firstKey: `${query.pveKey}`, secondKey: 'me' },
+          {mode:'pve', type: 'deck', firstKey: pveKey},
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me' },
         ])
         const deckKey = loadRedisKey[0]
         const handsKey = loadRedisKey[1]
@@ -174,7 +176,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             reducerPayload.game.board.allowDobon = false
           }
 
-          io.in(`${query.pveKey}`).emit('updateStateSpecify', reducerPayload) // Roomのターンを更新          
+          io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Roomのターンを更新
         }
         break
       }
@@ -183,14 +185,9 @@ const cpuModeHandler = (io: Socket, socket: any) => {
          * 本イベントはCPUターンになったタイミングで呼び出す
          * boardからユーザー情報を取得してCPU処理を実行していく
          */
-        // const redisKeys = loadDobonRedisKeys([
-        //   {mode:'pve', type: 'user', firstKey: `${query.pveKey}`, secondKey: nickname},
-        // ])
         const { data } = payload
         if (data?.type !== 'board') break
-
-        const user = data.data.users?.find(user => user.turn === data.data.turn)
-        if(!user) break
+        cpuMainProcess({io, adapterPubClient, data, pveKey })
         break
       }
       default: return {}

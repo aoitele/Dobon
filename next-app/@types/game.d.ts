@@ -39,6 +39,7 @@ export type Player = {
 export type OtherHands = {
   userId: number
   hands: string[] | HandCards[]
+  nickname?: string
 }
 
 export type Board = {

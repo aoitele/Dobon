@@ -41,10 +41,10 @@ interface HandSep {
 
 type HandsFilterCallback = (handSep: HandSep) => boolean // eslint-disable-line no-unused-vars
 
-const cardsICanPutOut = (hands:string[] | HandCards[], trash:Board['trash'], effect?:Board['effect']) => {
-  if (!trash.card || hands.length === 1) return []
+const cardsICanPutOut = (hands:string[] | HandCards[], trash:Board['trash']['card'], effect?:Board['effect']) => {
+  if (!trash || hands.length === 1) return []
   const handsSep = sepalateSuitNum(hands)
-  const trashSep = sepalateSuitNum([trash.card])
+  const trashSep = sepalateSuitNum([trash])
   const { suit, num } = trashSep[0]
   if (suit === 'x') return hands // Trash - joker is all card allow put
 
@@ -94,7 +94,7 @@ const updateHandsFn = ({ state, authUser, dispatch} : UpdateHandFnProps) => {
 const updateMyHandsStatus = ({state, hands, trash, dispatch}: UpdateHandProps) => {
   // 場に出せる手札を判定、isPutable=trueにする(['${suit}${num}op', ...])
   const effect = state.game?.board.effect
-  const putableCards = cardsICanPutOut(hands, trash, effect)
+  const putableCards = cardsICanPutOut(hands, trash.card, effect)
   const newHands = hands.map(_ => putableCards.includes(_) ? `${_}p`: `${_}`)
   const data = {
     game: {

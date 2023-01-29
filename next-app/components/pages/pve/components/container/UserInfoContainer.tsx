@@ -16,7 +16,7 @@ const UserInfoContainer:FC = () => {
           <UserInfo
             key={`user_${user.id}_info`}
             user={user}
-            hands={board.otherHands.filter(_=>_.userId === user.id)[0]}
+            hands={board.otherHands.filter(hand => hand.nickname === user.nickname)[0]}
             turnUser={turnUser}
           />
           {/* TODO 強さラベルの表示 */}

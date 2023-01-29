@@ -54,7 +54,7 @@ describe('checkHand TestCases', () => {
     expect(result).toBe(false)
   })
   it('柄か数字が同じカードが存在する場合、そのカードは出す事ができる', async () => {
-    const trash = { card:'s4o', user:initialState.game.board.trash.user }
+    const trash = 's4o'
 
     const hands1:HandCards[] = ['s1', 'h2', 'c3']
     const result1 = cardsICanPutOut(hands1, trash)
@@ -78,20 +78,20 @@ describe('checkHand TestCases', () => {
     expect(result4).toEqual(expected4)
   })
   it('jokerが出された場合、すべてのカードを出す事ができる', async () => {
-    const trash = { card: 'x0o', user:initialState.game.board.trash.user }
+    const trash = 'x0o'
     const hands:HandCards[] = ['s1', 'h2', 'c3']
     const result = cardsICanPutOut(hands, trash)
     expect(result).toEqual(hands)
   })
   it('手札の8やjokerは、無条件で出すことができる', async () => {
-    const trash = { card: 's1o', user:initialState.game.board.trash.user }
+    const trash = 's1o'
     const hands:HandCards[] = ['s2', 'c2', 'h8', 'x0']
     const result = cardsICanPutOut(hands, trash)
     const expected = ['s2', 'h8', 'x0']
     expect(result).toEqual(expected)
   })
   it('wild効果が発動中の場合、指定された柄はどの数字でも出すことができる', async () => {
-    const trash = { card: 's8o', user:initialState.game.board.trash.user }
+    const trash = 's8o'
     const hands:HandCards[] = ['s2', 'c2', 'c6', 'h8', 'x0']
     const effect: Effect[] = ['wildclub']
     const result = cardsICanPutOut(hands, trash, effect)
