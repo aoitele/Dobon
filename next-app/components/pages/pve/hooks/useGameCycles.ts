@@ -44,7 +44,9 @@ const useGameCycles = () => {
   useEffect(() => {
     if (!gameDispatch || !boardDispatch) return
     console.log('turnChanged')
-    if (gameState.game.board.turn !== 1) {
+    if (gameState.game.board.turn === 1) {
+      boardDispatch({ ...boardState, isMyTurn: true, isDrawnCard: false })
+    } else {
       handleEmit(
         gameState.wsClient, {
           event: 'cpuTurn',
@@ -52,8 +54,6 @@ const useGameCycles = () => {
           query: router.query
         }
       )
-    } else {
-      boardDispatch({ ...boardState, isMyTurn: true, isDrawnCard: false })
     }
   },[gameState.game.board.turn])
 }
