@@ -1,9 +1,11 @@
 import { HandCards } from "../../../../@types/card"
 import { Player } from "../../../../@types/game"
 import { NestedPartial } from "../../../../@types/utility"
+import { CpuTurnEmitData } from "../../../validator/emitData"
 import { cardsICanPutOut } from "../../checkHand"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
+import { culcNextUserTurn } from "../../turnInfo"
 import { CpuMainProcessArgs } from '../main'
 
 interface Args {
@@ -11,7 +13,7 @@ interface Args {
   io: CpuMainProcessArgs['io']
   hands: string[] | HandCards[]
   trash: string[]
-  data: CpuMainProcessArgs['data']
+  data: CpuTurnEmitData
   adapterPubClient: CpuMainProcessArgs['adapterPubClient']
   pveKey: CpuMainProcessArgs['pveKey']
   deckKey: string
@@ -19,35 +21,40 @@ interface Args {
   handsKey: string
 }
 
-const drawPhase = async({
+/**
+ * 手札を出せる場合
+ *  - 出せるカード毎のリスクを計算
+ *  - CPUレベルで定義されたリスク値を下回る場合はカードを出す
+ *  - ジョーカーは手元に持つ方が有利なので出さない
+ * 手札を出せない場合
+ *  - スキップする
+ */
+const putoutPhase = async({
   user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, trashKey, handsKey
 }: Args) => {
-  if (!data.data.otherHands) {
-    throw Error('drawPhase has Error: data.data.otherHands is not provided')
+  const {turn, users, effect, otherHands} = data.data 
+  if (!turn) {
+    throw Error('putoutPhase has Error: required data is not provided')
   }
   // 手札を場に出せるかを判定する
-  const putableCards = cardsICanPutOut(hands, trash[0], data.data.effect)
+  const putableCards = cardsICanPutOut(hands, trash[0], effect)
   console.log(putableCards, 'putableCards')
 
-  // 手札を出せない場合はドローする
   if (!putableCards.length) {
-    const newCard = await adapterPubClient.spop(deckKey, 1)
-    adapterPubClient.sadd(handsKey, newCard)
-    const comHands = await adapterPubClient.smembers(handsKey)
-    const comHandsIndex = data.data.otherHands.findIndex(hands => hands.nickname === user.nickname)
-    data.data.otherHands[comHandsIndex]['hands'] = comHands
-    // 手札情報を更新
-    await sleep(500)
+    console.log('----- skip -----')
+    const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
+    const nextTurn = culcNextUserTurn(turn, users, '', isReversed)
     const reducerPayload: reducerPayloadSpecify = {
       game: {
         board: {
-          otherHands: data.data.otherHands
+          turn: nextTurn,
         }
       }
     }
+    await sleep(500)
     io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+    return
   }
-  return data
 }
 
-export { drawPhase }
+export { putoutPhase }

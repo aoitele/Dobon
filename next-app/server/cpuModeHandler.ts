@@ -10,6 +10,8 @@ import { resEffectName } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 import { initialState } from "../utils/game/state"
 import { culcNextUserTurn } from "../utils/game/turnInfo"
+import { validateRules } from "../utils/validator/rule"
+import { isCpuTurnEmitData } from "../utils/validator/validate"
 import { redisHandsInit, redisTrashInit } from "./redis/gameProcess"
 import { loadDobonRedisKeys } from "./redis/loadDobonRedisKeys"
 
@@ -186,7 +188,9 @@ const cpuModeHandler = (io: Socket, socket: any) => {
          * boardからユーザー情報を取得してCPU処理を実行していく
          */
         const { data } = payload
-        if (data?.type !== 'board') break
+        const rule = validateRules['cpuTurn']
+        if (!isCpuTurnEmitData(data, rule)) break
+        
         cpuMainProcess({io, adapterPubClient, data, pveKey })
         break
       }

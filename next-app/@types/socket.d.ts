@@ -4,7 +4,7 @@ import { LiteralUnion } from 'type-fest'
 import { NestedPartial, PartiallyPartial } from '../@types/utility'
 import { ParsedUrlQuery } from 'querystring'
 
-type Event =
+export type Event =
   | 'drawcard'
   | 'drawcard__duetoeffect'
   | 'drawcard__deckset'

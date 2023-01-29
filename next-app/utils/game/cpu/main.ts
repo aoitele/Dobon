@@ -1,25 +1,27 @@
 import { Redis } from "ioredis"
 import { Socket } from "socket.io"
-import { EmitBoard } from "../../../@types/socket"
 import { loadDobonRedisKeys } from "../../../server/redis/loadDobonRedisKeys"
+import { CpuTurnEmitData } from "../../validator/emitData"
 import { drawPhase } from "./phase/drawPhase"
+import { putoutPhase } from "./phase/putoutPhase"
 
 /**
  * CPUのゲーム実行プロセス
  * 1. ドボン実行判断
  * 2. (カード効果があれば) 処理判断
- * 3. ドロー or 手札を出す
- * 4. (1でドローした場合) スキップ or 手札を出す
+ * 3. ドロー(手札を出せない or 出さない方が良い場合)
+ * 4. スキップ or 手札を出す
  */
 export interface CpuMainProcessArgs {
   io: Socket
   adapterPubClient: Redis
   pveKey:string
-  data: EmitBoard
+  data: CpuTurnEmitData
 }
 
 const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data }: CpuMainProcessArgs) => {
   console.log('cpuMainProcess start...')
+
   const user = data.data.users?.find(user => user.turn === data.data.turn)
   if (!user?.nickname) {
     throw Error('cpuMainProcess has Error: required data is not provided')
@@ -38,7 +40,8 @@ const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data }: CpuMainPro
     .exec((_err, results) => results)
   const [_deck, trash, hands] = [redisData[0][1], redisData[1][1], redisData[2][1]]
 
-  await drawPhase({ user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, trashKey, handsKey })
+  const dataAfterDrawPhase = await drawPhase({ user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, trashKey, handsKey })
+  await putoutPhase({ user, io, hands, trash, data: dataAfterDrawPhase, adapterPubClient, pveKey, deckKey, trashKey, handsKey })
 }
 
 export { cpuMainProcess }
