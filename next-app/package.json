@@ -6,7 +6,7 @@
     "node": "16.14.2"
   },
   "scripts": {
-    "dev": "nodemon --config nodemon.json",
+    "dev": "rm -rf .next && nodemon --config nodemon.json",
     "build:next": "next build",
     "build:server": "tsc --project tsconfig.server.json",
     "build:vercel": "npm run prisma:generate && npx prisma migrate deploy && next build",
