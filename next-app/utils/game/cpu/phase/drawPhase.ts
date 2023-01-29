@@ -37,7 +37,7 @@ const drawPhase = async({
     const comHandsIndex = data.data.otherHands.findIndex(hands => hands.nickname === user.nickname)
     data.data.otherHands[comHandsIndex]['hands'] = comHands
     // 手札情報を更新
-    await sleep(500)
+    await sleep(1000)
     const reducerPayload: reducerPayloadSpecify = {
       game: {
         board: {

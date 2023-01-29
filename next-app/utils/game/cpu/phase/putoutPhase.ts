@@ -2,7 +2,8 @@ import { HandCards } from "../../../../@types/card"
 import { Player } from "../../../../@types/game"
 import { NestedPartial } from "../../../../@types/utility"
 import { CpuTurnEmitData } from "../../../validator/emitData"
-import { cardsICanPutOut } from "../../checkHand"
+import { cardsICanPutOut, sepalateSuitNum } from "../../checkHand"
+import { resEffectName } from "../../effect"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
 import { culcNextUserTurn } from "../../turnInfo"
@@ -36,6 +37,7 @@ const putoutPhase = async({
   if (!turn) {
     throw Error('putoutPhase has Error: required data is not provided')
   }
+  let nextTurn;
   // 手札を場に出せるかを判定する
   const putableCards = cardsICanPutOut(hands, trash[0], effect)
   console.log(putableCards, 'putableCards')
@@ -43,7 +45,7 @@ const putoutPhase = async({
   if (!putableCards.length) {
     console.log('----- skip -----')
     const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
-    const nextTurn = culcNextUserTurn(turn, users, '', isReversed)
+    nextTurn = culcNextUserTurn(turn, users, '', isReversed)
     const reducerPayload: reducerPayloadSpecify = {
       game: {
         board: {
@@ -55,6 +57,27 @@ const putoutPhase = async({
     io.in(pveKey).emit('updateStateSpecify', reducerPayload)
     return
   }
+
+  // 試しに最初のカードを出す
+  // `${suit}${num}o`でデータがくるため、redisはoなしでlpush
+  await sleep(1000)
+  const trashCard = putableCards[0]
+  await adapterPubClient.lpush(trashKey, trashCard) // 最新の捨て札を先頭に追加
+
+  // const effectName = resEffectName({ card:[trashCard], selectedWildCard: null })
+  const reducerPayload: reducerPayloadSpecify = {
+    game: {
+      board: {
+        trash: {
+          card: `${trashCard}o`,
+          user,
+        },
+        allowDobon: true,
+        turn: culcNextUserTurn(turn, users, '', false),
+      }
+    }
+  }
+  io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
 }
 
 export { putoutPhase }
