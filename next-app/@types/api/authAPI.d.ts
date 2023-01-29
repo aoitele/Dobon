@@ -1,4 +1,4 @@
-declare namespace AuthAPIResponse {
+export namespace AuthAPIResponse {
   type UserMe = {
     id: number
     nickname: string

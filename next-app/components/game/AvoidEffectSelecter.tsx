@@ -15,6 +15,7 @@ import { HaveAllPropertyCard } from '../../@types/card'
 import UserInfo from './UserInfo'
 import { emit, Props } from '../../utils/game/emit'
 import { addEmitArgEvent } from './ActionBtn'
+import { AuthAPIResponse } from '../../@types/api/authAPI'
 
 interface AvoidEffectProps {
   states:{

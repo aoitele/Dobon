@@ -6,6 +6,7 @@ import { RoomAPIResponse } from '../../@types/api/roomAPI'
 import Link from 'next/link'
 import { AuthState } from '../../context/AuthProvider'
 import { DOBON_ROOM_STATUS_WAITING } from '../../constant'
+import { AuthAPIResponse } from '../../@types/api/authAPI'
 
 interface Props {
   room?: RoomAPIResponse['roomInfo']

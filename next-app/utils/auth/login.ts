@@ -1,4 +1,5 @@
 import axiosInstance from '../api/axiosInstance'
+import { AuthAPIResponse } from '../../@types/api/authAPI'
 
 const axios = axiosInstance()
 

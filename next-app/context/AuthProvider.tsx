@@ -1,6 +1,7 @@
 import { parseCookies } from 'nookies'
 import React, { createContext, useEffect, Dispatch, useReducer } from 'react'
 import { loginWithToken } from '../utils/auth/login'
+import { AuthAPIResponse } from '../@types/api/authAPI'
 
 /**
  **

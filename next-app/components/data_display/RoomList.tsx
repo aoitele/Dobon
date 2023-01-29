@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './RoomList.module.scss'
 import { Room } from '../../@types/game'
 import { User } from '../../@types/user'
+import { AuthAPIResponse } from '../../@types/api/authAPI'
 
 interface Props {
   room: Pick<Room, 'id' | 'title' | 'max_seat' | 'set_count' | 'rate' | 'create_user_id' | 'status'> & { user: Pick<User, 'nickname'> }
