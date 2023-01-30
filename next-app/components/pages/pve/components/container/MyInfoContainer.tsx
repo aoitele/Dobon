@@ -1,5 +1,4 @@
 import React, { useContext } from 'react'
-import { AuthStateContext } from '../../../../../context/AuthProvider'
 import { GameStateContext } from '../../../../../context/GameProvider'
 import UserInfo from '../../../../game/UserInfo'
 import styles from './MyInfoContainer.module.scss'
