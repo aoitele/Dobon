@@ -22,9 +22,12 @@ interface Args {
 const drawPhase = async({
   user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, trashKey, handsKey
 }: Args) => {
+  console.log(hands, 'hands')
   if (!data.data.otherHands) {
     throw Error('drawPhase has Error: data.data.otherHands is not provided')
   }
+
+  const updateHands = [...hands]
   // 手札を場に出せるかを判定する
   const putableCards = cardsICanPutOut(hands, trash[0], data.data.effect)
   console.log(putableCards, 'putableCards')
@@ -33,21 +36,25 @@ const drawPhase = async({
   if (!putableCards.length) {
     const newCard = await adapterPubClient.spop(deckKey, 1)
     adapterPubClient.sadd(handsKey, newCard)
-    const comHands = await adapterPubClient.smembers(handsKey)
+    updateHands.push(...newCard)
     const comHandsIndex = data.data.otherHands.findIndex(hands => hands.nickname === user.nickname)
-    data.data.otherHands[comHandsIndex]['hands'] = comHands
+    data.data.otherHands[comHandsIndex]['hands'] = updateHands
     // 手札情報を更新
     await sleep(1000)
     const reducerPayload: reducerPayloadSpecify = {
       game: {
         board: {
-          otherHands: data.data.otherHands
+          otherHands: data.data.otherHands,
+          deckCount: data.data.deckCount - 1,
         }
       }
     }
     io.in(pveKey).emit('updateStateSpecify', reducerPayload)
   }
-  return data
+  return {
+    updateData: data,
+    updateHands,
+  }
 }
 
 export { drawPhase }

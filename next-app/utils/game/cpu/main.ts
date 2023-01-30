@@ -40,8 +40,8 @@ const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data }: CpuMainPro
     .exec((_err, results) => results)
   const [_deck, trash, hands] = [redisData[0][1], redisData[1][1], redisData[2][1]]
 
-  const dataAfterDrawPhase = await drawPhase({ user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, trashKey, handsKey })
-  await putoutPhase({ user, io, hands, trash, data: dataAfterDrawPhase, adapterPubClient, pveKey, deckKey, trashKey, handsKey })
+  const { updateData, updateHands } = await drawPhase({ user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, trashKey, handsKey })
+  await putoutPhase({ user, io, hands: updateHands, trash, data: updateData, adapterPubClient, pveKey, deckKey, trashKey, handsKey })
 }
 
 export { cpuMainProcess }

@@ -191,7 +191,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const rule = validateRules['cpuTurn']
         if (!isCpuTurnEmitData(data, rule)) break
         
-        cpuMainProcess({io, adapterPubClient, data, pveKey })
+        cpuMainProcess({ io, adapterPubClient, data, pveKey })
         break
       }
       default: return {}

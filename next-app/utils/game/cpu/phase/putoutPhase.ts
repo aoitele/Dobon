@@ -2,8 +2,7 @@ import { HandCards } from "../../../../@types/card"
 import { Player } from "../../../../@types/game"
 import { NestedPartial } from "../../../../@types/utility"
 import { CpuTurnEmitData } from "../../../validator/emitData"
-import { cardsICanPutOut, sepalateSuitNum } from "../../checkHand"
-import { resEffectName } from "../../effect"
+import { cardsICanPutOut } from "../../checkHand"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
 import { culcNextUserTurn } from "../../turnInfo"
@@ -37,11 +36,14 @@ const putoutPhase = async({
   if (!turn) {
     throw Error('putoutPhase has Error: required data is not provided')
   }
+  let updateHands = [...hands]
   let nextTurn;
+
   // 手札を場に出せるかを判定する
   const putableCards = cardsICanPutOut(hands, trash[0], effect)
   console.log(putableCards, 'putableCards')
 
+  // 出せない場合はスキップ
   if (!putableCards.length) {
     console.log('----- skip -----')
     const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
@@ -59,12 +61,16 @@ const putoutPhase = async({
   }
 
   // 試しに最初のカードを出す
-  // `${suit}${num}o`でデータがくるため、redisはoなしでlpush
   await sleep(1000)
   const trashCard = putableCards[0]
-  await adapterPubClient.lpush(trashKey, trashCard) // 最新の捨て札を先頭に追加
+  adapterPubClient.lpush(trashKey, trashCard) // 最新の捨て札を先頭に追加
+  adapterPubClient.srem(handsKey, trashCard, trashCard.slice(0, -1)) // redisはoあり/なしでsrem
 
-  // const effectName = resEffectName({ card:[trashCard], selectedWildCard: null })
+  updateHands = updateHands.filter(card => card !== trashCard)
+  const comHandsIndex = data.data.otherHands.findIndex(hands => hands.nickname === user.nickname)
+  data.data.otherHands[comHandsIndex]['hands'] = updateHands
+
+  // Const effectName = resEffectName({ card:[trashCard], selectedWildCard: null })
   const reducerPayload: reducerPayloadSpecify = {
     game: {
       board: {
@@ -74,6 +80,7 @@ const putoutPhase = async({
         },
         allowDobon: true,
         turn: culcNextUserTurn(turn, users, '', false),
+        otherHands: data.data.otherHands,
       }
     }
   }
