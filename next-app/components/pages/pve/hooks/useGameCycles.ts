@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { BoardStateContext, BoardDispathContext } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
+import { updateMyHandsStatus } from '../../../../utils/game/checkHand'
 import { handleEmit } from '../../../../utils/socket/emit'
 import { establishWsForPve } from '../utils/webSocket'
 
@@ -46,6 +47,8 @@ const useGameCycles = () => {
     console.log('turnChanged')
     if (gameState.game.board.turn === 1) {
       boardDispatch({ ...boardState, isMyTurn: true, isDrawnCard: false })
+      const newState = updateMyHandsStatus({ state: gameState, hands: gameState.game.board.hands, trash: gameState.game.board.trash })
+      newState && gameDispatch(newState)
     } else {
       handleEmit(
         gameState.wsClient, {

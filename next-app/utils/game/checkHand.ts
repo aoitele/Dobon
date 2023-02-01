@@ -1,11 +1,12 @@
-import { Dispatch } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 import { Board, Action } from '../../@types/game'
 import { HandCards } from '../../@types/card'
-import { useUpdateStateFn } from './state'
+import { AnotateState, useUpdateStateFn } from './state'
 import { gameInitialState, Action as StateAction } from './roomStateReducer'
 import { AuthState } from '../../context/AuthProvider'
 import hasProperty from '../function/hasProperty'
 import { extractPutableSuitStr } from './effect'
+import { GameProviderState } from '../../context/GameProvider'
 
 const card2 = Number(process.env.NEXT_PUBLIC_RANK_CARD_DRAWTWO)
 const card13 = Number(process.env.NEXT_PUBLIC_RANK_CARD_OPENCARD)
@@ -73,7 +74,7 @@ interface UpdateHandProps {
   state: gameInitialState
   hands: Board['hands']
   trash: Board['trash']
-  dispatch: Dispatch<StateAction>
+  dispatch?: Dispatch<StateAction>
 }
 
 type ResetHandProps = Omit<UpdateHandProps, 'trash'>
@@ -91,7 +92,7 @@ const updateHandsFn = ({ state, authUser, dispatch} : UpdateHandFnProps) => {
   : resetMyHandsStatus({state, hands, dispatch})
 }
 
-const updateMyHandsStatus = ({state, hands, trash, dispatch}: UpdateHandProps) => {
+const updateMyHandsStatus = ({state, hands, trash, dispatch}: UpdateHandProps): void | AnotateState => {
   // 場に出せる手札を判定、isPutable=trueにする(['${suit}${num}op', ...])
   const effect = state.game?.board.effect
   const putableCards = cardsICanPutOut(hands, trash.card, effect)
@@ -104,10 +105,10 @@ const updateMyHandsStatus = ({state, hands, trash, dispatch}: UpdateHandProps) =
     }
   }
   const newState = useUpdateStateFn(state, data)
-  dispatch({ type: 'updateStateSpecify', payload: newState })
+  return dispatch ? dispatch({ type: 'updateStateSpecify', payload: newState }) : newState
 }
 
-const resetMyHandsStatus = ({state, hands, dispatch}: ResetHandProps) => {
+const resetMyHandsStatus = ({state, hands, dispatch}: ResetHandProps): void | AnotateState => {
   // IsPutable=falseにする
   const newHands = hands.map(_ => _.replace('p', ''))
   const data = {
@@ -118,7 +119,7 @@ const resetMyHandsStatus = ({state, hands, dispatch}: ResetHandProps) => {
     }
   }
   const newState = useUpdateStateFn(state, data)
-  dispatch({ type: 'updateStateSpecify', payload: newState })  
+  return dispatch ? dispatch({ type: 'updateStateSpecify', payload: newState }) : newState
 }
 
 const resMyHandsCardNumbers = (hands: Board['hands']) => {

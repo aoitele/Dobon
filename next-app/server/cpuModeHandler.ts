@@ -3,6 +3,7 @@ import { Socket } from 'socket.io'
 import { Board, Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
+import hasProperty from "../utils/function/hasProperty"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
 import { cpuMainProcess } from "../utils/game/cpu/main"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
@@ -143,6 +144,39 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           }
         }
         socket.emit('updateStateSpecify', reducerPayload)
+        break
+      }
+      case 'playcard': {
+        const { data } = payload
+        console.log(data, 'playcard!')
+        if (data?.type !== 'board') break
+        if (!data.data.trash?.card) break
+
+        const loadRedisKey = loadDobonRedisKeys([
+          {mode:'pve', type: 'trash', firstKey: pveKey},
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me' },
+        ])
+        const trashKey = loadRedisKey[0]
+        const handsKey = loadRedisKey[1]
+
+        // `${suit}${num}o`でデータがくるため、redisはoなしでlpush
+        const trashCard = data.data.trash.card.replace('o', '')
+        adapterPubClient.lpush(trashKey, trashCard) // 最新の捨て札を先頭に追加
+
+        // `${suit}${num}o`でデータがくるため、redisはoあり/なしでsrem
+        adapterPubClient.srem(handsKey, data.data.trash.card, data.data.trash.card.slice(0, -1))
+        const hands = await adapterPubClient.smembers(handsKey)
+
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: { 
+              trash: data.data.trash,
+              allowDobon: true,
+              hands,
+            }
+          }
+        }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
         break
       }
       case 'turnchange': {

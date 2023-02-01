@@ -52,6 +52,8 @@ module.exports = {
     'no-warning-comments': 'off',
     'lines-between-class-members': 'off',
     'capitalized-comments': 'off',
+    'multiline-comment-style': 'off',
+    'no-unused-expressions': 'off',
   },
   settings: {
     react: {
