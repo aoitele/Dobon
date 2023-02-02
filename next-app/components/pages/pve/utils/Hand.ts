@@ -1,5 +1,7 @@
+import { Dispatch, SetStateAction } from "react";
 import { EmitBoard } from "../../../../@types/socket";
 import { GameProviderState } from "../../../../context/GameProvider";
+import { updateMyHandsStatus } from "../../../../utils/game/checkHand";
 import { handleEmit } from "../../../../utils/socket/emit"
 
 /* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
@@ -7,25 +9,30 @@ class Hand {
   constructor(
     private wsClient: GameProviderState['wsClient'],
     private gameState: GameProviderState,
-    // Private gameDispatch: Dispatch<SetStateAction<GameProviderState>>,
+    private gameDispatch: Dispatch<SetStateAction<GameProviderState>>,
     // Private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
   ){}
-  putOut(trash: string) {
+  async putOut (trash: string) {
     console.log('putOut')
     const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: `${trash}o`, user: this.gameState.game.board.users[0] }}
-    handleEmit(
+    await handleEmit(
       this.wsClient, {
         event: 'playcard',
         data: { type: 'board', data: boardState }
       }
-    ).then(() => {
-      handleEmit(
-        this.wsClient, {
-          event: 'turnchange',
-          data: { type: 'board', data: boardState }
-        }
-      )
-    })
+    )
+    handleEmit(
+      this.wsClient, {
+        event: 'turnchange',
+        data: { type: 'board', data: boardState }
+      }
+    )
+  }
+  updateStatus() {
+    // putable状態をリセットして判定に回す
+    const h = this.gameState.game.board.hands.map(hand => hand.replace('p', ''))
+    const newState = updateMyHandsStatus({ state: this.gameState, hands: h, trash: this.gameState.game.board.trash })
+    newState && this.gameDispatch(newState)
   }
 }
 /* eslint-enable no-unused-vars, no-useless-constructor, no-empty-function */

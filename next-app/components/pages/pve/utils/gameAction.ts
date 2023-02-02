@@ -11,9 +11,8 @@ class GameAction {
     private gameDispatch: Dispatch<SetStateAction<GameProviderState>>,
     private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
   ){}
-  draw() {
-    console.log('draw')
-    handleEmit(this.wsClient, { event: 'draw' })
+  async draw() {
+    await handleEmit(this.wsClient, { event: 'draw' })
     this.boardDispatch(prevState => ({ ...prevState, isDrawnCard:true }))
   }
   deckSet() {

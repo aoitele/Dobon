@@ -3,6 +3,7 @@ import { BoardDispathContext, BoardStateContext } from '../../../../../context/B
 import { GameDispathContext, GameStateContext } from '../../../../../context/GameProvider'
 import { ActionBtnTypeResponse, checkActionBtnType } from '../../../../../utils/game/checkActionBtnType'
 import { GameAction } from '../../utils/gameAction'
+import { Hand } from '../../utils/Hand'
 import styles from './ActionBtn.module.scss'
 
 type BtnBaseType = 'action' | 'dobon'
@@ -17,11 +18,12 @@ const ActionBtn: FC<Props> = ({ type }) => {
   if (!gameDispatch || !boardDispatch) return <></>
 
   const Action = new GameAction(gameState.wsClient, gameState, gameDispatch, boardDispatch)
+  const MyHand = new Hand(gameState.wsClient, gameState, gameDispatch)
   const btnType = checkActionBtnType({ gameState, boardState, type })
 
   return (
     <div
-      onClick={() => onClickFnExec(btnType, Action)}
+      onClick={() => onClickFnExec(btnType, Action, MyHand)}
       className={styles[btnType.type]}
     >
       {btnType.text}
@@ -29,11 +31,14 @@ const ActionBtn: FC<Props> = ({ type }) => {
   )
 }
 
-const onClickFnExec = (btnType: ActionBtnTypeResponse, Action: GameAction) => {
+const onClickFnExec = async (btnType: ActionBtnTypeResponse, Action: GameAction, MyHand: Hand) => {
   switch(btnType.type) {
     case 'deckSet'    : return Action.deckSet()
     case 'dobon'      : return Action.dobon()
-    case 'draw'       : return Action.draw()
+    case 'draw'       : {
+      await Action.draw()
+      return MyHand.updateStatus()
+    }
     case 'turnChange' : return Action.turnChange()
     default           : return undefined
   }

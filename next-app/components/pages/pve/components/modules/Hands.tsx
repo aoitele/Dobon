@@ -12,7 +12,7 @@ const Hands = () => {
 
   if (!gameDispatch || !boardDispatch) return <></>
   
-  const MyHand = new Hand(gameState.wsClient, gameState)
+  const MyHand = new Hand(gameState.wsClient, gameState, gameDispatch)
   const hands = spreadCardState(gameState.game.board.hands, true)
  
   return (

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch } from 'react'
 import { Board, Action } from '../../@types/game'
 import { HandCards } from '../../@types/card'
 import { AnotateState, useUpdateStateFn } from './state'
@@ -6,7 +6,6 @@ import { gameInitialState, Action as StateAction } from './roomStateReducer'
 import { AuthState } from '../../context/AuthProvider'
 import hasProperty from '../function/hasProperty'
 import { extractPutableSuitStr } from './effect'
-import { GameProviderState } from '../../context/GameProvider'
 
 const card2 = Number(process.env.NEXT_PUBLIC_RANK_CARD_DRAWTWO)
 const card13 = Number(process.env.NEXT_PUBLIC_RANK_CARD_OPENCARD)
@@ -96,7 +95,7 @@ const updateMyHandsStatus = ({state, hands, trash, dispatch}: UpdateHandProps): 
   // 場に出せる手札を判定、isPutable=trueにする(['${suit}${num}op', ...])
   const effect = state.game?.board.effect
   const putableCards = cardsICanPutOut(hands, trash.card, effect)
-  const newHands = hands.map(_ => putableCards.includes(_) ? `${_}p`: `${_}`)
+  const newHands = hands.map(hand => putableCards.includes(hand) ? `${hand}p`: `${hand}`)
   const data = {
     game: {
       board: {
