@@ -109,7 +109,7 @@ const updateMyHandsStatus = ({state, hands, trash, dispatch}: UpdateHandProps): 
 
 const resetMyHandsStatus = ({state, hands, dispatch}: ResetHandProps): void | AnotateState => {
   // IsPutable=falseにする
-  const newHands = hands.map(_ => _.replace('p', ''))
+  const newHands = hands.map(hand => hand.replace('p', ''))
   const data = {
     game: {
       board: {

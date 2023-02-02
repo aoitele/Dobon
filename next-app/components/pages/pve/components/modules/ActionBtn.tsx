@@ -39,7 +39,10 @@ const onClickFnExec = async (btnType: ActionBtnTypeResponse, Action: GameAction,
       await Action.draw()
       return MyHand.updateStatus()
     }
-    case 'turnChange' : return Action.turnChange()
+    case 'turnChange' : {
+      MyHand.resetStatus()
+      return Action.turnChange()
+    }
     default           : return undefined
   }
 }

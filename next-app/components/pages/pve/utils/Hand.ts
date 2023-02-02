@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { EmitBoard } from "../../../../@types/socket";
 import { GameProviderState } from "../../../../context/GameProvider";
-import { updateMyHandsStatus } from "../../../../utils/game/checkHand";
+import { resetMyHandsStatus, updateMyHandsStatus } from "../../../../utils/game/checkHand";
 import { handleEmit } from "../../../../utils/socket/emit"
 
 /* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
@@ -32,6 +32,11 @@ class Hand {
     // putable状態をリセットして判定に回す
     const h = this.gameState.game.board.hands.map(hand => hand.replace('p', ''))
     const newState = updateMyHandsStatus({ state: this.gameState, hands: h, trash: this.gameState.game.board.trash })
+    newState && this.gameDispatch(newState)
+  }
+  resetStatus() {
+    const h = this.gameState.game.board.hands.map(hand => hand.replace('p', ''))
+    const newState = resetMyHandsStatus({ state: this.gameState, hands: h })
     newState && this.gameDispatch(newState)
   }
 }
