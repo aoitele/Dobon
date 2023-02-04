@@ -3,7 +3,6 @@ import { Socket } from 'socket.io'
 import { Board, Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
-import hasProperty from "../utils/function/hasProperty"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
 import { cpuMainProcess } from "../utils/game/cpu/main"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
@@ -80,7 +79,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             {mode:'pve', type: 'user', firstKey: pveKey, secondKey: nickname},
           ])
 
-          const hands = await redisHandsInit(adapterPubClient, deckKey, redisKeys[0])
+          const hands = await redisHandsInit(adapterPubClient, deckKey, redisKeys[0]) // eslint-disable-line no-await-in-loop
           isCom ? otherHands.push({ userId: 0, hands, nickname }) : myHands = hands
 
           // Score update
@@ -226,7 +225,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
          * boardからユーザー情報を取得してCPU処理を実行していく
          */
         const { data } = payload
-        const rule = validateRules['cpuTurn']
+        const rule = validateRules.cpuTurn
         if (!isCpuTurnEmitData(data, rule)) break
         
         cpuMainProcess({ io, adapterPubClient, data, pveKey })

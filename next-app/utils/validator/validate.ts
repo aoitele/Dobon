@@ -1,4 +1,4 @@
-import { CpuTurnEmitData } from './emitData'
+import { CpuTurnEmitData } from '../../@types/emitData'
 import { Rules } from './rule'
 
 export const isCpuTurnEmitData = (data: any, rule:Rules['cpuTurn']): data is CpuTurnEmitData => {

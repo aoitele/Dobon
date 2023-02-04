@@ -12,6 +12,7 @@ jest.config.js
 
 # lint
 .lintstagedrc.js
+.eslintrc.js
 
 # next.js
 /.next/

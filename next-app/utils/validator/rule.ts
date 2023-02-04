@@ -8,7 +8,8 @@ import { Board } from "../../@types/game"
 import { Emit, EmitDataType } from "../../@types/socket"
 
 export type Rules = {
-  [key in NonNullable<Emit['event']>]?: { // keyは検証するイベント名
+  // keyは検証するイベント名
+  [key in NonNullable<Emit['event']>]?: { // eslint-disable-line no-unused-vars
     dataType: EmitDataType, // 送られるデータ型の指定
     required: (keyof Board)[] // 必須とするプロパティ
   }

@@ -41,7 +41,7 @@ const hasSameValue = (target: string | string[] | undefined, specifyValue:string
   }
 
   if (typeof target === 'string' && typeof specifyValue === 'string') {
-    if (target == specifyValue) return true
+    if (target === specifyValue) return true
   }
   return false
 }

@@ -1,7 +1,7 @@
 import { Redis } from "ioredis"
 import { Socket } from "socket.io"
 import { loadDobonRedisKeys } from "../../../server/redis/loadDobonRedisKeys"
-import { CpuTurnEmitData } from "../../validator/emitData"
+import { CpuTurnEmitData } from "../../../@types/emitData"
 import { drawPhase } from "./phase/drawPhase"
 import { putoutPhase } from "./phase/putoutPhase"
 
@@ -22,26 +22,25 @@ export interface CpuMainProcessArgs {
 const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data }: CpuMainProcessArgs) => {
   console.log('cpuMainProcess start...')
 
-  const user = data.data.users?.find(user => user.turn === data.data.turn)
-  if (!user?.nickname) {
+  const player = data.data.users?.find(user => user.turn === data.data.turn)
+  if (!player?.nickname) {
     throw Error('cpuMainProcess has Error: required data is not provided')
   }
 
   const [deckKey, trashKey, handsKey] = loadDobonRedisKeys([
     { mode:'pve', type: 'deck', firstKey: pveKey },
     { mode:'pve', type: 'trash', firstKey: pveKey },
-    { mode:'pve', type: 'hands', firstKey: pveKey, secondKey: user.nickname },
+    { mode:'pve', type: 'hands', firstKey: pveKey, secondKey: player.nickname },
   ])
 
   const redisData = await adapterPubClient.pipeline()
-    .smembers(deckKey)
     .lrange(trashKey, 0, -1)
     .smembers(handsKey)
     .exec((_err, results) => results)
-  const [_deck, trash, hands] = [redisData[0][1], redisData[1][1], redisData[2][1]]
+  const [trash, hands] = [redisData[0][1], redisData[1][1]]
 
-  const { updateData, updateHands } = await drawPhase({ user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, trashKey, handsKey })
-  await putoutPhase({ user, io, hands: updateHands, trash, data: updateData, adapterPubClient, pveKey, deckKey, trashKey, handsKey })
+  const { updateData, updateHands } = await drawPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey })
+  await putoutPhase({ user: player, io, hands: updateHands, trash, data: updateData, adapterPubClient, pveKey, trashKey, handsKey })
 }
 
 export { cpuMainProcess }

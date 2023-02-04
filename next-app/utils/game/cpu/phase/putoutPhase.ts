@@ -1,7 +1,7 @@
 import { HandCards } from "../../../../@types/card"
 import { Player } from "../../../../@types/game"
 import { NestedPartial } from "../../../../@types/utility"
-import { CpuTurnEmitData } from "../../../validator/emitData"
+import { CpuTurnEmitData } from "../../../../@types/emitData"
 import { cardsICanPutOut } from "../../checkHand"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
@@ -16,7 +16,6 @@ interface Args {
   data: CpuTurnEmitData
   adapterPubClient: CpuMainProcessArgs['adapterPubClient']
   pveKey: CpuMainProcessArgs['pveKey']
-  deckKey: string
   trashKey: string
   handsKey: string
 }
@@ -30,14 +29,14 @@ interface Args {
  *  - スキップする
  */
 const putoutPhase = async({
-  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, trashKey, handsKey
+  user, io, hands, trash, data, adapterPubClient, pveKey, trashKey, handsKey
 }: Args) => {
-  const {turn, users, effect, otherHands} = data.data 
+  const {turn, users, effect} = data.data
   if (!turn) {
     throw Error('putoutPhase has Error: required data is not provided')
   }
   let updateHands = [...hands]
-  let nextTurn;
+  let nextTurn; // eslint-disable-line init-declarations
 
   // 手札を場に出せるかを判定する
   const putableCards = cardsICanPutOut(hands, trash[0], effect)
@@ -67,8 +66,8 @@ const putoutPhase = async({
   adapterPubClient.srem(handsKey, trashCard, trashCard.slice(0, -1)) // redisはoあり/なしでsrem
 
   updateHands = updateHands.filter(card => card !== trashCard)
-  const comHandsIndex = data.data.otherHands.findIndex(hands => hands.nickname === user.nickname)
-  data.data.otherHands[comHandsIndex]['hands'] = updateHands
+  const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
+  data.data.otherHands[comHandsIndex].hands = updateHands
 
   // Const effectName = resEffectName({ card:[trashCard], selectedWildCard: null })
   const reducerPayload: reducerPayloadSpecify = {

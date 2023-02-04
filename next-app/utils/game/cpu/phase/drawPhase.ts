@@ -15,12 +15,11 @@ interface Args {
   adapterPubClient: CpuMainProcessArgs['adapterPubClient']
   pveKey: CpuMainProcessArgs['pveKey']
   deckKey: string
-  trashKey: string
   handsKey: string
 }
 
 const drawPhase = async({
-  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, trashKey, handsKey
+  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey
 }: Args) => {
   console.log(hands, 'hands')
   if (!data.data.otherHands) {
@@ -37,8 +36,8 @@ const drawPhase = async({
     const newCard = await adapterPubClient.spop(deckKey, 1)
     adapterPubClient.sadd(handsKey, newCard)
     updateHands.push(...newCard)
-    const comHandsIndex = data.data.otherHands.findIndex(hands => hands.nickname === user.nickname)
-    data.data.otherHands[comHandsIndex]['hands'] = updateHands
+    const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
+    data.data.otherHands[comHandsIndex].hands = updateHands
     // 手札情報を更新
     await sleep(1000)
     const reducerPayload: reducerPayloadSpecify = {
