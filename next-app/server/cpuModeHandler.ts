@@ -8,6 +8,7 @@ import { cpuMainProcess } from "../utils/game/cpu/main"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { resEffectName } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
+import sleep from "../utils/game/sleep"
 import { initialState } from "../utils/game/state"
 import { culcNextUserTurn } from "../utils/game/turnInfo"
 import { validateRules } from "../utils/validator/rule"
@@ -25,7 +26,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
   socket.on('emit', async (payload: EmitForPVE) => {
     console.log(payload, 'payload')
     console.log(socket.id, 'socket.id')
-    const { event, gameId } = payload
+    const { event, gameId, user } = payload
     console.log(event, 'event')
 
     // payload.queryを検証、pveKeyが存在しない場合は後続処理を行わない。 
@@ -182,6 +183,26 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
         break
       }
+      case 'effectcard': {
+        /**
+         * カード効果を全員に表示するため
+         * event.action 更新を行う
+         */
+        const { data } = payload
+        if (data?.type !== 'action') break
+        const reducerPayload:reducerPayloadSpecify = {
+          game: {
+            event: {
+              action: data.data.effect,
+              user,
+            }
+          }
+        }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+        await sleep(1000)
+        resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+        break
+      }
       case 'turnchange': {
         const { data } = payload
 
@@ -235,6 +256,15 @@ const cpuModeHandler = (io: Socket, socket: any) => {
     }
     return {}
   })
+}
+
+const resetEvent = (io:Socket, pveKey:string) => {
+  const reducerPayload: reducerPayloadSpecify = {
+    game: {
+      event: initialState.game?.event
+    }
+  }
+  io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 }
 
 export { cpuModeHandler }

@@ -9,11 +9,10 @@ const useBoardCycles = () => {
   const [boardState, gameDispatch, boardDispatch] = [useContext(BoardStateContext), useContext(GameDispathContext), useContext(BoardDispathContext)]
 
   useEffect(() => {
-    console.log('useBoardCycles useEffect')
     if (!gameDispatch || !boardDispatch) return
 
     const boardStateHandler = () => {
-      console.log('boardStateHandler called')
+      // Console.log('boardStateHandler called')
     }
     boardStateHandler()
   },[boardState])

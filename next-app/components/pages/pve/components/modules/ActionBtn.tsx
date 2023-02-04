@@ -18,7 +18,7 @@ const ActionBtn: FC<Props> = ({ type }) => {
   if (!gameDispatch || !boardDispatch) return <></>
 
   const Action = new GameAction(gameState.wsClient, gameState, gameDispatch, boardDispatch)
-  const MyHand = new Hand(gameState.wsClient, gameState, gameDispatch, boardDispatch)
+  const MyHand = new Hand(gameState.wsClient, gameState, boardState, gameDispatch, boardDispatch)
   const btnType = checkActionBtnType({ gameState, boardState, type })
 
   return (

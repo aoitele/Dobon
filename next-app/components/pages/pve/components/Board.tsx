@@ -2,6 +2,7 @@ import React, { FC } from "react"
 import styles from './Board.module.scss'
 import { ActionsContainer } from "./container/ActionsContainer"
 import { BoardInfoContainer } from "./container/BoardInfoContainer"
+import { EffectContainer } from "./container/EffectContainer"
 import { HandsContainer } from "./container/HandsContainer"
 import { MyInfoContainer } from "./container/MyInfoContainer"
 import { RoomInfoContainer } from "./container/RoomInfoContainer"
@@ -17,6 +18,7 @@ const Board:FC = () => {
       <MyInfoContainer />
       <HandsContainer />
       <ActionsContainer />
+      <EffectContainer />
     </div>
   )
 }
