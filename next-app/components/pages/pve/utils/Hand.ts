@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { EmitBoard } from "../../../../@types/socket";
+import { BoardProviderState, boardProviderInitialState } from "../../../../context/BoardProvider";
 import { GameProviderState } from "../../../../context/GameProvider";
 import { resetMyHandsStatus, updateMyHandsStatus } from "../../../../utils/game/checkHand";
 import { handleEmit } from "../../../../utils/socket/emit"
@@ -10,7 +11,7 @@ class Hand {
     private wsClient: GameProviderState['wsClient'],
     private gameState: GameProviderState,
     private gameDispatch: Dispatch<SetStateAction<GameProviderState>>,
-    // Private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
+    private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
   ){}
   async putOut (trash: string) {
     console.log('putOut')
@@ -38,6 +39,7 @@ class Hand {
     const h = this.gameState.game.board.hands.map(hand => hand.replace('p', ''))
     const newState = resetMyHandsStatus({ state: this.gameState, hands: h })
     newState && this.gameDispatch(newState)
+    this.boardDispatch(boardProviderInitialState)
   }
 }
 /* eslint-enable no-unused-vars, no-useless-constructor, no-empty-function */

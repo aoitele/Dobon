@@ -1,6 +1,5 @@
 import React, { createContext, Dispatch, FC, ReactNode, SetStateAction, useState } from "react"
 import { Card } from "../@types/card"
-import { InitialBoardState } from "../@types/game"
 
 export type BoardProviderState = {
   selectedCard: string
@@ -24,7 +23,7 @@ export type BoardProviderState = {
 
 export type BoardProviderDispatch = Dispatch<SetStateAction<BoardProviderState>> | undefined
 
-const initialState: BoardProviderState = {
+const boardProviderInitialState: BoardProviderState = {
   selectedCard: '',
   selectedWildCard: {
     isSelected: false,
@@ -47,7 +46,7 @@ const initialState: BoardProviderState = {
 /**
  * Create Context
  */
-const BoardStateContext = createContext<BoardProviderState>(initialState)
+const BoardStateContext = createContext<BoardProviderState>(boardProviderInitialState)
 const BoardDispathContext = createContext<BoardProviderDispatch>(undefined)
 
 interface Props {
@@ -55,7 +54,7 @@ interface Props {
 }
 
 const BoardProvider:FC<Props> = (props) => {
-  const [values, dispatch] = useState(initialState)
+  const [values, dispatch] = useState(boardProviderInitialState)
 
   return (
     <BoardStateContext.Provider value={values}>
@@ -66,4 +65,4 @@ const BoardProvider:FC<Props> = (props) => {
   )
 }
 
-export { BoardProvider, BoardStateContext, BoardDispathContext }
+export { BoardProvider, BoardStateContext, BoardDispathContext, boardProviderInitialState }
