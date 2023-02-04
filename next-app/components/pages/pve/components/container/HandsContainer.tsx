@@ -19,7 +19,7 @@ const HandsContainer:FC = () => {
           prevState => ({
             ...prevState,
             selectedCard: '',
-            selectedWildCard: boardProviderInitialState['selectedWildCard']
+            selectedWildCard: boardProviderInitialState.selectedWildCard,
           })
         )}
       />
