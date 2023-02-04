@@ -11,3 +11,13 @@
     text-align: center;
   }
 }
+.stateResetArea {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.2;
+  transition: 0.6s ease-in-out;
+}

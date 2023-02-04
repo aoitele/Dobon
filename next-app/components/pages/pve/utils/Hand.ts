@@ -28,6 +28,7 @@ class Hand {
         data: { type: 'board', data: boardState }
       }
     )
+    this.resetStatus()
   }
   updateStatus() {
     // putable状態をリセットして判定に回す
