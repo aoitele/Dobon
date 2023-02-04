@@ -125,6 +125,10 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'draw': {
+        const { data } = payload
+        if (data?.type !== 'board' || !data.data.hands) break
+        const prevHands = data.data.hands // 返却する手札の順番を変化させないため盤面手札を取得しておく
+
         const loadRedisKey = loadDobonRedisKeys([
           {mode:'pve', type: 'deck', firstKey: pveKey},
           {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me' },
@@ -133,7 +137,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const handsKey = loadRedisKey[1]
         const newCard = await adapterPubClient.spop(deckKey, 1)
         await adapterPubClient.sadd(handsKey, newCard)
-        const hands = await adapterPubClient.smembers(handsKey)
+        const hands = [...prevHands, ...newCard]
 
         // 手札を更新
         const reducerPayload: reducerPayloadSpecify = {
