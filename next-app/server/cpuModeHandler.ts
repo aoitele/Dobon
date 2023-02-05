@@ -26,7 +26,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
   socket.on('emit', async (payload: EmitForPVE) => {
     console.log(payload, 'payload')
     console.log(socket.id, 'socket.id')
-    const { event, gameId, user } = payload
+    const { event, gameId, user, data } = payload
+    const { board, action } = data ?? {}
     console.log(event, 'event')
 
     // payload.queryを検証、pveKeyが存在しない場合は後続処理を行わない。 
@@ -125,9 +126,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'draw': {
-        const { data } = payload
-        if (data?.type !== 'board' || !data.data.hands) break
-        const prevHands = data.data.hands // 返却する手札の順番を変化させないため盤面手札を取得しておく
+        const prevHands = board?.data.hands // 返却する手札の順番を変化させないため盤面手札を取得しておく
+        if (!prevHands?.length) break
 
         const loadRedisKey = loadDobonRedisKeys([
           {mode:'pve', type: 'deck', firstKey: pveKey},
@@ -151,10 +151,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'playcard': {
-        const { data } = payload
-        console.log(data, 'playcard!')
-        if (data?.type !== 'board') break
-        if (!data.data.trash?.card) break
+        const trash = board?.data.trash
+        if (!trash || !trash.card) break
 
         const loadRedisKey = loadDobonRedisKeys([
           {mode:'pve', type: 'trash', firstKey: pveKey},
@@ -164,17 +162,17 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const handsKey = loadRedisKey[1]
 
         // `${suit}${num}o`でデータがくるため、redisはoなしでlpush
-        const trashCard = data.data.trash.card.replace('o', '')
+        const trashCard = trash.card.replace('o', '')
         adapterPubClient.lpush(trashKey, trashCard) // 最新の捨て札を先頭に追加
 
         // `${suit}${num}o`でデータがくるため、redisはoあり/なしでsrem
-        adapterPubClient.srem(handsKey, data.data.trash.card, data.data.trash.card.slice(0, -1))
+        adapterPubClient.srem(handsKey, trash.card, trash.card.slice(0, -1))
         const hands = await adapterPubClient.smembers(handsKey)
 
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             board: { 
-              trash: data.data.trash,
+              trash,
               allowDobon: true,
               hands,
             }
@@ -188,12 +186,11 @@ const cpuModeHandler = (io: Socket, socket: any) => {
          * カード効果を全員に表示するため
          * event.action 更新を行う
          */
-        const { data } = payload
-        if (data?.type !== 'action') break
+        if (!action) break
         const reducerPayload:reducerPayloadSpecify = {
           game: {
             event: {
-              action: data.data.effect,
+              action: action.data.effect,
               user,
             }
           }
@@ -204,17 +201,15 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'turnchange': {
-        const { data } = payload
-
-        if (data?.type !== 'board') break
+        if (!board) break
 
         // 実行経路(putOut or actionBtn)により処理を分ける
-        const byPutout = data.option?.triggered === 'putOut'
-        const byActionBtn = data.option?.triggered === 'actionBtn'
+        const byPutout = board.option?.triggered === 'putOut'
+        const byActionBtn = board.option?.triggered === 'actionBtn'
 
         // ボードデータ取得、連続した自分のターンかどうかの判定(=skip効果によるturnchange?)
-        const { users, turn, trash, effect } = data.data
-        const isMyTurnConsecutive = data.option?.values.isMyTurnConsecutive
+        const { users, turn, trash, effect } = board.data
+        const isMyTurnConsecutive = board.option?.values.isMyTurnConsecutive
 
         if (users && turn && trash?.card) {
           // Skipカード効果で得た自分の連続ターンでない、純粋に自分のターンが来てカードを出した場合のみeffectNameを取得する
@@ -245,11 +240,10 @@ const cpuModeHandler = (io: Socket, socket: any) => {
          * 本イベントはCPUターンになったタイミングで呼び出す
          * boardからユーザー情報を取得してCPU処理を実行していく
          */
-        const { data } = payload
         const rule = validateRules.cpuTurn
-        if (!isCpuTurnEmitData(data, rule)) break
+        if (!board || !isCpuTurnEmitData(board, rule)) break
         
-        cpuMainProcess({ io, adapterPubClient, data, pveKey })
+        cpuMainProcess({ io, adapterPubClient, data: board, pveKey })
         break
       }
       default: return {}

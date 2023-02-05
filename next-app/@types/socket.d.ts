@@ -74,6 +74,16 @@ export type Emit = {
   query?: ParsedUrlQuery
 }
 
-export type EmitForPVE = PartiallyPartial<Emit, 'roomId'>
+export type EmitForPVE = {
+  event: Event
+  gameId?: number | null
+  user?: Player
+  query?: ParsedUrlQuery
+  data?: {
+    card?: Omit<EmitCard, 'type'>
+    action?: Omit<EmitAction, 'type'>
+    board?: Omit<EmitBoard, 'type'>
+  }
+}
 
 export type HandleEmitFn = (data: Emit) => Promise<any> // eslint-disable-line no-unused-vars

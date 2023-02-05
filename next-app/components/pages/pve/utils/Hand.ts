@@ -22,7 +22,7 @@ class Hand {
     handleEmit(
       this.wsClient, {
         event: 'playcard',
-        data: { type: 'board', data: boardState }
+        data: { board: { data: boardState } }
       }
     )
     const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
@@ -31,10 +31,11 @@ class Hand {
         event: 'effectcard',
         user: this.gameState.game.board.users[0],
         data: {
-          type:'action',
-          data: {
-            effectState: this.gameState.game.board.effect,
-            effect: effectName
+          action: {
+            data: {
+              effectState: this.gameState.game.board.effect,
+              effect: effectName
+            }
           }
         }
       })
@@ -44,7 +45,7 @@ class Hand {
     handleEmit(
       this.wsClient, {
         event: 'turnchange',
-        data: { type: 'board', data: boardState }
+        data: { board: { data: boardState } }
       }
     )
     this.resetStatus()

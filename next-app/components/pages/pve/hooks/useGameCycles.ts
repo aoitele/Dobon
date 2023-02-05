@@ -53,7 +53,7 @@ const useGameCycles = () => {
       handleEmit(
         gameState.wsClient, {
           event: 'cpuTurn',
-          data:{ type:'board', data: gameState.game.board },
+          data: {board: {data: gameState.game.board }},
           query: router.query
         }
       )

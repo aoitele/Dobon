@@ -12,7 +12,7 @@ class GameAction {
     private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
   ){}
   async draw() {
-    await handleEmit(this.wsClient, { event: 'draw', data:{ type:'board', data: this.gameState.game.board }})
+    await handleEmit(this.wsClient, { event: 'draw', data: { board: { data: this.gameState.game.board } } })
     this.boardDispatch(prevState => ({ ...prevState, isDrawnCard:true }))
   }
   deckSet() {
@@ -24,7 +24,7 @@ class GameAction {
     handleEmit(
       this.wsClient, {
         event: 'turnchange',
-        data: { type: 'board', data: this.gameState.game.board, option:{ values: {}, triggered: 'actionBtn' }}
+        data: { board: { data: this.gameState.game.board, option:{ values: {}, triggered: 'actionBtn' } } }
       }
     )
     this.boardDispatch(prevState => ({ ...prevState, isMyTurn: false }))
