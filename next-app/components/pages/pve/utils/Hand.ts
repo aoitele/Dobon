@@ -19,28 +19,21 @@ class Hand {
   async putOut (trash: string) {
     console.log('putOut')
     const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: `${trash}o`, user: this.gameState.game.board.users[0] }}
+    const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
+
     handleEmit(
       this.wsClient, {
         event: 'playcard',
-        data: { board: { data: boardState } }
-      }
-    )
-    const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
-    if (effectName) {
-      handleEmit(this.wsClient, {
-        event: 'effectcard',
         user: this.gameState.game.board.users[0],
         data: {
-          action: {
-            data: {
-              effectState: this.gameState.game.board.effect,
-              effect: effectName
-            }
-          }
+          board: { data: boardState },
+          action: effectName
+            ? { data: { effectState: this.gameState.game.board.effect, effect: effectName }}
+            : undefined
         }
-      })
-      await sleep(1000)
-    }
+      }
+    )
+    await sleep(1000)
 
     handleEmit(
       this.wsClient, {

@@ -2,6 +2,7 @@ import { Redis } from "ioredis"
 import { Socket } from 'socket.io'
 import { Board, Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
+import { PartiallyRequired } from "../@types/utility"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
 import { cpuMainProcess } from "../utils/game/cpu/main"
@@ -169,33 +170,18 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         adapterPubClient.srem(handsKey, trash.card, trash.card.slice(0, -1))
         const hands = await adapterPubClient.smembers(handsKey)
 
-        const reducerPayload: reducerPayloadSpecify = {
+        const reducerPayload: PartiallyRequired<reducerPayloadSpecify, 'game'> = {
           game: {
             board: { 
               trash,
               allowDobon: true,
               hands,
-            }
+            },
+            event: action ? { action: action.data.effect, user } : undefined
           }
         }
+
         io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
-        break
-      }
-      case 'effectcard': {
-        /**
-         * カード効果を全員に表示するため
-         * event.action 更新を行う
-         */
-        if (!action) break
-        const reducerPayload:reducerPayloadSpecify = {
-          game: {
-            event: {
-              action: action.data.effect,
-              user,
-            }
-          }
-        }
-        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
         await sleep(1000)
         resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
         break
