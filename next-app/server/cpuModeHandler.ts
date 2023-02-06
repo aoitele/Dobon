@@ -152,7 +152,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'playcard': {
-        const trash = board?.data.trash
+        const { trash, effect } = board?.data ?? {}
         if (!trash || !trash.card) break
 
         const loadRedisKey = loadDobonRedisKeys([
@@ -176,6 +176,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
               trash,
               allowDobon: true,
               hands,
+              effect,
             },
             event: action ? { action: action.data.effect, user } : undefined
           }

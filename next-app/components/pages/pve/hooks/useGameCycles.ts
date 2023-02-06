@@ -6,6 +6,7 @@ import { useContext, useEffect } from 'react'
 import { BoardStateContext, BoardDispathContext } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
 import { updateMyHandsStatus } from '../../../../utils/game/checkHand'
+import { existShouldBeSolvedEffect } from '../../../../utils/game/effect'
 import { handleEmit } from '../../../../utils/socket/emit'
 import { establishWsForPve } from '../utils/webSocket'
 
@@ -46,7 +47,9 @@ const useGameCycles = () => {
     if (!gameDispatch || !boardDispatch) return
     console.log('turnChanged')
     if (gameState.game.board.turn === 1) {
-      boardDispatch({ ...boardState, isMyTurn: true, isDrawnCard: false })
+      const showAvoidEffectview = gameState.game.board.effect.length > 0 && existShouldBeSolvedEffect(gameState.game.board.effect)
+
+      boardDispatch({ ...boardState, isMyTurn: true, isDrawnCard: false, showAvoidEffectview })
       const newState = updateMyHandsStatus({ state: gameState, hands: gameState.game.board.hands, trash: gameState.game.board.trash })
       newState && gameDispatch(newState)
     } else {

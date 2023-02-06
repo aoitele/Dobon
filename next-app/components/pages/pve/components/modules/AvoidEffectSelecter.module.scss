@@ -1,0 +1,68 @@
+.wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 90%;
+  height: 90%;
+  z-index: 2500;
+  .imageBg {
+    position: absolute;
+    top:60px;
+    width: 100%;
+    height: 90%;
+    padding: 26px;
+    background: #E0E0E0;
+    border-radius: 20px;
+    background-size: 30px 30px;
+    background-position: 0 0, 15px 15px, 15px 15px, 30px 30px;
+    .inner {
+      height: 100%;
+      text-align: center;
+      .attention {
+        font-size: 18px;
+        font-weight: bold;
+        white-space: pre-wrap;
+      }
+      .singleCardWrap {
+        margin: 20px 0px;
+      }
+      .btn {
+        width: 200px;
+        display:inline-block;
+        margin: 8px 0px;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        transition: 0.3s;
+        font-weight: bold;
+      }
+      .acceptEffect {
+        @extend .btn;
+        background-color: lightcoral;
+        white-space: pre-wrap;
+      }
+      .escapeEffect {
+        @extend .btn;
+        background-color: gold;
+      }
+      .noEscapeEffect {
+        @extend .btn;
+        background-color:lightgray;
+      }
+      .inspectOtherHands {
+        @extend .btn;
+        background-color: lightgreen;
+      }
+      .dobonBtn {
+        @extend .btn;
+        background-color: orange;
+      }
+      .actionBtn {
+        margin: 20px 0px;
+      }
+    }
+  }
+}

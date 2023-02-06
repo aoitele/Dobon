@@ -1,14 +1,12 @@
 import { Dispatch, SetStateAction } from "react";
-import { EmitBoard } from "../../../../@types/socket";
 import { BoardProviderState, boardProviderInitialState } from "../../../../context/BoardProvider";
 import { GameProviderState } from "../../../../context/GameProvider";
 import { resetMyHandsStatus, updateMyHandsStatus } from "../../../../utils/game/checkHand";
-import { resEffectName, resNewEffectState } from "../../../../utils/game/effect";
-import sleep from "../../../../utils/game/sleep";
+import { EmitForPVE } from "../../../../@types/socket";
 import { handleEmit } from "../../../../utils/socket/emit"
 
 /* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
-class Hand {
+class Effect {
   constructor(
     private wsClient: GameProviderState['wsClient'],
     private gameState: GameProviderState,
@@ -16,36 +14,25 @@ class Hand {
     private gameDispatch: Dispatch<SetStateAction<GameProviderState>>,
     private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
   ){}
-  async putOut (trash: string) {
-    console.log('putOut')
-    const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: `${trash}o`, user: this.gameState.game.board.users[0] }}
-    const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
-    const existsEffect = this.gameState.game.board.effect.length > 0
-
-    // エフェクトカードを出した場合はgameStateのeffectの状態を更新する
-    effectName && (boardState.effect = existsEffect ? resNewEffectState(this.gameState.game.board.effect, effectName) : [effectName])
-
-    handleEmit(
-      this.wsClient, {
-        event: 'playcard',
-        user: this.gameState.game.board.users[0],
-        data: {
-          board: { data: boardState },
-          action: effectName
-            ? { data: { effectState: this.gameState.game.board.effect, effect: effectName }}
-            : undefined
-        }
-      }
-    )
-    await sleep(1000)
-
-    handleEmit(
-      this.wsClient, {
-        event: 'turnchange',
-        data: { board: { data: boardState } }
-      }
-    )
-    this.resetStatus()
+  async accept() {
+    const re = /draw/u
+    const event = this.gameState.game.board.effect[0].match(re) ? 'drawcard__duetoeffect' : 'opencard' 
+    const actionEmit:EmitForPVE = {
+      event,
+      data: { action: { data: { effectState:this.gameState.game.board.effect, effect:this.gameState.game.board.effect[0] }}}
+    }
+    await handleEmit(this.wsClient, actionEmit)
+    this.boardDispatch({ ...this.boardState, showAvoidEffectview: false })
+  }
+  get description() {
+    switch(this.gameState.game.board.effect[0]) {
+      case 'draw2'    : return 'カードを2枚引きます'
+      case 'draw4'    : return 'カードを4枚引きます'
+      case 'draw6'    : return 'カードを6枚引きます'
+      case 'draw8'    : return 'カードを8枚引きます'
+      case 'opencard' : return '手札を公開します'
+      default         : return ''
+    }
   }
   updateStatus() {
     // putable状態をリセットして判定に回す
@@ -62,4 +49,4 @@ class Hand {
 }
 /* eslint-enable no-unused-vars, no-useless-constructor, no-empty-function */
 
-export { Hand }
+export { Effect }
