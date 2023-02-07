@@ -7,6 +7,7 @@ import { ParsedUrlQuery } from 'querystring'
 export type Event =
   | 'drawcard'
   | 'drawcard__duetoeffect'
+  | 'drawcard__effect'
   | 'drawcard__deckset'
   | 'playcard'
   | 'call'

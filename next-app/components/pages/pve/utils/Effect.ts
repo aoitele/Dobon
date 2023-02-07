@@ -16,10 +16,13 @@ class Effect {
   ){}
   async accept() {
     const re = /draw/u
-    const event = this.gameState.game.board.effect[0].match(re) ? 'drawcard__duetoeffect' : 'opencard' 
+    const event = this.gameState.game.board.effect[0].match(re) ? 'drawcard__effect' : 'opencard'
     const actionEmit:EmitForPVE = {
       event,
-      data: { action: { data: { effectState:this.gameState.game.board.effect, effect:this.gameState.game.board.effect[0] }}}
+      data: {
+        board : { data: { hands: this.gameState.game.board.hands }},
+        action: { data: { effectState: this.gameState.game.board.effect, effect: this.gameState.game.board.effect[0] }}
+      }
     }
     await handleEmit(this.wsClient, actionEmit)
     this.boardDispatch({ ...this.boardState, showAvoidEffectview: false })

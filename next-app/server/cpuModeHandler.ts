@@ -222,6 +222,38 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         }
         break
       }
+      case 'drawcard__effect': {
+        // 本イベントはdraw effectを受けた場合に呼び出す
+        const prevHands = board?.data.hands // 返却する手札の順番を変化させないため盤面手札を取得しておく
+        if (!action || !prevHands?.length) break
+
+        const { effectState, effect } = action.data
+        const mat = effect.match(/[0-9]/u)
+        if (mat === null) break
+
+        const drawCardNum = Number(mat)
+        const loadRedisKey = loadDobonRedisKeys([
+          {mode:'pve', type: 'deck', firstKey: pveKey},
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me' },
+        ])
+        const [deckKey, handsKey] = loadRedisKey
+
+        const newCard = await adapterPubClient.spop(deckKey, drawCardNum)
+        adapterPubClient.sadd(handsKey, newCard)
+
+        const newHands = [...prevHands, ...newCard]
+        const resolvedEffect = effectState.filter(state => state !== effect)
+        const reducerPayload: reducerPayloadSpecify = {
+            game: {
+              board: {
+                hands: newHands,
+                effect: resolvedEffect
+              }
+            }
+          }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+        break
+      }
       case 'cpuTurn': {
         /**
          * 本イベントはCPUターンになったタイミングで呼び出す
