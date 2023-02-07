@@ -60,7 +60,7 @@ const putoutPhase = async({
   }
 
   // 試しに最初のカードを出す
-  await sleep(1000)
+  await sleep(500)
   const trashCard = putableCards[0]
   adapterPubClient.lpush(trashKey, trashCard) // 最新の捨て札を先頭に追加
   adapterPubClient.srem(handsKey, trashCard, trashCard.slice(0, -1)) // redisはoあり/なしでsrem

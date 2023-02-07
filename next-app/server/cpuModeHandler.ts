@@ -254,6 +254,47 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         io.in(pveKey).emit('updateStateSpecify', reducerPayload)
         break
       }
+      case 'opencard': {
+        // 本イベントはopencard effectを受けた場合に呼び出す
+        const prevHands = board?.data.hands // 返却する手札の順番を変化させないため盤面手札を取得しておく
+        if (!action || !prevHands?.length) break
+
+        const { effectState, effect } = action.data
+        const loadRedisKey = loadDobonRedisKeys([
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me' },
+        ])
+        const [handsKey] = loadRedisKey
+        /**
+         * 盤面手札は下記のパターンで送られる
+         * s1   出せない手札
+         * s1p  出せる手札
+         * s1o  既に公開状態の手札、出せない
+         * s1op 既に公開状態の手札、出せる
+        */
+        const re = /[a-z][0-9]+o/gu
+        const hands = prevHands.map(card => {
+          const mat = card.match(re)
+          if (mat) return card // 既に公開状態であればそのまま返す
+          return card.includes('p') ? `${card.replace('p', 'op')}` : `${card}o` // 出せるカードであればopを付加して返す
+        })
+
+        adapterPubClient.pipeline()
+          .del(handsKey)
+          .sadd(handsKey, hands)
+          .exec((_err, results) => results)
+
+        const resolvedEffect = effectState.filter(state => state !== effect)
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              hands,
+              effect: resolvedEffect
+            }
+          }
+        }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+        break
+      }
       case 'cpuTurn': {
         /**
          * 本イベントはCPUターンになったタイミングで呼び出す
