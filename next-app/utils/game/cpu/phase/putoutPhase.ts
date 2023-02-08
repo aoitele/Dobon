@@ -40,11 +40,9 @@ const putoutPhase = async({
 
   // 手札を場に出せるかを判定する
   const putableCards = cardsICanPutOut(hands, trash[0], effect)
-  console.log(putableCards, 'putableCards')
 
   // 出せない場合はスキップ
   if (!putableCards.length) {
-    console.log('----- skip -----')
     const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
     nextTurn = culcNextUserTurn(turn, users, '', isReversed)
     const reducerPayload: reducerPayloadSpecify = {

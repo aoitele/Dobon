@@ -21,7 +21,6 @@ interface Args {
 const drawPhase = async({
   user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey
 }: Args) => {
-  console.log(hands, 'hands')
   if (!data.data.otherHands) {
     throw Error('drawPhase has Error: data.data.otherHands is not provided')
   }
@@ -29,7 +28,6 @@ const drawPhase = async({
   const updateHands = [...hands]
   // 手札を場に出せるかを判定する
   const putableCards = cardsICanPutOut(hands, trash[0], data.data.effect)
-  console.log(putableCards, 'putableCards')
 
   // 手札を出せない場合はドローする
   if (!putableCards.length) {

@@ -5,6 +5,7 @@ import { EmitForPVE } from "../@types/socket"
 import { PartiallyRequired } from "../@types/utility"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
+import { sepalateSuitNum } from "../utils/game/checkHand"
 import { cpuMainProcess } from "../utils/game/cpu/main"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { resEffectName } from "../utils/game/effect"
@@ -152,8 +153,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'playcard': {
-        const { trash, effect } = board?.data ?? {}
-        if (!trash || !trash.card) break
+        const { trash, effect, hands } = board?.data ?? {}
+        if (!trash || !trash.card || !hands) break
 
         const loadRedisKey = loadDobonRedisKeys([
           {mode:'pve', type: 'trash', firstKey: pveKey},
@@ -162,20 +163,21 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const trashKey = loadRedisKey[0]
         const handsKey = loadRedisKey[1]
 
-        // `${suit}${num}o`でデータがくるため、redisはoなしでlpush
-        const trashCard = trash.card.replace('o', '')
-        adapterPubClient.lpush(trashKey, trashCard) // 最新の捨て札を先頭に追加
+        const trashCard = sepalateSuitNum([trash.card])[0]
 
-        // `${suit}${num}o`でデータがくるため、redisはoあり/なしでsrem
-        adapterPubClient.srem(handsKey, trash.card, trash.card.slice(0, -1))
-        const hands = await adapterPubClient.smembers(handsKey)
+        adapterPubClient.pipeline()
+        .lpush(trashKey, `${trashCard.suit}${trashCard.num}`) // 最新の捨て札を先頭に追加(trashは`suit+num`形式で追加する)
+        .srem(handsKey, trash.card)
+        .exec((_err, results) => results)
+
+        const newHands = hands.filter(card => card !== trash.card)
 
         const reducerPayload: PartiallyRequired<reducerPayloadSpecify, 'game'> = {
           game: {
             board: { 
-              trash,
+              trash: {...trash, card: `${trashCard.suit}${trashCard.num}o`},
               allowDobon: true,
-              hands,
+              hands: newHands,
               effect,
             },
             event: action ? { action: action.data.effect, user } : undefined

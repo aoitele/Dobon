@@ -17,7 +17,7 @@ const Hands = () => {
  
   return (
     <div className={styles.slides}>
-      {hands.map(card => {
+      {hands.map((card, idx) => {
         const face = `${card.suit}${card.num}`
         return (
           <div key={face}>
@@ -27,7 +27,7 @@ const Hands = () => {
               ${card.isPutable ? undefined : styles.cantPut}
               ${boardState.selectedCard === face ? styles.selected : undefined }
               `} 
-              onClick={() => boardState.selectedCard === face ? MyHand.putOut(face) : undefined }
+              onClick={() => boardState.selectedCard === face ? MyHand.putOut(gameState.game.board.hands[idx]) : undefined }
             >
               <div className={styles.effectEye}>
                 { card.isOpen && <Image src='/images/game/effect/eye.png' width={15} height={15} />}

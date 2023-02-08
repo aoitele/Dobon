@@ -18,7 +18,7 @@ class Hand {
   ){}
   async putOut (trash: string) {
     console.log('putOut')
-    const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: `${trash}o`, user: this.gameState.game.board.users[0] }}
+    const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: trash, user: this.gameState.game.board.users[0] }}
     const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
     const existsEffect = this.gameState.game.board.effect.length > 0
 
