@@ -42,7 +42,12 @@ class Hand {
     handleEmit(
       this.wsClient, {
         event: 'turnchange',
-        data: { board: { data: boardState } }
+        data: {
+          board: {
+            data: boardState,
+            option: { values: { isMyTurnConsecutive: this.boardState.isMyTurnConsecutive }, triggered: 'putOut' }
+          },
+        }
       }
     )
     this.resetStatus()
