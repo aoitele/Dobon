@@ -60,18 +60,18 @@ const putoutPhase = async({
   // 試しに最初のカードを出す
   await sleep(500)
   const trashCard = putableCards[0]
-  adapterPubClient.lpush(trashKey, trashCard) // 最新の捨て札を先頭に追加
-  adapterPubClient.srem(handsKey, trashCard, trashCard.slice(0, -1)) // redisはoあり/なしでsrem
+  console.log(trashCard, 'trashCard')
+  adapterPubClient.lpush(trashKey, trashCard.replace('o', '')) // 最新の捨て札を先頭に追加(oは除いておく)
+  adapterPubClient.srem(handsKey, trashCard)
 
   updateHands = updateHands.filter(card => card !== trashCard)
   const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
   data.data.otherHands[comHandsIndex].hands = updateHands
 
-  // 出すカードがdraw、opencardであれば解決されたEffectを返却させる
-  // Const effectName = resEffectName({ card:[trashCard], selectedWildCard: null })
   const reducerPayload: reducerPayloadSpecify = {
     game: {
       board: {
+        effect: data.data.effect,
         trash: {
           card: `${trashCard}o`,
           user,

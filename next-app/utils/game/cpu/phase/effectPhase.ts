@@ -43,7 +43,8 @@ const effectPhase = async({
   }
 
   // 以降、効果を受ける場合
-  const updateHands = [...hands]
+  let updateHands = [...hands]
+  let drawCnt = 0
 
   switch(effect) {
     case 'draw2':
@@ -51,33 +52,44 @@ const effectPhase = async({
     case 'draw6':
     case 'draw8': {
       // ドロー実行
-      const drawCnt = effect.substring(effect.length - 1)
-      const newCard = await adapterPubClient.spop(deckKey, Number(drawCnt))
+      drawCnt = Number(effect.substring(effect.length - 1))
+      const newCard = await adapterPubClient.spop(deckKey, drawCnt)
       adapterPubClient.sadd(handsKey, newCard)
       updateHands.push(...newCard)
-
-      // 手札情報、エフェクト情報を更新
-      const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
-      data.data.otherHands[comHandsIndex].hands = updateHands
-      data.data.effect = data.data.effect.filter(item => item !== effect)
- 
-      const reducerPayload: reducerPayloadSpecify = {
-        game: {
-          board: {
-            effect: data.data.effect,
-            otherHands: data.data.otherHands,
-            deckCount: data.data.deckCount - Number(drawCnt),
-          }
-        }
-      }
-      io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-      break;
+      break
     }
     case 'opencard': {
-      break;
+      // カードを公開状態に変更
+      const re = /[a-z][0-9]+o/gu
+      updateHands = hands.map(card => {
+        const mat = card.match(re)
+        if (mat) return card // 既に公開状態であればそのまま返す
+        return card.includes('p') ? `${card.replace('p', 'op')}` : `${card}o` // 出せるカードであればopを付加して返す
+      })
+      adapterPubClient.pipeline()
+      .del(handsKey)
+      .sadd(handsKey, updateHands)
+      .exec((_err, results) => results)
+      break
     }
     default: break;
   }
+
+  // 手札情報、エフェクト情報を更新
+  const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
+  data.data.otherHands[comHandsIndex].hands = updateHands
+  data.data.effect = data.data.effect.filter(item => item !== effect)
+
+  const reducerPayload: reducerPayloadSpecify = {
+    game: {
+      board: {
+        effect: data.data.effect,
+        otherHands: data.data.otherHands,
+        deckCount: drawCnt ? data.data.deckCount - drawCnt : data.data.deckCount,
+      }
+    }
+  }
+  io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 
   await sleep(1000)
 
