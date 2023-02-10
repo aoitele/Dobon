@@ -49,8 +49,8 @@ const drawPhase = async({
     io.in(pveKey).emit('updateStateSpecify', reducerPayload)
   }
   return {
-    updateData: data,
-    updateHands,
+    updateData2: data,
+    updateHands2: updateHands,
   }
 }
 

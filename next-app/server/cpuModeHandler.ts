@@ -26,11 +26,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
   const adapterPubClient: Redis = socket.adapter.pubClient
 
   socket.on('emit', async (payload: EmitForPVE) => {
-    console.log(payload, 'payload')
-    console.log(socket.id, 'socket.id')
     const { event, gameId, user, data } = payload
     const { board, action } = data ?? {}
-    console.log(event, 'event')
 
     // payload.queryを検証、pveKeyが存在しない場合は後続処理を行わない。 
     const hasValidQueriesArgs: HasValidQueriesArgs = {

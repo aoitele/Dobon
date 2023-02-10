@@ -67,6 +67,7 @@ const putoutPhase = async({
   const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
   data.data.otherHands[comHandsIndex].hands = updateHands
 
+  // 出すカードがdraw、opencardであれば解決されたEffectを返却させる
   // Const effectName = resEffectName({ card:[trashCard], selectedWildCard: null })
   const reducerPayload: reducerPayloadSpecify = {
     game: {
