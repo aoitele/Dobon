@@ -7,7 +7,7 @@ import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
 import { culcNextUserTurn } from "../../turnInfo"
 import { CpuMainProcessArgs } from '../main'
-import { resEffectName, resNewEffectState } from "../../effect"
+import { isAddableEffect, resEffectName, resNewEffectState } from "../../effect"
 import { DOBON_CARD_NUMBER_WILD } from "../../../../constant"
 import { resetEvent } from "../../../../server/cpuModeHandler"
 
@@ -94,18 +94,22 @@ const putoutPhase = async({
     console.log(`PutOut Phase : user:${user.nickname} select suit - ${mostOwnedSuit}`)
   }
 
-  // 場の効果を解決、捨て札が効果カードであればeffectに追加する
+  // 場の効果を解決、trashが追加すべき効果カードであればeffectに追加する
   const effectName = resEffectName({ card:[trashCard], selectedWildCard: { isSelected: true, suit: mostOwnedSuit } })
   const existsEffect = data.data.effect.length > 0
+  const isReversed = data.data.effect.includes('reverse') // 解決前の反転状態を取得して後続のculcNextUserTurnに次ターンを計算させている
+  console.log(`PutOut Phase : trash card effect - ${effectName}`)
+  console.log(`PutOut Phase : isReversed before resolve effect - ${isReversed}`)
 
   if (existsEffect) {
     const newEffectState = resNewEffectState(data.data.effect, effectName)
     data.data.effect = newEffectState
     console.log(`PutOut Phase : new Effect state - ${newEffectState}`)
-  } else if(effectName && effectName !== 'reverse' && effectName !== 'skip') {
-    // TODO：skip reverseの効果解決は追って実装
-    data.data.effect.push(effectName)
-    console.log(`PutOut Phase : add Effect - ${effectName}`)
+  } else if(effectName) {
+    if (isAddableEffect(effectName)){
+      data.data.effect.push(effectName)
+      console.log(`PutOut Phase : add Effect - ${effectName}`)
+    }
   }
 
   const reducerPayload: reducerPayloadSpecify = {
@@ -117,7 +121,7 @@ const putoutPhase = async({
           user,
         },
         allowDobon: true,
-        turn: culcNextUserTurn(turn, users, '', false),
+        turn: culcNextUserTurn(turn, users, effectName, isReversed),
         otherHands: data.data.otherHands,
       },
       event: effectName ? { user, action: effectName } : undefined
