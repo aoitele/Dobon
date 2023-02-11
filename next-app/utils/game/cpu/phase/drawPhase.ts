@@ -22,7 +22,7 @@ const drawPhase = async({
   user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey
 }: Args) => {
   if (!data.data.otherHands) {
-    throw Error('drawPhase has Error: data.data.otherHands is not provided')
+    throw Error('Draw Phase : has Error: data.data.otherHands is not provided')
   }
 
   const updateHands = [...hands]
@@ -37,7 +37,7 @@ const drawPhase = async({
     const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
     data.data.otherHands[comHandsIndex].hands = updateHands
     // 手札情報を更新
-    await sleep(500)
+    await sleep(1000)
     const reducerPayload: reducerPayloadSpecify = {
       game: {
         board: {
@@ -47,6 +47,7 @@ const drawPhase = async({
       }
     }
     io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+    console.log(`Draw Phase : user:${user.nickname} draw - ${newCard}`)
   }
   return {
     updateData2: data,

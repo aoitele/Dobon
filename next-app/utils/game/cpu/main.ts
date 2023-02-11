@@ -21,7 +21,7 @@ export interface CpuMainProcessArgs {
 }
 
 const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data }: CpuMainProcessArgs) => {
-  console.log('cpuMainProcess start...')
+  console.log(`\n--- COM TURN START ---\n`)
 
   const player = data.data.users?.find(user => user.turn === data.data.turn)
   if (!player?.nickname) {

@@ -7,7 +7,7 @@ import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
 import { culcNextUserTurn } from "../../turnInfo"
 import { CpuMainProcessArgs } from '../main'
-import { resEffectName } from "../../effect"
+import { resEffectName, resNewEffectState } from "../../effect"
 import { DOBON_CARD_NUMBER_WILD } from "../../../../constant"
 import { resetEvent } from "../../../../server/cpuModeHandler"
 
@@ -36,7 +36,7 @@ const putoutPhase = async({
 }: Args) => {
   const {turn, users, effect} = data.data
   if (!turn) {
-    throw Error('putoutPhase has Error: required data is not provided')
+    throw Error('PutOut Phase : has Error: required data is not provided')
   }
   let updateHands = [...hands]
   let nextTurn; // eslint-disable-line init-declarations
@@ -55,15 +55,17 @@ const putoutPhase = async({
         }
       }
     }
+    console.log(`\n--- COM TURN END for SKIP ---\n`)
     await sleep(500)
     io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+
     return
   }
 
   // 試しに最初のカードを出す
   await sleep(500)
   const trashCard = putableCards[0]
-  console.log(trashCard, 'trashCard')
+  console.log(`PutOut Phase : user:${user.nickname} trash - ${trashCard}`)
   adapterPubClient.lpush(trashKey, trashCard.replace('o', '')) // 最新の捨て札を先頭に追加(oは除いておく)
   adapterPubClient.srem(handsKey, trashCard)
 
@@ -89,11 +91,21 @@ const putoutPhase = async({
         mostOwnedSuit = key
       }
     }
+    console.log(`PutOut Phase : user:${user.nickname} select suit - ${mostOwnedSuit}`)
   }
 
+  // 場の効果を解決、捨て札が効果カードであればeffectに追加する
   const effectName = resEffectName({ card:[trashCard], selectedWildCard: { isSelected: true, suit: mostOwnedSuit } })
-  if (effectName) {
+  const existsEffect = data.data.effect.length > 0
+
+  if (existsEffect) {
+    const newEffectState = resNewEffectState(data.data.effect, effectName)
+    data.data.effect = newEffectState
+    console.log(`PutOut Phase : new Effect state - ${newEffectState}`)
+  } else if(effectName && effectName !== 'reverse' && effectName !== 'skip') {
+    // TODO：skip reverseの効果解決は追って実装
     data.data.effect.push(effectName)
+    console.log(`PutOut Phase : add Effect - ${effectName}`)
   }
 
   const reducerPayload: reducerPayloadSpecify = {
@@ -112,6 +124,7 @@ const putoutPhase = async({
     }
   }
   io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
+  console.log(`\n--- COM TURN END ---\n`)
 
   await sleep(1000)
   resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新

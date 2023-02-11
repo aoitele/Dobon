@@ -29,7 +29,7 @@ const effectPhase = async({
   // ドロー効果/手札公開効果がなければ何もせずドローフェイズへ
   const effect = extractShouldBeSolvedEffect(data.data.effect)[0]
   if (!effect) {
-    console.log('skip effect phase - no effect')
+    console.log('Effect Phase : SKIP - no effect')
     return { updateData1: data, updateHands1: hands }
   }
 
@@ -38,7 +38,7 @@ const effectPhase = async({
   const _hands = sepalateSuitNum(hands).map(card => card.num)
 
   if (_hands.includes(cardNum)) {
-    console.log('skip effect phase - have num')
+    console.log('Effect Phase : SKIP - have num')
     return { updateData1: data, updateHands1: hands }
   }
 
@@ -56,6 +56,7 @@ const effectPhase = async({
       const newCard = await adapterPubClient.spop(deckKey, drawCnt)
       adapterPubClient.sadd(handsKey, newCard)
       updateHands.push(...newCard)
+      console.log(`Effect Phase : user:${user.nickname} accept effect - ${effect}`)
       break
     }
     case 'opencard': {
@@ -70,6 +71,7 @@ const effectPhase = async({
       .del(handsKey)
       .sadd(handsKey, updateHands)
       .exec((_err, results) => results)
+      console.log(`Effect Phase : user:${user.nickname} accept effect - ${effect}`)
       break
     }
     default: break;
