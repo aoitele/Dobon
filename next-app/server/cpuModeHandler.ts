@@ -320,4 +320,4 @@ const resetEvent = (io:Socket, pveKey:string) => {
   io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 }
 
-export { cpuModeHandler }
+export { cpuModeHandler, resetEvent }
