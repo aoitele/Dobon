@@ -39,7 +39,7 @@ const effectPhase = async({
 
   if (_hands.includes(cardNum)) {
     console.log('Effect Phase : SKIP - have num')
-    return { updateData1: data, updateHands1: hands }
+    return { updateData1: data, updateHands1: hands, haveNum: true }
   }
 
   // 以降、効果を受ける場合
@@ -56,6 +56,7 @@ const effectPhase = async({
       const newCard = await adapterPubClient.spop(deckKey, drawCnt)
       adapterPubClient.sadd(handsKey, newCard)
       updateHands.push(...newCard)
+      data.data.deckCount -= drawCnt
       console.log(`Effect Phase : user:${user.nickname} accept effect - ${effect}`)
       break
     }
@@ -81,13 +82,14 @@ const effectPhase = async({
   const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
   data.data.otherHands[comHandsIndex].hands = updateHands
   data.data.effect = data.data.effect.filter(item => item !== effect)
+  const deckCount = await adapterPubClient.scard(deckKey)
 
   const reducerPayload: reducerPayloadSpecify = {
     game: {
       board: {
         effect: data.data.effect,
         otherHands: data.data.otherHands,
-        deckCount: drawCnt ? data.data.deckCount - drawCnt : data.data.deckCount,
+        deckCount,
       }
     }
   }

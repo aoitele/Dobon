@@ -15,13 +15,15 @@ class Effect {
     private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
   ){}
   async accept() {
-    const re = /draw/u
-    const event = this.gameState.game.board.effect[0].match(re) ? 'drawcard__effect' : 'opencard'
+    const isDrawEvent = this.gameState.game.board.effect.find(ef => ef.match(/draw/u))
+    const isOpenCardEvent = this.gameState.game.board.effect.find(ef => ef.match(/opencard/u))
+    if (!isDrawEvent && !isOpenCardEvent) return
+
     const actionEmit:EmitForPVE = {
-      event,
+      event: isDrawEvent ? 'drawcard__effect' : 'opencard',
       data: {
         board : { data: { hands: this.gameState.game.board.hands }},
-        action: { data: { effectState: this.gameState.game.board.effect, effect: this.gameState.game.board.effect[0] }}
+        action: { data: { effectState: this.gameState.game.board.effect, effect: isDrawEvent ?? 'opencard' }}
       }
     }
     await handleEmit(this.wsClient, actionEmit)

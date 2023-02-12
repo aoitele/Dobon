@@ -1,6 +1,6 @@
 import { Redis } from "ioredis"
 import { Socket } from 'socket.io'
-import { Board, Player } from "../@types/game"
+import { Board, Effect, Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
 import { PartiallyRequired } from "../@types/utility"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
@@ -8,7 +8,7 @@ import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValid
 import { sepalateSuitNum } from "../utils/game/checkHand"
 import { cpuMainProcess } from "../utils/game/cpu/main"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
-import { resEffectName } from "../utils/game/effect"
+import { isAddableEffect, resEffectName, resNewEffectState } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 import sleep from "../utils/game/sleep"
 import { initialState } from "../utils/game/state"
@@ -126,7 +126,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
       }
       case 'draw': {
         const prevHands = board?.data.hands // 返却する手札の順番を変化させないため盤面手札を取得しておく
-        if (!prevHands?.length) break
+        if (!board?.data || !prevHands?.length) break
 
         const loadRedisKey = loadDobonRedisKeys([
           {mode:'pve', type: 'deck', firstKey: pveKey},
@@ -135,14 +135,16 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const deckKey = loadRedisKey[0]
         const handsKey = loadRedisKey[1]
         const newCard = await adapterPubClient.spop(deckKey, 1)
-        await adapterPubClient.sadd(handsKey, newCard)
+        adapterPubClient.sadd(handsKey, newCard)
+        const deckCount = await adapterPubClient.scard(deckKey)
         const hands = [...prevHands, ...newCard]
 
         // 手札を更新
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             board: {
-              hands
+              hands,
+              deckCount,
             }
           }
         }
@@ -150,7 +152,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'playcard': {
-        const { trash, effect, hands } = board?.data ?? {}
+        const { trash, hands } = board?.data ?? {}
         if (!trash || !trash.card || !hands) break
 
         const loadRedisKey = loadDobonRedisKeys([
@@ -175,7 +177,6 @@ const cpuModeHandler = (io: Socket, socket: any) => {
               trash: {...trash, card: `${trashCard.suit}${trashCard.num}o`},
               allowDobon: true,
               hands: newHands,
-              effect,
             },
             event: action ? { action: action.data.effect, user } : undefined
           }
@@ -196,16 +197,23 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         // ボードデータ取得、連続した自分のターンかどうかの判定(=skip効果によるturnchange?)
         const { users, turn, trash, effect } = board.data
         const isMyTurnConsecutive = board.option?.values.isMyTurnConsecutive
+        let updatedEffect: Effect[] = []
 
         if (users && turn && trash?.card) {
           // Skipカード効果で得た自分の連続ターンでない、純粋に自分のターンが来てカードを出した場合のみeffectNameを取得する
           const effectName = (!isMyTurnConsecutive && byPutout) ? resEffectName({ card: [trash.card], selectedWildCard: null }) : ''
           const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
           const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed)
+
+          if (effect && effectName && isAddableEffect(effectName)) {
+            updatedEffect = resNewEffectState(effect, effectName)
+          }
+
           const reducerPayload: reducerPayloadSpecify = {
             game: {
               board: {
                 turn: nextTurn,
+                effect: updatedEffect.length ? updatedEffect : undefined,
               }
             }
           }
@@ -242,11 +250,14 @@ const cpuModeHandler = (io: Socket, socket: any) => {
 
         const newHands = [...prevHands, ...newCard]
         const resolvedEffect = effectState.filter(state => state !== effect)
+        const deckCount = await adapterPubClient.scard(deckKey)
+
         const reducerPayload: reducerPayloadSpecify = {
             game: {
               board: {
                 hands: newHands,
-                effect: resolvedEffect
+                effect: resolvedEffect,
+                deckCount,
               }
             }
           }

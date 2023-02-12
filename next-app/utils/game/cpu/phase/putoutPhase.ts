@@ -21,6 +21,7 @@ interface Args {
   pveKey: CpuMainProcessArgs['pveKey']
   trashKey: string
   handsKey: string
+  haveNum?: boolean
 }
 
 /**
@@ -32,7 +33,7 @@ interface Args {
  *  - スキップする
  */
 const putoutPhase = async({
-  user, io, hands, trash, data, adapterPubClient, pveKey, trashKey, handsKey
+  user, io, hands, trash, data, adapterPubClient, pveKey, trashKey, handsKey, haveNum
 }: Args) => {
   const {turn, users, effect} = data.data
   if (!turn) {
@@ -43,6 +44,7 @@ const putoutPhase = async({
 
   // 手札を場に出せるかを判定する
   const putableCards = cardsICanPutOut(hands, trash[0], effect)
+  console.log(putableCards, 'putableCards')
 
   // 出せない場合はスキップ
   if (!putableCards.length) {
@@ -62,9 +64,14 @@ const putoutPhase = async({
     return
   }
 
-  // 試しに最初のカードを出す
+  // カード効果をeffectPhaseで回避している場合は、回避用のカードを優先して出す
+  const trashCard = haveNum
+  ? putableCards.filter(card => sepalateSuitNum([card])[0].num === sepalateSuitNum([trash[0]])[0].num)[0]
+  : putableCards[0]
+  console.log(`PutOut Phase :haveNum - ${haveNum}`)
+  // 効果解決でない場合はカードを選択して出す(TODO：選択ロジック実装)
   await sleep(500)
-  const trashCard = putableCards[0]
+  // trashCard = putableCards[0]
   console.log(`PutOut Phase : user:${user.nickname} trash - ${trashCard}`)
   adapterPubClient.lpush(trashKey, trashCard.replace('o', '')) // 最新の捨て札を先頭に追加(oは除いておく)
   adapterPubClient.srem(handsKey, trashCard)
