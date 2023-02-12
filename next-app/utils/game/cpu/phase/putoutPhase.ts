@@ -69,9 +69,9 @@ const putoutPhase = async({
   ? putableCards.filter(card => sepalateSuitNum([card])[0].num === sepalateSuitNum([trash[0]])[0].num)[0]
   : putableCards[0]
   console.log(`PutOut Phase :haveNum - ${haveNum}`)
+
   // 効果解決でない場合はカードを選択して出す(TODO：選択ロジック実装)
   await sleep(500)
-  // trashCard = putableCards[0]
   console.log(`PutOut Phase : user:${user.nickname} trash - ${trashCard}`)
   adapterPubClient.lpush(trashKey, trashCard.replace('o', '')) // 最新の捨て札を先頭に追加(oは除いておく)
   adapterPubClient.srem(handsKey, trashCard)
