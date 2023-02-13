@@ -30,7 +30,13 @@ class GameAction {
     this.boardDispatch(prevState => ({ ...prevState, isMyTurn: false }))
   }
   dobon() {
-    console.log('dobon')
+    handleEmit(
+      this.wsClient, {
+        event: 'dobon',
+        user: this.gameState.game.board.users[0],
+        data: { board: { data: this.gameState.game.board } }
+      }
+    )
     this.gameDispatch(prevState => prevState)
   }
 }

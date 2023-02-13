@@ -8,6 +8,7 @@ import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValid
 import { sepalateSuitNum } from "../utils/game/checkHand"
 import { cpuMainProcess } from "../utils/game/cpu/main"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
+import { dobonJudge } from "../utils/game/dobonJudge"
 import { isAddableEffect, resEffectName, resNewEffectState } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 import sleep from "../utils/game/sleep"
@@ -314,6 +315,64 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         if (!board || !isCpuTurnEmitData(board, rule)) break
         
         cpuMainProcess({ io, adapterPubClient, data: board, pveKey })
+        break
+      }
+      case 'dobon': {
+        if (!board?.data.trash?.card || !board.data.hands) break
+
+        // 全ユーザーにドボン発生を通知
+        let reducerPayload: reducerPayloadSpecify = {
+          game: {
+            event: {
+              user,
+              action: 'dobon'
+            }
+          }
+        }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+        await sleep(3000)
+        resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+
+        const lastTrashUser = board.data.trash.user
+        const judge = dobonJudge(board.data.trash.card, board.data.hands)
+
+        // ドボン成功ならユーザーデータのwiner/loserを更新させる
+        const newUsersState = board.data.users?.map(u => {
+          if (judge) {
+            if (u.id === user?.id) { u.isWinner = true}
+            if (u.id === lastTrashUser?.id) { u.isLoser = true }
+          }
+          return u
+        })
+
+        // ドボン結果を通知
+        reducerPayload = {
+          game: {
+            event: {
+              action: judge ? 'dobonsuccess' : 'dobonfailure'
+            },
+            board: {
+              users: newUsersState,
+            },
+            result: {
+              dobonHandsCount: board.data.hands.length
+            }
+          }
+        }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+        await sleep(3000)
+
+        if (judge) {
+          // ドボン成功ならスコア計算画面へ移行
+          reducerPayload = {
+            game: {
+              status: 'ended'
+            }
+          }
+          io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+          await sleep(3000)
+        }
+        resetEvent(io, pveKey)
         break
       }
       default: return {}
