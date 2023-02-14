@@ -37,6 +37,35 @@ const useGameCycles = () => {
           boardDispatch({ ...boardState, isMyTurn: true })
           break
         }
+        case 'showScore': {
+          // const bonusCards = gameState.game.board.bonusCards
+          // const bonusNums = resBonusNumArray(bonusCards)
+          // const isSingleDobon = gameState.game.result.dobonHandsCount === 1
+          // const bonusTotal = culcBonus(bonusNums)
+          // const resultScore = culcGetScore({ dobonNum, bonusCards: bonusNums, isReverseDobon, isSingleDobon })
+          // const roundUpScore = Math.ceil(resultScore / 10) * 10
+          // const jokerCount = bonusNums.filter(card => card === 0).length
+
+          // const valueBaseObj = {
+          //   ...values,
+          //   bonusCards,
+          //   bonusTotal,
+          //   resultScore,
+          //   roundUpScore,
+          //   addBonus: {
+          //     isSingleDobon,
+          //     isReverseDobon,
+          //     jokerCount
+          //   }
+          // }
+
+          // setValues(() => ({
+          //   ...valueBaseObj,
+          //   winerScore: winner.score,
+          //   loserScore: loser.score,
+          // }))
+          break
+        }
         default: break
       }
     }

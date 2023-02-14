@@ -7,6 +7,7 @@ import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
 import { sepalateSuitNum } from "../utils/game/checkHand"
 import { cpuMainProcess } from "../utils/game/cpu/main"
+import { getBonus } from "../utils/game/cpu/utils/getBonus"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { dobonJudge } from "../utils/game/dobonJudge"
 import { isAddableEffect, resEffectName, resNewEffectState } from "../utils/game/effect"
@@ -330,11 +331,12 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           }
         }
         io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-        await sleep(3000)
+        await sleep(1000)
         resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
 
         const lastTrashUser = board.data.trash.user
         const judge = dobonJudge(board.data.trash.card, board.data.hands)
+        // const judge = true
 
         // ドボン成功ならユーザーデータのwiner/loserを更新させる
         const newUsersState = board.data.users?.map(u => {
@@ -360,7 +362,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           }
         }
         io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-        await sleep(3000)
+        await sleep(1000)
 
         if (judge) {
           // ドボン成功ならスコア計算画面へ移行
@@ -370,9 +372,38 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             }
           }
           io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-          await sleep(3000)
+          await sleep(1000)
         }
         resetEvent(io, pveKey)
+        break
+      }
+      case 'getbonus': {
+        const loadRedisKey = loadDobonRedisKeys([
+          {mode:'pve', type: 'deck', firstKey: pveKey},
+          {mode:'pve', type: 'trash', firstKey: pveKey},
+        ])
+        const [deckKey, trashKey] = loadRedisKey
+        // ボーナスカードを取得
+        const bonusCards = await getBonus(adapterPubClient, deckKey, trashKey)
+        // スコアデータを更新
+        // 結果をクライアントに通知
+        console.log(bonusCards, 'bonusCard')
+        let reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              bonusCards
+            }
+          }
+        }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+        await sleep(3000)
+        // 結果表示状態に移行させる
+        reducerPayload = {
+          game: {
+            status: 'showScore'
+          }
+        }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
         break
       }
       default: return {}

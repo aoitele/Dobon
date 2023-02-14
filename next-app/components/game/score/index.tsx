@@ -18,7 +18,7 @@ export interface Props {
   authUser: AuthState['authUser']
 }
 
-interface ScoreBoardState {
+export interface ScoreBoardState {
   bonusCards: string[]
   bonusTotal: number
   addBonus: {
@@ -33,7 +33,7 @@ interface ScoreBoardState {
   message: string
 }
 
-const createInitialState = (winner: Player, loser: Player) => {
+export const createInitialState = (winner: Player, loser: Player) => {
   const initialState: ScoreBoardState = {
     bonusCards: [],
     bonusTotal: 0,
@@ -226,7 +226,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
 /**
  * 上がり計算のドボン値に利用する数字を算出させる
  */
-const resDobonNum = (dobonCard: string) => {
+export const resDobonNum = (dobonCard: string) => {
   if (['x0o', 'x1o'].includes(dobonCard)) return DOBON_JUDGE_NUMBER_JOKER
   const num = dobonCard.match(/\d+/gu)
   if (num === null) return null
@@ -241,7 +241,7 @@ const resDobonNum = (dobonCard: string) => {
  * @returns [1, 2, 0, ...]
  */
 
-const resBonusNumArray = (bonusCards: string[]): number[] => {
+export const resBonusNumArray = (bonusCards: string[]): number[] => {
   const _bonusCards = bonusCards.map(card => card === 'x1o' ? 'x0o' : card)
   const joinedStr = _bonusCards.join()
   const mat = joinedStr.match(/\d+/gu)
