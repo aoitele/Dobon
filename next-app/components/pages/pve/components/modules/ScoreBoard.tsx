@@ -1,29 +1,27 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect } from "react"
 import { GameStateContext } from "../../../../../context/GameProvider"
+import { ScoreDispathContext, ScoreStateContext } from "../../../../../context/ScoreProvider"
 import { handleEmit } from "../../../../../utils/socket/emit"
-import { createInitialState, resDobonNum } from "../../../../game/score"
+import { resDobonNum } from "../../../../game/score"
 import styles from '../../../../game/score/index.module.scss'
 import UserScore from "../../../../game/score/UserScore"
 import WinCardInfo from "../../../../game/score/WinCardInfo"
 
 const ScoreBoard = () => {
-  const [gameState] = [useContext(GameStateContext)]
+  const [gameState, scoreState, scoreDispatch] = [useContext(GameStateContext), useContext(ScoreStateContext), useContext(ScoreDispathContext)]
 
   const winner = gameState.game.board.users.filter(user => user.isWinner)[0]
   const loser = gameState.game.board.users.filter(user => user.isLoser)[0]
-  const [ values, setValues ] = useState(createInitialState(winner, loser))
   const dobonCard = gameState.game.board.trash.card
-  // const isReverseDobon = gameState.game.event.action === 'dobonreverse'
-  // const bonusCards = gameState.game.board.bonusCards
   const dobonNum = resDobonNum(dobonCard) // 計算に使われる上がりカードの数値
-  const existAddBonus = values.addBonus.isReverseDobon || values.addBonus.isSingleDobon || values.addBonus.jokerCount > 0
+  const existAddBonus = scoreState.addBonus.isReverseDobon || scoreState.addBonus.isSingleDobon || scoreState.addBonus.jokerCount > 0
 
   useEffect(() => {
     // ボーナスカード取得
     (async() => {
       await handleEmit(gameState.wsClient, { event: 'getbonus' })
-      setValues({
-        ...values,
+      scoreDispatch && scoreDispatch({
+        ...scoreState,
         bonusCards: gameState.game.board.bonusCards
       })
     })()
@@ -35,7 +33,7 @@ const ScoreBoard = () => {
           <UserScore
             key='userScore-winer'
             user={winner}
-            score={values.winerScore}
+            score={scoreState.winerScore}
           />
           <span className={styles.heading}>どぼん成功！</span>
   
@@ -54,28 +52,28 @@ const ScoreBoard = () => {
               <div className={styles.winCardInfoContainer}>
                 <WinCardInfo 
                   key='winCardInfo-bonus'
-                  cards={values.bonusCards}
-                  message={`ボーナス\n「${values.bonusTotal}」`}
+                  cards={scoreState.bonusCards}
+                  message={scoreState.bonusTotal > 0 ? `ボーナス\n「${scoreState.bonusTotal}」` : ''}
                 />
               </div>
             </div>
           </div>
           { existAddBonus &&
             <div className={styles.addBonus}>
-              { values.addBonus.jokerCount > 0 && <p>ジョーカーボーナス ×{values.addBonus.jokerCount * 2}</p> }
-              { values.addBonus.isSingleDobon && <p>単騎どぼんボーナス ×2</p> }
-              { values.addBonus.isReverseDobon && <p>どぼん返し成功！ ×2</p> }
+              { scoreState.addBonus.jokerCount > 0 && <p>ジョーカーボーナス ×{scoreState.addBonus.jokerCount * 2}</p> }
+              { scoreState.addBonus.isSingleDobon && <p>単騎どぼんボーナス ×2</p> }
+              { scoreState.addBonus.isReverseDobon && <p>どぼん返し成功！ ×2</p> }
             </div>
           }
           <div className={styles.winScoreContainer}>
-            <span>{`= +${values.roundUpScore}`}</span>
+            <span>{`= +${scoreState.roundUpScore}`}</span>
           </div>
-          <p className={styles.resultScore}>(roundUp : {values.resultScore} )</p>
+          <p className={styles.resultScore}>(roundUp : {scoreState.resultScore} )</p>
         </div>
   
-        {values.message.length > 0 &&
+        {scoreState.message.length > 0 &&
           <div className={styles.NextGameInfo}>
-            <span>{values.message}</span>
+            <span>{scoreState.message}</span>
           </div>
         }
         
@@ -83,10 +81,10 @@ const ScoreBoard = () => {
           <UserScore 
             key='userScore-loser'
             user={loser}
-            score={values.loserScore}
+            score={scoreState.loserScore}
           />
           <div className={styles.loserScoreContainer}>
-            <span>{`-${values.roundUpScore}`}</span>
+            <span>{`-${scoreState.roundUpScore}`}</span>
           </div>
         </div>
       </div>

@@ -5,13 +5,16 @@ import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { BoardStateContext, BoardDispathContext } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
+import { ScoreDispathContext, ScoreProviderState, ScoreStateContext } from '../../../../context/ScoreProvider'
 import { updateMyHandsStatus } from '../../../../utils/game/checkHand'
 import { existShouldBeSolvedEffect } from '../../../../utils/game/effect'
+import { culcBonus, culcGetScore } from '../../../../utils/game/score'
 import { handleEmit } from '../../../../utils/socket/emit'
+import { resBonusNumArray, resDobonNum } from '../../../game/score'
 import { establishWsForPve } from '../utils/webSocket'
 
 const useGameCycles = () => {
-  const [gameState, boardState, gameDispatch, boardDispatch] = [useContext(GameStateContext), useContext(BoardStateContext), useContext(GameDispathContext), useContext(BoardDispathContext)]
+  const [gameState, boardState, scoreState, gameDispatch, boardDispatch, scoreDispatch] = [useContext(GameStateContext), useContext(BoardStateContext), useContext(ScoreStateContext), useContext(GameDispathContext), useContext(BoardDispathContext), useContext(ScoreDispathContext)]
   const router = useRouter()
 
   useEffect(() => {
@@ -38,32 +41,36 @@ const useGameCycles = () => {
           break
         }
         case 'showScore': {
-          // const bonusCards = gameState.game.board.bonusCards
-          // const bonusNums = resBonusNumArray(bonusCards)
-          // const isSingleDobon = gameState.game.result.dobonHandsCount === 1
-          // const bonusTotal = culcBonus(bonusNums)
-          // const resultScore = culcGetScore({ dobonNum, bonusCards: bonusNums, isReverseDobon, isSingleDobon })
-          // const roundUpScore = Math.ceil(resultScore / 10) * 10
-          // const jokerCount = bonusNums.filter(card => card === 0).length
+          const winner = gameState.game.board.users.filter(user => user.isWinner)[0]
+          const loser = gameState.game.board.users.filter(user => user.isLoser)[0]
+          const bonusCards = gameState.game.board.bonusCards
+          const bonusNums = resBonusNumArray(bonusCards)
+          const isSingleDobon = gameState.game.result.dobonHandsCount === 1
+          const bonusTotal = culcBonus(bonusNums)
+          const dobonNum = resDobonNum(gameState.game.board.trash.card) // 計算に使われる上がりカードの数値
+          const isReverseDobon = gameState.game.event.action === 'dobonreverse'
 
-          // const valueBaseObj = {
-          //   ...values,
-          //   bonusCards,
-          //   bonusTotal,
-          //   resultScore,
-          //   roundUpScore,
-          //   addBonus: {
-          //     isSingleDobon,
-          //     isReverseDobon,
-          //     jokerCount
-          //   }
-          // }
+          if (!dobonNum) return
 
-          // setValues(() => ({
-          //   ...valueBaseObj,
-          //   winerScore: winner.score,
-          //   loserScore: loser.score,
-          // }))
+          const resultScore = culcGetScore({ dobonNum, bonusCards: bonusNums, isReverseDobon, isSingleDobon })
+          const roundUpScore = Math.ceil(resultScore / 10) * 10
+          const jokerCount = bonusNums.filter(card => card === 0).length
+
+          const newScoreState: ScoreProviderState = {
+            ...scoreState,
+            bonusCards,
+            bonusTotal,
+            resultScore,
+            roundUpScore,
+            winerScore: winner.score,
+            loserScore: loser.score,
+            addBonus: {
+              isSingleDobon,
+              isReverseDobon,
+              jokerCount
+            }
+          }
+          scoreDispatch && scoreDispatch(newScoreState)
           break
         }
         default: break

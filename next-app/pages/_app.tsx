@@ -6,6 +6,7 @@ import { AuthProvider } from '../context/AuthProvider'
 import dynamic from 'next/dynamic'
 import { GameProvider } from '../context/GameProvider'
 import { BoardProvider } from '../context/BoardProvider'
+import { ScoreProvider } from '../context/ScoreProvider'
 
 const ErrorPage = dynamic(() => import('./_error'))
 
@@ -16,7 +17,9 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     <AuthProvider>
       <GameProvider>
         <BoardProvider>
-          <Component {...pageProps} />
+          <ScoreProvider>
+            <Component {...pageProps} />
+          </ScoreProvider>
         </BoardProvider>
       </GameProvider>
     </AuthProvider>
