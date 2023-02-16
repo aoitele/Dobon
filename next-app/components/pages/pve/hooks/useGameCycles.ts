@@ -9,6 +9,7 @@ import { ScoreDispathContext, ScoreProviderState, ScoreStateContext } from '../.
 import { updateMyHandsStatus } from '../../../../utils/game/checkHand'
 import { existShouldBeSolvedEffect } from '../../../../utils/game/effect'
 import { culcBonus, culcGetScore } from '../../../../utils/game/score'
+import sleep from '../../../../utils/game/sleep'
 import { handleEmit } from '../../../../utils/socket/emit'
 import { resBonusNumArray, resDobonNum } from '../../../game/score'
 import { establishWsForPve } from '../utils/webSocket'
@@ -41,6 +42,8 @@ const useGameCycles = () => {
           break
         }
         case 'showScore': {
+          if (!scoreDispatch) return
+
           const winner = gameState.game.board.users.filter(user => user.isWinner)[0]
           const loser = gameState.game.board.users.filter(user => user.isLoser)[0]
           const bonusCards = gameState.game.board.bonusCards
@@ -70,7 +73,35 @@ const useGameCycles = () => {
               jokerCount
             }
           }
-          scoreDispatch && scoreDispatch(newScoreState)
+          scoreDispatch(newScoreState);
+
+          (async() => {
+            await sleep(2000)
+            let i = 0
+
+            const scoreCountUp = setInterval(async() => {
+              i += 1
+              scoreDispatch({
+                ...newScoreState,
+                winerScore: winner.score + i,
+                loserScore: loser.score - i,
+              })
+              if (i === roundUpScore) {
+                clearInterval(scoreCountUp)
+                console.log(gameState.game.id, 'gameState.game.id')
+                const nextGameId = gameState.game.id ? gameState.game.id + 1 : null
+                await sleep(1000)
+                scoreDispatch(() => ({
+                  ...newScoreState,
+                  winerScore: winner.score + i,
+                  loserScore: loser.score - i,
+                  message:`GoTo Next →「Game${nextGameId}」`
+                }))
+                await sleep(1000)
+                handleEmit(gameState.wsClient, { event: 'prepare', gameId: nextGameId, query: router.query })
+              }
+            }, 10)
+          })()
           break
         }
         default: break

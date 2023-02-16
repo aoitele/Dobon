@@ -9,7 +9,7 @@ import { sepalateSuitNum } from "../utils/game/checkHand"
 import { cpuMainProcess } from "../utils/game/cpu/main"
 import { getBonus } from "../utils/game/cpu/utils/getBonus"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
-import { dobonJudge } from "../utils/game/dobonJudge"
+// import { dobonJudge } from "../utils/game/dobonJudge"
 import { isAddableEffect, resEffectName, resNewEffectState } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 import sleep from "../utils/game/sleep"
@@ -41,7 +41,6 @@ const cpuModeHandler = (io: Socket, socket: any) => {
     if (event === 'prepare') {
       hasValidQueriesArgs.target.push({ key: 'setCount', forceString: true })
     }
-
     if (!hasValidQueries(hasValidQueriesArgs)) return {}
     const { query } = hasValidQueriesArgs
     const pveKey = `${query.pveKey}`
@@ -105,6 +104,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
 
         const reducerPayload: reducerPayloadSpecify = {
           game: {
+            id: isFirstGame ? 1 : gameId,
             board: {
               users: userData,
               hands: myHands,
@@ -120,7 +120,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             },
             status: 'playing',
             result: initialState.game.result,
-            setCount: typeof query.setCount === 'string' ? Number(query.setCount) : null
+            setCount: Number(query.setCount)
           },
         }
         socket.emit('updateStateSpecify', reducerPayload) // 送信者を更新
@@ -335,8 +335,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
 
         const lastTrashUser = board.data.trash.user
-        const judge = dobonJudge(board.data.trash.card, board.data.hands)
-        // const judge = true
+        // const judge = dobonJudge(board.data.trash.card, board.data.hands)
+        const judge = true
 
         // ドボン成功ならユーザーデータのwiner/loserを更新させる
         const newUsersState = board.data.users?.map(u => {
