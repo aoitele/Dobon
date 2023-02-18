@@ -16,6 +16,7 @@
 .dobon {
   @extend .btn;
   background-color: orange;
+  animation:circleanime 1s infinite;
 }
 .turnChange {
   @extend .btn;
@@ -32,4 +33,11 @@
 .disabled {
   @extend .btn;
   background-color: gray;
+}
+
+/*波形が広がるアニメーション*/
+@keyframes circleanime {
+	100%{
+		transform:scale(1.1);
+	}
 }

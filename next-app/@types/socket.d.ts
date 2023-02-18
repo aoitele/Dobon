@@ -23,6 +23,7 @@ export type Event =
   | 'draw'
   | 'turnchange'
   | 'dobon'
+  | 'dobonwait'
   | 'dobonsuccess'
   | 'dobonfailure'
   | 'dobonreverse'

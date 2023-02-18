@@ -1,6 +1,7 @@
 import React, { createContext, Dispatch, FC, ReactNode, SetStateAction, useState } from "react"
 import { Game } from "../@types/game"
 import { SocketClient } from "../utils/socket/client"
+import { gameInitialState } from "./state/gameInitialState"
 
 export type GameProviderState = {
   roomId: number | null
@@ -11,45 +12,6 @@ export type GameProviderState = {
 }
 
 export type GameProviderDispatch = Dispatch<SetStateAction<GameProviderState>> | undefined
-
-const gameInitialState: GameProviderState = {
-  roomId: null,
-  userId: null,
-  game: {
-    id: null,
-    setCount: null,
-    status: undefined,
-    event: {
-      user: { nickname:'', turn:0 },
-      action: null,
-      message: null
-    },
-    board: {
-      users: [],
-      deckCount: 0,
-      hands: [],
-      trash: {
-        card: '',
-        user: {
-          id: 0,
-          nickname: '',
-          turn: 0,
-          score: 0,
-          isWinner: false,
-          isLoser: false
-        }
-      },
-      otherHands: [],
-      turn: null,
-      effect: [],
-      allowDobon: true,
-      bonusCards: []
-    },
-    result: {},
-  },
-  connected: false,
-  wsClient: null
-}
 
 /**
  * Create Context

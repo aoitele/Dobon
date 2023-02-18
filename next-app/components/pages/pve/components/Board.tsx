@@ -9,7 +9,6 @@ import { RoomInfoContainer } from "./container/RoomInfoContainer"
 import { UserInfoContainer } from "./container/UserInfoContainer"
 
 const Board:FC = () => {
-
   return (
     <div className={styles.wrap}>
       <RoomInfoContainer />

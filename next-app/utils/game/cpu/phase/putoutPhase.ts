@@ -10,6 +10,8 @@ import { CpuMainProcessArgs } from '../main'
 import { isAddableEffect, resEffectName, resNewEffectState } from "../../effect"
 import { DOBON_CARD_NUMBER_WILD } from "../../../../constant"
 import { resetEvent } from "../../../../server/cpuModeHandler"
+import { loadDobonRedisKeys } from "../../../../server/redis/loadDobonRedisKeys"
+import { dobonJudge } from "../../dobonJudge"
 
 interface Args {
   user: NestedPartial<Player>
@@ -119,6 +121,13 @@ const putoutPhase = async({
     }
   }
 
+  // playerユーザーがドボン可能なカードを出した時はターンを更新せずドボン判断フェイズを挟ませる
+  const [handKey] = loadDobonRedisKeys([
+    { mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me' },
+  ])
+  const userMeHand = await adapterPubClient.smembers(handKey)
+  const canIDobon = dobonJudge(trashCard, userMeHand)
+
   const reducerPayload: reducerPayloadSpecify = {
     game: {
       board: {
@@ -128,8 +137,9 @@ const putoutPhase = async({
           user,
         },
         allowDobon: true,
-        turn: culcNextUserTurn(turn, users, effectName, isReversed),
+        turn: canIDobon ? undefined : culcNextUserTurn(turn, users, effectName, isReversed),
         otherHands: data.data.otherHands,
+        waitDobon: canIDobon ? true : undefined
       },
       event: effectName ? { user, action: effectName } : undefined
     }

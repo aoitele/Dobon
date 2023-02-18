@@ -55,6 +55,7 @@ export type Board = {
   effect: Effect[] // カードの効果名
   bonusCards: string[]
   allowDobon: boolean
+  waitDobon?: boolean
 }
 
 export type InitialBoardState = {

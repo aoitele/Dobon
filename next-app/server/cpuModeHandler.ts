@@ -4,6 +4,7 @@ import { Board, Effect, Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
 import { PartiallyRequired } from "../@types/utility"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
+import { gameInitialState } from "../context/state/gameInitialState"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
 import { sepalateSuitNum } from "../utils/game/checkHand"
 import { cpuMainProcess } from "../utils/game/cpu/main"
@@ -106,6 +107,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           game: {
             id: isFirstGame ? 1 : gameId,
             board: {
+              ...gameInitialState.game.board, // 盤面ステートを初期化
               users: userData,
               hands: myHands,
               otherHands,
@@ -168,7 +170,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
 
         adapterPubClient.pipeline()
         .lpush(trashKey, `${trashCard.suit}${trashCard.num}`) // 最新の捨て札を先頭に追加(trashは`suit+num`形式で追加する)
-        .srem(handsKey, trash.card)
+        .srem(handsKey, trash.card.replace('p', '')) // `${suit}${num}p`でデータがくるため、redisはpなしでsrem
         .exec((_err, results) => results)
 
         const newHands = hands.filter(card => card !== trash.card)
@@ -290,9 +292,11 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           return card.includes('p') ? `${card.replace('p', 'op')}` : `${card}o` // 出せるカードであればopを付加して返す
         })
 
+        const rmPutableInfoHands = hands.map(hand => hand.replace('p', '')) // redisの手札情報にはpは入れない(oは入れる)
+
         adapterPubClient.pipeline()
           .del(handsKey)
-          .sadd(handsKey, hands)
+          .sadd(handsKey, rmPutableInfoHands)
           .exec((_err, results) => results)
 
         const resolvedEffect = effectState.filter(state => state !== effect)
