@@ -341,8 +341,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         // ドボン成功ならユーザーデータのwiner/loserを更新させる
         const newUsersState = board.data.users?.map(u => {
           if (judge) {
-            if (u.id === user?.id) { u.isWinner = true}
-            if (u.id === lastTrashUser?.id) { u.isLoser = true }
+            if (u.nickname === user?.nickname) { u.isWinner = true}
+            if (u.nickname === lastTrashUser?.nickname) { u.isLoser = true }
           }
           return u
         })
@@ -404,6 +404,25 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           }
         }
         io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+        break
+      }
+      case 'postprocess': {
+        /**
+         * ゲーム終了時に行う処理を定義
+         * - ユーザースコアの更新(data.users[]でスコアがくるのでredisを更新させる)
+         */
+        if (!board?.data.users?.length) break
+        const { users } = board.data
+
+        for (const u of users) {
+          if (u.nickname && u.score) {
+            const loadRedisKey = loadDobonRedisKeys([
+              {mode:'pve', type: 'user', firstKey: pveKey, secondKey: u.nickname},
+            ])
+            const userKey = loadRedisKey[0]
+            adapterPubClient.hset(userKey, 'score', u.score)
+          }
+        }
         break
       }
       default: return {}

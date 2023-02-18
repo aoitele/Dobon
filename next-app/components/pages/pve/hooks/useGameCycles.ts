@@ -3,6 +3,7 @@
  */
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
+import { EmitForPVE } from '../../../../@types/socket'
 import { BoardStateContext, BoardDispathContext } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
 import { ScoreDispathContext, ScoreProviderState, ScoreStateContext } from '../../../../context/ScoreProvider'
@@ -88,7 +89,19 @@ const useGameCycles = () => {
               })
               if (i === roundUpScore) {
                 clearInterval(scoreCountUp)
-                console.log(gameState.game.id, 'gameState.game.id')
+                // スコア更新
+                const postProcessEmit:EmitForPVE = {
+                  event: 'postprocess',
+                  data: {
+                    board: {
+                      data: {
+                        users: [{ nickname: winner.mode ? winner.nickname : 'me', score: winner.score + i }, { nickname: loser.nickname, score: loser.score - i }]
+                      }
+                    }
+                  }
+                }
+                handleEmit(gameState.wsClient, postProcessEmit )
+
                 const nextGameId = gameState.game.id ? gameState.game.id + 1 : null
                 await sleep(1000)
                 scoreDispatch(() => ({
