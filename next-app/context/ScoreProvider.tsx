@@ -10,14 +10,14 @@ export interface ScoreProviderState {
   }
   resultScore: number
   roundUpScore: number
-  winerScore: number
-  loserScore: number
+  winerScore: number | null
+  loserScore: number | null
   message: string
 }
 
 export type ScoreProviderDispatch = Dispatch<SetStateAction<ScoreProviderState>> | undefined
 
-const ScoreProviderInitialState: ScoreProviderState = {
+const scoreProviderInitialState: ScoreProviderState = {
   bonusCards: [],
   bonusTotal: 0,
   addBonus: {
@@ -27,15 +27,15 @@ const ScoreProviderInitialState: ScoreProviderState = {
   },
   resultScore: 0,
   roundUpScore: 0,
-  winerScore: 0,
-  loserScore: 0,
+  winerScore: null,
+  loserScore: null,
   message: '',
 }
 
 /**
  * Create Context
  */
-const ScoreStateContext = createContext<ScoreProviderState>(ScoreProviderInitialState)
+const ScoreStateContext = createContext<ScoreProviderState>(scoreProviderInitialState)
 const ScoreDispathContext = createContext<ScoreProviderDispatch>(undefined)
 
 interface Props {
@@ -43,7 +43,7 @@ interface Props {
 }
 
 const ScoreProvider:FC<Props> = (props) => {
-  const [values, dispatch] = useState(ScoreProviderInitialState)
+  const [values, dispatch] = useState(scoreProviderInitialState)
 
   return (
     <ScoreStateContext.Provider value={values}>
@@ -54,4 +54,4 @@ const ScoreProvider:FC<Props> = (props) => {
   )
 }
 
-export { ScoreProvider, ScoreStateContext, ScoreDispathContext, ScoreProviderInitialState }
+export { ScoreProvider, ScoreStateContext, ScoreDispathContext, scoreProviderInitialState }

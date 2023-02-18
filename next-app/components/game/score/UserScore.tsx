@@ -2,10 +2,11 @@ import React, { VFC } from 'react'
 import Image from 'next/image'
 import style from './UserScore.module.scss'
 import { Player } from '../../../@types/game'
+import { ScoreProviderState } from '../../../context/ScoreProvider'
 
 interface Props {
   user: Player
-  score: number
+  score: ScoreProviderState['winerScore'] | ScoreProviderState['loserScore']
   roundUpScore?: number
 }
 const UserScore:VFC<Props> = ({ user, score }) => {
@@ -18,7 +19,8 @@ const UserScore:VFC<Props> = ({ user, score }) => {
       />
       <div>
         <p><span className={style.nickname}>{user.nickname}</span></p>
-        <p><span className={style.star}>⭐️</span>{score}</p>
+        {/* scoreStateにユーザースコアの初期値がセットされてから出力させる */}
+        {typeof score === 'number' && <p><span className={style.star}>⭐️</span>{score}</p>}
       </div>
     </div>
   )

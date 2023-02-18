@@ -6,7 +6,7 @@ import { useContext, useEffect } from 'react'
 import { EmitForPVE } from '../../../../@types/socket'
 import { BoardStateContext, BoardDispathContext } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
-import { ScoreDispathContext, ScoreProviderState, ScoreStateContext } from '../../../../context/ScoreProvider'
+import { ScoreDispathContext, ScoreProviderState, ScoreStateContext, scoreProviderInitialState } from '../../../../context/ScoreProvider'
 import { updateMyHandsStatus } from '../../../../utils/game/checkHand'
 import { existShouldBeSolvedEffect } from '../../../../utils/game/effect'
 import { culcBonus, culcGetScore } from '../../../../utils/game/score'
@@ -112,6 +112,7 @@ const useGameCycles = () => {
                 }))
                 await sleep(1000)
                 handleEmit(gameState.wsClient, { event: 'prepare', gameId: nextGameId, query: router.query })
+                scoreDispatch(scoreProviderInitialState) // ScoreBoardの状態をリセット(次ゲーム終了時の表示を初期状態に戻すため)
               }
             }, 10)
           })()
