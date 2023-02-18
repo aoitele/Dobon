@@ -2,6 +2,7 @@
   height: 100vh;
   overflow: hidden;
   animation: fadeup 1s cubic-bezier(0.33, 1, 0.68, 1) 1 forwards;
+  user-select: none; //　タップ時に文章選択をさせないように抑制
 
   .heading {
     text-align: center;
