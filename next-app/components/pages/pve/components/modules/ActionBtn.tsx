@@ -35,6 +35,7 @@ const onClickFnExec = async (btnType: ActionBtnTypeResponse, Action: GameAction,
   switch(btnType.type) {
     case 'deckSet'    : return Action.deckSet()
     case 'dobon'      : return Action.dobon()
+    case 'notDobon'   : return Action.notDobon()
     case 'draw'       : {
       await Action.draw()
       return MyHand.updateStatus()

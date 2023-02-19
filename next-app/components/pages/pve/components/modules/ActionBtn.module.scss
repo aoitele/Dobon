@@ -17,6 +17,10 @@
   background-color: orange;
   animation:circleanime 1s infinite;
 }
+.notDobon {
+  @extend .btn;
+  background-color: lightsalmon;
+}
 .turnChange {
   @extend .btn;
   background-color:lightsalmon;

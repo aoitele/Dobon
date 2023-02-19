@@ -37,7 +37,15 @@ class GameAction {
         data: { board: { data: this.gameState.game.board } }
       }
     )
-    this.gameDispatch(prevState => prevState)
+  }
+  notDobon() {
+    handleEmit(
+      this.wsClient, {
+        event: 'turnchange',
+        data: { board: { data: this.gameState.game.board, option:{ values: {}, triggered: 'actionBtn' } } }
+      }
+    )
+    this.gameDispatch(prevState => ({ ...prevState, game:{...prevState.game, board: {...prevState.game.board, waitDobon: false}} }))
   }
 }
 /* eslint-enable no-unused-vars, no-useless-constructor, no-empty-function */
