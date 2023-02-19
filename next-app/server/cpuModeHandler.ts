@@ -268,6 +268,45 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         io.in(pveKey).emit('updateStateSpecify', reducerPayload)
         break
       }
+      case 'drawcard__deckset': {
+        /**
+         * デッキ残枚数0の時にこのケースに入る
+         * trashの最新1枚以外のカード情報を取得して新たな山札を生成
+         * 生成後の山札から1枚を実行ユーザーの手札に加える
+         */
+        const prevHands = board?.data.hands // 返却する手札の順番を変化させないため盤面手札を取得しておく
+        if (!board?.data || !prevHands?.length) break
+
+        const [deckKey, trashKey, handsKey] = loadDobonRedisKeys([
+          {mode:'pve', type: 'deck', firstKey: pveKey},
+          {mode:'pve', type: 'trash', firstKey: pveKey },
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me'},
+        ])
+
+        const trashCard = await adapterPubClient.lrange(trashKey, 1, -1) // 最後の捨て札(先頭)を除くカードを取得
+
+        adapterPubClient.pipeline()
+        .sadd(deckKey, trashCard) // deckにtrashcardを戻す(順番はランダムに追加される)
+        .ltrim(trashKey, 0, 0) // Trashは先頭だけ残す
+        .exec((_err, results) => results)
+
+        const newCard = await adapterPubClient.spop(deckKey, 1)
+        adapterPubClient.sadd(handsKey, newCard)
+
+        const deckCount = await adapterPubClient.scard(deckKey)
+        const hands = [...prevHands, ...newCard]
+
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              hands,
+              deckCount
+            }
+          }
+        }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+        break
+      }
       case 'opencard': {
         // 本イベントはopencard effectを受けた場合に呼び出す
         const prevHands = board?.data.hands // 返却する手札の順番を変化させないため盤面手札を取得しておく

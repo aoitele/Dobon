@@ -2,7 +2,7 @@ import React, { FC, useContext } from 'react'
 import { BoardDispathContext, BoardStateContext } from '../../../../../context/BoardProvider'
 import { GameDispathContext, GameStateContext } from '../../../../../context/GameProvider'
 import { ActionBtnTypeResponse, checkActionBtnType } from '../../../../../utils/game/checkActionBtnType'
-import { GameAction } from '../../utils/gameAction'
+import { GameAction } from '../../utils/GameAction'
 import { Hand } from '../../utils/Hand'
 import styles from './ActionBtn.module.scss'
 

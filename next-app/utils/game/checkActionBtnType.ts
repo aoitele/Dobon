@@ -27,7 +27,7 @@ const checkActionBtnType = (arg: ActionBtnTypeArg): ActionBtnTypeResponse => {
     case 'action': {
       if (!boardState.isMyTurn) return {...TYPE_DISABLED, text: 'ドロー'}
       if (boardState.isDrawnCard) return TYPE_TURNCHANGE
-      return gameState.game.board.deckCount === 0 ? TYPE_DECKSET : TYPE_DRAW
+      return gameState.game.board.deckCount <= 0 ? TYPE_DECKSET : TYPE_DRAW // MEMO：開発中は便宜上0以下としている
     }
     case 'dobon': {
       if (!gameState.game.board.allowDobon || !gameState.game.board.waitDobon) return {...TYPE_DISABLED, text: 'どぼん！'}
