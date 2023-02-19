@@ -83,18 +83,10 @@
        text-align: center;
       }
   }
-  .NextGameInfo {
-    animation: blink .5s infinite alternate ease-in-out;
-    text-align: center;
-    font-size: 24px;
-    background-color: bisque;
-    position: fixed;
-    bottom: 140px;
-    width: 90%;
-  }
 
   .loserInfoContainer {
     @extend .infoWrap;
+    position: relative;
     height: 20%;
     padding: 20px;
     background: rgba(255, 132, 38, 0.6); // 背景のみ透過
@@ -107,6 +99,16 @@
       span {
         font-size: 30px;
       }
+    }
+    .NextGameInfo {
+      animation: blink .5s infinite alternate ease-in-out;
+      text-align: center;
+      font-size: 24px;
+      background-color: bisque;
+      position: absolute;
+      top: -30px;
+      left: 0;
+      width: 90%;
     }
   }
 }

@@ -70,13 +70,6 @@ const ScoreBoard = () => {
           </div>
           <p className={styles.resultScore}>(roundUp : {scoreState.resultScore} )</p>
         </div>
-  
-        {scoreState.message.length > 0 &&
-          <div className={styles.NextGameInfo}>
-            <span>{scoreState.message}</span>
-          </div>
-        }
-        
         <div className={styles.loserInfoContainer}>
           <UserScore 
             key='userScore-loser'
@@ -86,6 +79,11 @@ const ScoreBoard = () => {
           <div className={styles.loserScoreContainer}>
             <span>{`-${scoreState.roundUpScore}`}</span>
           </div>
+          {scoreState.message.length > 0 &&
+            <div className={styles.NextGameInfo}>
+              <span>{scoreState.message}</span>
+            </div>
+          }
         </div>
       </div>
   )
