@@ -156,7 +156,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'playcard': {
-        const { trash, hands } = board?.data ?? {}
+        const { trash, hands, effect } = board?.data ?? {}
         if (!trash || !trash.card || !hands) break
 
         const loadRedisKey = loadDobonRedisKeys([
@@ -177,10 +177,11 @@ const cpuModeHandler = (io: Socket, socket: any) => {
 
         const reducerPayload: PartiallyRequired<reducerPayloadSpecify, 'game'> = {
           game: {
-            board: { 
+            board: {
               trash: {...trash, card: `${trashCard.suit}${trashCard.num}o`},
               allowDobon: true,
               hands: newHands,
+              effect,
             },
             event: action ? { action: action.data.effect, user } : undefined
           }
