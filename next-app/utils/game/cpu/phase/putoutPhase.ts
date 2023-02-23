@@ -56,6 +56,7 @@ const putoutPhase = async({
       game: {
         board: {
           turn: nextTurn,
+          allowDobon: false,
         }
       }
     }
@@ -136,7 +137,7 @@ const putoutPhase = async({
           card: `${trashCard}o`,
           user,
         },
-        allowDobon: true,
+        // allowDobon: true,
         turn: canIDobon ? undefined : culcNextUserTurn(turn, users, effectName, isReversed),
         otherHands: data.data.otherHands,
         waitDobon: canIDobon ? true : undefined

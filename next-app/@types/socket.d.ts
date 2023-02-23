@@ -36,6 +36,7 @@ export type Event =
   | 'avoidEffect'
   | 'notAvoidEffect'
   | 'cpuTurn'
+  | 'cpuDobon'
   | Effect
   | null
 

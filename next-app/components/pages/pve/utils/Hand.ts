@@ -17,7 +17,6 @@ class Hand {
     private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
   ){}
   async putOut (trash: string) {
-    console.log('putOut')
     const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
     const newEffectState = resNewEffectState(this.gameState.game.board.effect, effectName)
     const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: trash, user: this.gameState.game.board.users[0] }, effect: newEffectState}

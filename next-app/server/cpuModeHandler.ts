@@ -10,6 +10,7 @@ import { sepalateSuitNum } from "../utils/game/checkHand"
 import { cpuMainProcess } from "../utils/game/cpu/main"
 import { getBonus } from "../utils/game/cpu/utils/getBonus"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
+import { dobonJudge } from "../utils/game/dobonJudge"
 // import { dobonJudge } from "../utils/game/dobonJudge"
 import { isAddableEffect, resEffectName, resNewEffectState } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
@@ -179,7 +180,6 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           game: {
             board: {
               trash: {...trash, card: `${trashCard.suit}${trashCard.num}o`},
-              allowDobon: true,
               hands: newHands,
               effect,
             },
@@ -360,6 +360,54 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         if (!board || !isCpuTurnEmitData(board, rule)) break
         
         cpuMainProcess({ io, adapterPubClient, data: board, pveKey })
+        break
+      }
+      case 'cpuDobon': {
+        /**
+         * カードが場に出た後、次のターンに移行する前に実施されるドボン判定。
+         * 全CPUにドボンできるか（するか）を判断させる。
+         */
+        console.log(`\n--- DOBON CHECK START ---\n`)
+
+        const trashCard = board?.data.trash?.card
+        const trashUser = board?.data.trash?.user?.nickname
+        if (!trashCard) return {}
+        let [canCom1Dobon, canCom2Dobon, canCom3Dobon] = [false, false, false]
+
+        const [handsKey_1, handsKey_2, handsKey_3] = loadDobonRedisKeys([
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com1' },
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com2' },
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com3' },
+        ])
+
+        adapterPubClient.pipeline()
+        .smembers(handsKey_1)
+        .smembers(handsKey_2)
+        .smembers(handsKey_3)
+        .exec((_err, results) => {
+          const com1Hands = results[0][1]
+          const com2Hands = results[1][1]
+          const com3Hands = results[2][1]
+          canCom1Dobon = trashUser !== 'com1' && dobonJudge(trashCard, com1Hands)
+          canCom2Dobon = trashUser !== 'com2' && dobonJudge(trashCard, com2Hands)
+          canCom3Dobon = trashUser !== 'com3' && dobonJudge(trashCard, com3Hands)
+          console.log(trashCard, 'trashCard')
+
+          console.log(`com1 - ${com1Hands} - ${canCom1Dobon}`)
+          console.log(`com2 - ${com2Hands} - ${canCom2Dobon}`)
+          console.log(`com3 - ${com3Hands} - ${canCom3Dobon}`)
+          console.log(`\n--- DOBON CHECK END ---\n`)
+        })
+
+        // 判定結果でクライアント側の盤面状態を更新させる
+        const reducerPayload: reducerPayloadSpecify = {
+          game: {
+            board: {
+              allowDobon: false
+            }
+          }
+        }
+        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
         break
       }
       case 'dobon': {

@@ -20,25 +20,20 @@ const useGameCycles = () => {
   const router = useRouter()
 
   useEffect(() => {
-    console.log('useGameCycles useEffect')
     if (!gameDispatch || !boardDispatch) return
 
     const gameStatusHandler = async() => {
-      console.log(`gameStatus is ${gameState.game.status}`)
       switch(gameState.game.status) {
         case undefined: {
-          console.log('status undefined start...')
           const { client } = await establishWsForPve({ dispatch: gameDispatch })
           if (client) {
             const newState = {...gameState, wsClient: client}
             gameDispatch({ ...newState })
             handleEmit(client, { event: 'prepare', gameId: 1, query: router.query })
-            console.log('status undefined end...')
           }
           break
         }
         case 'playing': {
-          console.log('playing start...')
           boardDispatch({ ...boardState, isMyTurn: true })
           break
         }
@@ -125,8 +120,20 @@ const useGameCycles = () => {
   },[gameState.game.status])
 
   useEffect(() => {
+    if (!gameState.game.board.turn) return // turnに有効な値(1〜4)が入ってから実行させる
     if (!gameDispatch || !boardDispatch) return
-    console.log('turnChanged')
+
+    // allowDobonがtrueとなった時は一旦CPUのドボン判定を行う
+    if (gameState.game.board.allowDobon) {
+      handleEmit(gameState.wsClient, {
+        event: 'cpuDobon',
+        query: router.query,
+        data: { board: { data: gameState.game.board } }
+      })
+      return
+    }
+
+    // ドボン判定が終わった状態であれば次ユーザーのターンを開始する
     if (gameState.game.board.turn === 1) {
       const showAvoidEffectview = gameState.game.board.effect.length > 0 && existShouldBeSolvedEffect(gameState.game.board.effect)
 
@@ -142,7 +149,7 @@ const useGameCycles = () => {
         }
       )
     }
-  },[gameState.game.board.turn])
+  },[gameState.game.board.turn, gameState.game.board.allowDobon])
 }
 
 export { useGameCycles }

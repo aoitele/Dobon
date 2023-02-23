@@ -32,7 +32,7 @@ const checkActionBtnType = (arg: ActionBtnTypeArg): ActionBtnTypeResponse => {
       return gameState.game.board.deckCount <= 0 ? TYPE_DECKSET : TYPE_DRAW // MEMO：開発中は便宜上0以下としている
     }
     case 'dobon': {
-      if (!gameState.game.board.allowDobon || !gameState.game.board.waitDobon) return {...TYPE_DISABLED, text: 'どぼん！'}
+      if (!gameState.game.board.waitDobon) return {...TYPE_DISABLED, text: 'どぼん！'}
       return TYPE_DOBON
     }
     default: return TYPE_DISABLED
