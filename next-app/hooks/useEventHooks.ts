@@ -89,7 +89,7 @@ const useEventHooks = (
           const data: reducerPayloadSpecify = {
             game: {
               event: {
-                user: { nickname: event.user.nickname, turn: event.user.turn },
+                user: [{ nickname: event.user[0].nickname, turn: event.user[0].turn }],
                 action: event.action,
               }
             }
@@ -111,7 +111,7 @@ const useEventHooks = (
           const data: reducerPayloadSpecify = {
             game: {
               event: {
-                user: { nickname:'', turn:0 },
+                user: [],
                 action: null,
                 message: null
               }

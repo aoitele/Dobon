@@ -391,7 +391,7 @@ const emitHandler = (io: Socket, socket: any) => {
           game: {
             event: {
               action,
-              user: { nickname:user.nickname, turn }
+              user: [{ nickname:user.nickname, turn }]
             }
           }
         }
@@ -448,7 +448,7 @@ const emitHandler = (io: Socket, socket: any) => {
         let reducerPayload: reducerPayloadSpecify = {
           game: {
             event: {
-              user,
+              user: [user],
               action: 'dobon'
             }
           }

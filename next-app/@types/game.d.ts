@@ -87,7 +87,7 @@ export type Order = 'skip' | 'draw'| 'draw2'| 'draw4'| 'draw6'| 'draw8' | 'wild'
 
 export type AllActionType = Action | Order
 export type ModalEffect = {
-  user: Pick<Player, 'nickname' | 'turn'> | Pick<Player, 'nickname' | 'turn'>[]
+  user: Pick<Player, 'nickname' | 'turn'>[]
   action: Event
   message: string  | null
 }

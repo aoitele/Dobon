@@ -182,7 +182,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
               hands: newHands,
               effect,
             },
-            event: action ? { action: action.data.effect, user: [user] } : undefined
+            event: action && user ? { user: [user], action: action.data.effect } : undefined
           }
         }
 
@@ -433,6 +433,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
       }
       case 'dobon': {
         if (!board?.data.trash?.card || !board.data.hands) break
+        if (!user) break
 
         // 全ユーザーにドボン発生を通知
         let reducerPayload: reducerPayloadSpecify = {

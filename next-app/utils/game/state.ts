@@ -17,9 +17,9 @@ const initialState: gameInitialState = {
     id: null,
     status: 'join',
     event: {
-      user: { nickname:'', turn:0 },
+      user: [],
       action: null,
-      message: null
+      message: '',
     },
     board: {
       users: [],
