@@ -137,12 +137,12 @@ const putoutPhase = async({
           card: `${trashCard}o`,
           user,
         },
-        // allowDobon: true,
+        allowDobon: !canIDobon,
         turn: canIDobon ? undefined : culcNextUserTurn(turn, users, effectName, isReversed),
         otherHands: data.data.otherHands,
         waitDobon: canIDobon ? true : undefined
       },
-      event: effectName ? { user, action: effectName } : undefined
+      event: effectName ? { user: [user], action: effectName } : undefined
     }
   }
   io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新

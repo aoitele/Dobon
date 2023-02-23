@@ -2,7 +2,6 @@ import { Redis } from "ioredis"
 import { Socket } from 'socket.io'
 import { Board, Effect, Player } from "../@types/game"
 import { EmitForPVE } from "../@types/socket"
-import { PartiallyRequired } from "../@types/utility"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
 import { gameInitialState } from "../context/state/gameInitialState"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
@@ -176,14 +175,14 @@ const cpuModeHandler = (io: Socket, socket: any) => {
 
         const newHands = hands.filter(card => card !== trash.card)
 
-        const reducerPayload: PartiallyRequired<reducerPayloadSpecify, 'game'> = {
+        const reducerPayload: reducerPayloadSpecify = {
           game: {
             board: {
               trash: {...trash, card: `${trashCard.suit}${trashCard.num}o`},
               hands: newHands,
               effect,
             },
-            event: action ? { action: action.data.effect, user } : undefined
+            event: action ? { action: action.data.effect, user: [user] } : undefined
           }
         }
 
@@ -385,29 +384,51 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         .smembers(handsKey_2)
         .smembers(handsKey_3)
         .exec((_err, results) => {
-          const com1Hands = results[0][1]
-          const com2Hands = results[1][1]
-          const com3Hands = results[2][1]
-          canCom1Dobon = trashUser !== 'com1' && dobonJudge(trashCard, com1Hands)
-          canCom2Dobon = trashUser !== 'com2' && dobonJudge(trashCard, com2Hands)
-          canCom3Dobon = trashUser !== 'com3' && dobonJudge(trashCard, com3Hands)
-          console.log(trashCard, 'trashCard')
+          (() => {
+            const com1Hands = results[0][1]
+            const com2Hands = results[1][1]
+            const com3Hands = results[2][1]
+            canCom1Dobon = trashUser !== 'com1' && dobonJudge(trashCard, com1Hands)
+            canCom2Dobon = trashUser !== 'com2' && dobonJudge(trashCard, com2Hands)
+            canCom3Dobon = trashUser !== 'com3' && dobonJudge(trashCard, com3Hands)
+            console.log(trashCard, 'trashCard')
 
-          console.log(`com1 - ${com1Hands} - ${canCom1Dobon}`)
-          console.log(`com2 - ${com2Hands} - ${canCom2Dobon}`)
-          console.log(`com3 - ${com3Hands} - ${canCom3Dobon}`)
-          console.log(`\n--- DOBON CHECK END ---\n`)
-        })
+            console.log(`com1 - ${com1Hands} - ${canCom1Dobon}`)
+            console.log(`com2 - ${com2Hands} - ${canCom2Dobon}`)
+            console.log(`com3 - ${com3Hands} - ${canCom3Dobon}`)
+            console.log(`\n--- DOBON CHECK END ---\n`)
 
-        // 判定結果でクライアント側の盤面状態を更新させる
-        const reducerPayload: reducerPayloadSpecify = {
-          game: {
-            board: {
-              allowDobon: false
+            const dobonPlayer: Pick<Player, 'nickname'| 'turn'>[] = []
+            canCom1Dobon && dobonPlayer.push({ nickname: 'com1', turn: 2 })
+            canCom2Dobon && dobonPlayer.push({ nickname: 'com2', turn: 3 })
+            canCom3Dobon && dobonPlayer.push({ nickname: 'com3', turn: 4 })
+            console.log(dobonPlayer, 'dobonPlayer')
+
+            // 判定結果でクライアント側の盤面状態を更新させる
+            if (dobonPlayer.length) {
+              // ドボンプレイヤーが出たらゲームを終了させる
+              const reducerPayload: reducerPayloadSpecify = {
+                game: {
+                  event: {
+                    user: dobonPlayer, action: 'dobon'
+                  }
+                }
+              }
+              console.log(reducerPayload, 'reducerPayload')
+              io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+              return {}
             }
-          }
-        }
-        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+
+            // ドボンプレイヤーがいなければゲームを続行
+            const reducerPayload = {
+              game: {
+                board: { allowDobon: false }
+              }
+            }
+            io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+            return {}
+          })()
+        })
         break
       }
       case 'dobon': {
@@ -417,7 +438,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         let reducerPayload: reducerPayloadSpecify = {
           game: {
             event: {
-              user,
+              user: [user],
               action: 'dobon'
             }
           }

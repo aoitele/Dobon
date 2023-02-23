@@ -8,7 +8,7 @@ const gameInitialState: GameProviderState = {
     setCount: null,
     status: undefined,
     event: {
-      user: { nickname:'', turn:0 },
+      user: [],
       action: null,
       message: null
     },
