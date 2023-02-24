@@ -206,7 +206,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         if (users && turn && trash?.card) {
           // Skipカード効果で得た自分の連続ターンでない、純粋に自分のターンが来てカードを出した場合のみeffectNameを取得する
           const effectName = (!isMyTurnConsecutive && byPutout) ? resEffectName({ card: [trash.card], selectedWildCard: null }) : ''
-          const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
+          const isReversed = Array.isArray(effect) && effect.includes('reverse') && effectName !==  'reverse'
           const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed)
 
           if (effect && effectName && isAddableEffect(effectName)) {
