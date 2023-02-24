@@ -4,6 +4,7 @@ import { GameProviderState } from "../../../../context/GameProvider";
 import { resetMyHandsStatus, updateMyHandsStatus } from "../../../../utils/game/checkHand";
 import { EmitForPVE } from "../../../../@types/socket";
 import { handleEmit } from "../../../../utils/socket/emit"
+import { Effect as EffectType } from '../../../../@types/game'
 
 /* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
 class Effect {
@@ -30,13 +31,15 @@ class Effect {
     this.boardDispatch({ ...this.boardState, showAvoidEffectview: false })
   }
   get description() {
-    switch(this.gameState.game.board.effect[0]) {
-      case 'draw2'    : return 'カードを2枚引きます'
-      case 'draw4'    : return 'カードを4枚引きます'
-      case 'draw6'    : return 'カードを6枚引きます'
-      case 'draw8'    : return 'カードを8枚引きます'
-      case 'opencard' : return '手札を公開します'
-      default         : return ''
+    const searchEffects:EffectType[] = ['draw2', 'draw4', 'draw6', 'draw8', 'opencard']
+    const effect = this.gameState.game.board.effect.find(ef => searchEffects.includes(ef))
+    switch(effect) {
+      case 'draw2'   : return 'カードを2枚引きます'
+      case 'draw4'   : return 'カードを4枚引きます'
+      case 'draw6'   : return 'カードを6枚引きます'
+      case 'draw8'   : return 'カードを8枚引きます'
+      case 'opencard': return '手札を公開します'
+      default        : return ''
     }
   }
   updateStatus() {
