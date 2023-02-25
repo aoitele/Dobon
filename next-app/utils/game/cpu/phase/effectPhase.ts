@@ -95,7 +95,7 @@ const effectPhase = async({
   }
   io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 
-  await sleep(1000)
+  await sleep(500)
 
   return {
     updateData1: { ...data, hands: updateHands },

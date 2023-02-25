@@ -61,9 +61,7 @@ const putoutPhase = async({
       }
     }
     console.log(`\n--- COM TURN END for SKIP ---\n`)
-    await sleep(500)
     io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-
     return
   }
 
@@ -74,7 +72,7 @@ const putoutPhase = async({
   console.log(`PutOut Phase :haveNum - ${haveNum}`)
 
   // 効果解決でない場合はカードを選択して出す(TODO：選択ロジック実装)
-  await sleep(500)
+  await sleep(500) // CPUターンに間をつけるためのsleep
   console.log(`PutOut Phase : user:${user.nickname} trash - ${trashCard}`)
   adapterPubClient.lpush(trashKey, trashCard.replace('o', '')) // 最新の捨て札を先頭に追加(oは除いておく)
   adapterPubClient.srem(handsKey, trashCard)
