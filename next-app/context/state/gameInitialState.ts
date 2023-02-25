@@ -30,7 +30,7 @@ const gameInitialState: GameProviderState = {
       otherHands: [],
       turn: null,
       effect: [],
-      allowDobon: true,
+      allowDobon: false,
       waitDobon: false,
       bonusCards: []
     },

@@ -129,7 +129,7 @@ const putoutPhase = async({
   const userMeHand = await adapterPubClient.smembers(handKey)
   const canIDobon = dobonJudge(trashCard, userMeHand)
 
-  const reducerPayload: reducerPayloadSpecify = {
+  let reducerPayload: reducerPayloadSpecify = {
     game: {
       board: {
         effect: data.data.effect,
@@ -137,19 +137,31 @@ const putoutPhase = async({
           card: `${trashCard}o`,
           user,
         },
-        allowDobon: !canIDobon,
-        turn: canIDobon ? undefined : culcNextUserTurn(turn, users, effectName, isReversed),
         otherHands: data.data.otherHands,
         waitDobon: canIDobon ? true : undefined
       },
       event: effectName ? { user: [user], action: effectName } : undefined
     }
   }
-  io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
-  console.log(`\n--- COM TURN END ---\n`)
+  io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 
-  await sleep(1000)
-  resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+  if (effectName) {
+    await sleep(1000)
+    resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+  }
+
+  if (!canIDobon) {
+    // エフェクトモーダル終了後にターンを変更させる
+    reducerPayload = {
+      game: {
+        board: {
+          turn: culcNextUserTurn(turn, users, effectName, isReversed),
+        }
+      }
+    }
+    io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
+  }
+  console.log(`\n--- COM TURN END ---\n`)
 }
 
 export { putoutPhase }
