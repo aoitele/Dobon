@@ -369,8 +369,11 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         console.log(`\n--- DOBON CHECK START ---\n`)
 
         const trashCard = board?.data.trash?.card
-        const trashUser = board?.data.trash?.user?.nickname
-        if (!trashCard) return {}
+        const trashUser = board?.data.trash?.user
+        const users = board?.data.users
+        const hands = board?.data.hands
+        if (!(trashCard && trashUser && users && hands)) return {}
+
         let [canCom1Dobon, canCom2Dobon, canCom3Dobon] = [false, false, false]
 
         const [handsKey_1, handsKey_2, handsKey_3] = loadDobonRedisKeys([
@@ -384,13 +387,13 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         .smembers(handsKey_2)
         .smembers(handsKey_3)
         .exec((_err, results) => {
-          (() => {
+          (async() => {
             const com1Hands = results[0][1]
             const com2Hands = results[1][1]
             const com3Hands = results[2][1]
-            canCom1Dobon = trashUser !== 'com1' && dobonJudge(trashCard, com1Hands)
-            canCom2Dobon = trashUser !== 'com2' && dobonJudge(trashCard, com2Hands)
-            canCom3Dobon = trashUser !== 'com3' && dobonJudge(trashCard, com3Hands)
+            canCom1Dobon = trashUser.nickname !== 'com1' && dobonJudge(trashCard, com1Hands)
+            canCom2Dobon = trashUser.nickname !== 'com2' && dobonJudge(trashCard, com2Hands)
+            canCom3Dobon = trashUser.nickname !== 'com3' && dobonJudge(trashCard, com3Hands)
             console.log(trashCard, 'trashCard')
 
             console.log(`com1 - ${com1Hands} - ${canCom1Dobon}`)
@@ -407,7 +410,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             // 判定結果でクライアント側の盤面状態を更新させる
             if (dobonPlayer.length) {
               // ドボンプレイヤーが出たらゲームを終了させる
-              const reducerPayload: reducerPayloadSpecify = {
+              let reducerPayload: reducerPayloadSpecify = {
                 game: {
                   event: {
                     user: dobonPlayer, action: 'dobon'
@@ -415,6 +418,34 @@ const cpuModeHandler = (io: Socket, socket: any) => {
                 }
               }
               console.log(reducerPayload, 'reducerPayload')
+              io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+
+              // モーダル表示を終了させるためにクライアント側のstateを更新
+              await sleep(1000)
+              resetEvent(io, pveKey)
+
+              // ドボン結果を通知
+              const dobonPlayersName = dobonPlayer.map(player => player.nickname)
+              const newUsersState = users.map(u => {
+                if (u.nickname && dobonPlayersName.includes(u.nickname)) { u.isWinner = true}
+                if (u.nickname === trashUser.nickname) { u.isLoser = true }
+                return u
+              })
+
+              reducerPayload = {
+                game: {
+                  event: { action: 'dobonsuccess' },
+                  board: { users: newUsersState },
+                  result: { dobonHandsCount: hands.length }
+                }
+              }
+              io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+
+              await sleep(1000)
+              resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+
+              // スコア計算画面へ移行
+              reducerPayload = { game: { status: 'ended' } }
               io.in(pveKey).emit('updateStateSpecify', reducerPayload)
               return {}
             }
