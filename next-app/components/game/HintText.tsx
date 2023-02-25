@@ -77,7 +77,7 @@ const HintText:VFC<Props> = ({ boardState }) => {
         // Jokerを1枚持っている場合
         if (hasJokerCount === 1) {
           if (sumIsBelow13)        text = `${baseNum - 1} or ${baseNum + 1}でドボン待ち`
-          else if (baseNum === 14) text = `${baseNum - 1}でドボン待ち`
+          else if (baseNum === 13 || baseNum === 14) text = `${baseNum - 1}でドボン待ち`
         }
         // Jokerを2枚持っている場合
         if (hasJokerCount === 2) {
