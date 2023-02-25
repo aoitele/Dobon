@@ -71,7 +71,7 @@ describe('message TestCases', () => {
     const action: AllActionType = 'opencard'
     const info = { user, action, card }
     const result = createMsg(info)
-    const expected = '「手札公開(13)」\n次のユーザーは手札を公開！'
+    const expected = '「手札公開(13)」\n次のユーザーは手札を公開!'
     expect(result).toBe(expected)
   })
 })
