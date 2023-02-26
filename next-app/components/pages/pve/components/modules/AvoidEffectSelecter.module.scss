@@ -50,7 +50,7 @@
       }
       .noEscapeEffect {
         @extend .btn;
-        background-color:rgb(218, 186, 143);
+        background-color:rgb(153, 147, 147);
       }
       .inspectOtherHands {
         @extend .btn;
@@ -59,6 +59,10 @@
       .dobonBtn {
         @extend .btn;
         background-color: orange;
+      }
+      .backBtn {
+        @extend .btn;
+        background-color: rgb(162, 221, 122);
       }
       .actionBtn {
         margin: 20px 0px;

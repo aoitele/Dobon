@@ -34,6 +34,8 @@ const AvoidEffectSelecter = () => {
   const cardNumber = effectName && resEffectNumber(effectName)
   const myHandsNums = resMyHandsCardNumbers(gameState.game.board.hands)
   const existCardNumInMyHands = (cardNumber !== null) && myHandsNums.includes(cardNumber)
+  const havingOneCardInMyHands = existCardNumInMyHands && myHandsNums.length === 1
+  const allowEscape = existCardNumInMyHands && !havingOneCardInMyHands
 
   const GameEffect = new Effect(gameState.wsClient, gameState, boardState, gameDispatch, boardDispatch)
 
@@ -56,10 +58,11 @@ const AvoidEffectSelecter = () => {
               <div className={styles.actionBtn}>
               <span className={styles.acceptEffect} onClick={() => GameEffect.accept()}>{`効果を受ける\n(${GameEffect.description})`}</span>
                 <span
-                  className={existCardNumInMyHands ? styles.escapeEffect : styles.noEscapeEffect}
-                  onClick={() => existCardNumInMyHands ? setLocalState({ cardSelectMode: true, handsInspectMode: false }) : undefined}
+                  className={allowEscape ? styles.escapeEffect : styles.noEscapeEffect}
+                  onClick={() => allowEscape ? setLocalState({ cardSelectMode: true, handsInspectMode: false }) : undefined}
                   >{cardNumber}を出して回避する</span>
                   {!existCardNumInMyHands && <span className={styles.cantAvoidEffectDesc}>※{cardNumber}を持っていないため回避できません</span>}
+                  {havingOneCardInMyHands && <span className={styles.cantAvoidEffectDesc}>※{cardNumber}を持っていますが手札が1枚のため出せません</span>}
                 <span className={styles.inspectOtherHands} onClick={() => setLocalState({ cardSelectMode: false, handsInspectMode: true })}>みんなの手札をみる</span>
                 {/* { emitArgs &&
                   <span
@@ -76,7 +79,7 @@ const AvoidEffectSelecter = () => {
               {/* {states.cards:効果回避ができる同数字のカードのみをputableにしてHandsに渡す} */}
               <Hands isAvoidSelectMode/>
               <span
-                className={styles.noEscapeEffect}
+                className={styles.backBtn}
                 onClick={() => setLocalState(initialState)}
               >戻る</span>
             </div>
@@ -86,7 +89,7 @@ const AvoidEffectSelecter = () => {
           <div>
             <UserHandsInfo board={gameState.game.board} />
             <span
-              className={styles.noEscapeEffect}
+              className={styles.backBtn}
               onClick={() => setLocalState(initialState)}
             >戻る</span>
             </div>
