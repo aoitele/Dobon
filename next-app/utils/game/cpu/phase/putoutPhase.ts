@@ -5,7 +5,6 @@ import { CpuTurnEmitData } from "../../../../@types/emitData"
 import { cardsICanPutOut, sepalateSuitNum } from "../../checkHand"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
-import { culcNextUserTurn } from "../../turnInfo"
 import { CpuMainProcessArgs } from '../main'
 import { isAddableEffect, resEffectName, resNewEffectState } from "../../effect"
 import { DOBON_CARD_NUMBER_WILD } from "../../../../constant"
@@ -38,7 +37,7 @@ interface Args {
 const putoutPhase = async({
   user, io, hands, trash, data, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed
 }: Args) => {
-  const {turn, users, effect} = data.data
+  const {turn, effect} = data.data
   if (!turn) {
     throw Error('PutOut Phase : has Error: required data is not provided')
   }
@@ -50,8 +49,6 @@ const putoutPhase = async({
 
   // 出せない場合はスキップ
   if (!putableCards.length) {
-    const isReversed = (typeof effect !== 'undefined') && effect.includes('reverse')
-    nextTurn = culcNextUserTurn(turn, users, '', isReversed)
     const reducerPayload: reducerPayloadSpecify = {
       game: {
         board: {
