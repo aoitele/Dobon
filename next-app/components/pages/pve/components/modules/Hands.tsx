@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { FC, useContext } from 'react'
 import { BoardDispathContext, BoardStateContext } from '../../../../../context/BoardProvider'
 import { GameDispathContext, GameStateContext } from '../../../../../context/GameProvider'
 import spreadCardState from '../../../../../utils/game/spreadCardState'
@@ -7,13 +7,28 @@ import { Hand } from '../../utils/Hand'
 import Image from 'next/image'
 import styles from './Hands.module.scss'
 
-const Hands = () => {
+interface Props {
+  isAvoidSelectMode?: boolean
+}
+
+const Hands: FC<Props> = ({ isAvoidSelectMode }) => {
   const [gameState, boardState, gameDispatch, boardDispatch] = [useContext(GameStateContext), useContext(BoardStateContext), useContext(GameDispathContext), useContext(BoardDispathContext)]
 
   if (!gameDispatch || !boardDispatch) return <></>
   
   const MyHand = new Hand(gameState.wsClient, gameState, boardState, gameDispatch, boardDispatch)
-  const hands = spreadCardState(gameState.game.board.hands, true)
+  let hands = spreadCardState(gameState.game.board.hands, true)
+
+  // カード効果回避モード時：数字が合致するカードのみputableにする
+  if (isAvoidSelectMode) {
+    const lastTrashNum: number = spreadCardState([gameState.game.board.trash.card], true)[0].num
+    hands = hands.map(card => {
+      if (card.num !== lastTrashNum) {
+        card.isPutable = false
+      }
+      return card
+    })
+  }
  
   return (
     <div className={styles.slides}>

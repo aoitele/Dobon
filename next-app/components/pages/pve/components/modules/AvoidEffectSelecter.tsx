@@ -1,12 +1,13 @@
-import React, { useContext, useState } from "react"
+import React, { FC, useContext, useState } from "react"
 import { BoardStateContext, BoardDispathContext } from "../../../../../context/BoardProvider"
-import { GameStateContext, GameDispathContext } from "../../../../../context/GameProvider"
+import { GameStateContext, GameDispathContext, GameProviderState } from "../../../../../context/GameProvider"
 import { resMyHandsCardNumbers } from "../../../../../utils/game/checkHand"
 
 import { extractShouldBeSolvedEffect, resEffectNumber } from "../../../../../utils/game/effect"
 import spreadCardState from "../../../../../utils/game/spreadCardState"
 import { culcBeforeUserTurn } from "../../../../../utils/game/turnInfo"
 import { SingleCard } from "../../../../game/SingleCard"
+import UserInfo from "../../../../game/UserInfo"
 import { Effect } from "../../utils/Effect"
 import styles from './AvoidEffectSelecter.module.scss'
 import Hands from "./Hands"
@@ -58,6 +59,7 @@ const AvoidEffectSelecter = () => {
                   className={existCardNumInMyHands ? styles.escapeEffect : styles.noEscapeEffect}
                   onClick={() => existCardNumInMyHands ? setLocalState({ cardSelectMode: true, handsInspectMode: false }) : undefined}
                   >{cardNumber}を出して回避する</span>
+                  {!existCardNumInMyHands && <span className={styles.cantAvoidEffectDesc}>※{cardNumber}を持っていないため回避できません</span>}
                 <span className={styles.inspectOtherHands} onClick={() => setLocalState({ cardSelectMode: false, handsInspectMode: true })}>みんなの手札をみる</span>
                 {/* { emitArgs &&
                   <span
@@ -72,7 +74,7 @@ const AvoidEffectSelecter = () => {
             <div>
               <p className={styles.attention}>カードを選択してください</p>
               {/* {states.cards:効果回避ができる同数字のカードのみをputableにしてHandsに渡す} */}
-              <Hands />
+              <Hands isAvoidSelectMode/>
               <span
                 className={styles.noEscapeEffect}
                 onClick={() => setLocalState(initialState)}
@@ -82,10 +84,7 @@ const AvoidEffectSelecter = () => {
 
           { localState.handsInspectMode &&
           <div>
-            {/* <UserHandsInfo
-              users={state.game.board.users}
-              authUser={authUser}
-            /> */}
+            <UserHandsInfo board={gameState.game.board} />
             <span
               className={styles.noEscapeEffect}
               onClick={() => setLocalState(initialState)}
@@ -95,6 +94,30 @@ const AvoidEffectSelecter = () => {
           </div>
         </div>
       </div>
+    </>
+  )
+}
+
+/**
+ * 自分以外のユーザーの手札情報を出力する
+ */
+interface UserHandsInfoPros {
+  board: GameProviderState['game']['board']
+}
+
+const UserHandsInfo:FC<UserHandsInfoPros> = ({ board }) => {
+  const cpus = board.users.filter(user => user.mode)
+
+  return (
+    <>
+      { cpus.map(cpu =>
+      <UserInfo
+        key={cpu.nickname}
+        user={cpu}
+        turnUser={null}
+        hands={board.otherHands.filter(hand => hand.nickname === cpu.nickname)[0]}
+      />
+      )}
     </>
   )
 }

@@ -50,7 +50,7 @@
       }
       .noEscapeEffect {
         @extend .btn;
-        background-color:lightgray;
+        background-color:rgb(218, 186, 143);
       }
       .inspectOtherHands {
         @extend .btn;
@@ -62,6 +62,11 @@
       }
       .actionBtn {
         margin: 20px 0px;
+      }
+      .cantAvoidEffectDesc {
+        font-size: 12px;
+        color: #ea3333;
+        display: block;
       }
     }
   }
