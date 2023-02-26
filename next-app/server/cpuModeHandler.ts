@@ -103,6 +103,9 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const initialTrash = await redisTrashInit(adapterPubClient, deckKey, trashKey)
         const deckCount = await adapterPubClient.scard(deckKey)
 
+        // 自分がドボンできるか判定
+        const canIDobon = dobonJudge(initialTrash, myHands)
+
         const reducerPayload: reducerPayloadSpecify = {
           game: {
             id: isFirstGame ? 1 : gameId,
@@ -119,6 +122,9 @@ const cpuModeHandler = (io: Socket, socket: any) => {
               },
               effect: initialState.game.board.effect,
               bonusCards: initialState.game.board.bonusCards,
+              waitDobon: canIDobon ? true : undefined, // 自分のドボンチェックからゲームスタート
+              status: 'playing',
+              speed: board?.data.speed
             },
             status: 'playing',
             result: initialState.game.result,
@@ -172,23 +178,29 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         .lpush(trashKey, `${trashCard.suit}${trashCard.num}`) // 最新の捨て札を先頭に追加(trashは`suit+num`形式で追加する)
         .srem(handsKey, trash.card.replace('p', '')) // `${suit}${num}p`でデータがくるため、redisはpなしでsrem
         .exec((_err, results) => results)
+        .then(async() => {
+          const newHands = hands.filter(card => card !== trash.card)
 
-        const newHands = hands.filter(card => card !== trash.card)
-
-        const reducerPayload: reducerPayloadSpecify = {
-          game: {
-            board: {
-              trash: {...trash, card: `${trashCard.suit}${trashCard.num}o`},
-              hands: newHands,
-              effect,
-            },
-            event: action && user ? { user: [user], action: action.data.effect } : undefined
+          let reducerPayload: reducerPayloadSpecify = {
+            game: {
+              board: {
+                trash: {...trash, card: `${trashCard.suit}${trashCard.num}o`},
+                hands: newHands,
+                effect,
+                allowDobon: true,
+              },
+              event: action && user ? { user: [user], action: action.data.effect } : undefined
+            }
           }
-        }
+          io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 
-        io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
-        await sleep(1000)
-        resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+          if (effect) {
+            await sleep(1000)
+            resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+          }
+          reducerPayload = { game: { board: { status: 'dobonCheck' } } }
+          io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+        })
         break
       }
       case 'turnchange': {
@@ -218,6 +230,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
               board: {
                 turn: nextTurn,
                 effect: updatedEffect.length ? updatedEffect : undefined,
+                status: 'playing',
               }
             }
           }
@@ -451,9 +464,11 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             }
 
             // ドボンプレイヤーがいなければゲームを続行
-            const reducerPayload = {
+            const reducerPayload: reducerPayloadSpecify = {
               game: {
-                board: { allowDobon: false }
+                board: {
+                  status: 'turnChanging',
+                }
               }
             }
             io.in(pveKey).emit('updateStateSpecify', reducerPayload)

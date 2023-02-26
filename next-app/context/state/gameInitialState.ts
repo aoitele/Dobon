@@ -33,6 +33,7 @@ const gameInitialState: GameProviderState = {
       allowDobon: false,
       waitDobon: false,
       speed: '1x',
+      status: undefined,
       bonusCards: []
     },
     result: {},

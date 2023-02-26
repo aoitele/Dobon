@@ -43,7 +43,6 @@ const putoutPhase = async({
     throw Error('PutOut Phase : has Error: required data is not provided')
   }
   let updateHands = [...hands]
-  let nextTurn; // eslint-disable-line init-declarations
 
   // 手札を場に出せるかを判定する
   const putableCards = cardsICanPutOut(hands, trash[0], effect)
@@ -56,8 +55,8 @@ const putoutPhase = async({
     const reducerPayload: reducerPayloadSpecify = {
       game: {
         board: {
-          turn: nextTurn,
           allowDobon: false,
+          status: 'turnChanging',
         }
       }
     }
@@ -138,7 +137,8 @@ const putoutPhase = async({
           user,
         },
         otherHands: data.data.otherHands,
-        waitDobon: canIDobon ? true : undefined
+        allowDobon: true,
+        waitDobon: canIDobon ? true : undefined,
       },
       event: effectName ? { user: [user], action: effectName } : undefined
     }
@@ -150,16 +150,10 @@ const putoutPhase = async({
     resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
   }
 
+  // 自分がドボンできる場合はwaitDobonの判定操作を待つため、dobonCheckフェイズには移行させない
   if (!canIDobon) {
-    // エフェクトモーダル終了後にターンを変更させる
-    reducerPayload = {
-      game: {
-        board: {
-          turn: culcNextUserTurn(turn, users, effectName, isReversed),
-        }
-      }
-    }
-    io.in(pveKey).emit('updateStateSpecify', reducerPayload) // Room全員の捨て札を更新
+    reducerPayload = { game: { board: { status: 'dobonCheck' } } }
+    io.in(pveKey).emit('updateStateSpecify', reducerPayload)
   }
   console.log(`\n--- COM TURN END ---\n`)
 }

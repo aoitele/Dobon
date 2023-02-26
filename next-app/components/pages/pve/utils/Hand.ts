@@ -3,9 +3,7 @@ import { EmitBoard } from "../../../../@types/socket";
 import { BoardProviderState, boardProviderInitialState } from "../../../../context/BoardProvider";
 import { GameProviderState } from "../../../../context/GameProvider";
 import { resetMyHandsStatus, updateMyHandsStatus } from "../../../../utils/game/checkHand";
-import { resEffectName, resNewEffectState } from "../../../../utils/game/effect";
-import sleep from "../../../../utils/game/sleep";
-import { handleEmit } from "../../../../utils/socket/emit"
+import { resEffectName, resNewEffectState } from "../../../../utils/game/effect";import { handleEmit } from "../../../../utils/socket/emit"
 
 /* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
 class Hand {
@@ -21,7 +19,7 @@ class Hand {
     const newEffectState = resNewEffectState(this.gameState.game.board.effect, effectName)
     const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: trash, user: this.gameState.game.board.users[0] }, effect: newEffectState}
 
-    handleEmit(
+    await handleEmit(
       this.wsClient, {
         event: 'playcard',
         user: this.gameState.game.board.users[0],
@@ -30,19 +28,6 @@ class Hand {
           action: effectName
             ? { data: { effectState: this.gameState.game.board.effect, effect: effectName }}
             : undefined
-        }
-      }
-    )
-    await sleep(1000)
-
-    handleEmit(
-      this.wsClient, {
-        event: 'turnchange',
-        data: {
-          board: {
-            data: boardState,
-            option: { values: { isMyTurnConsecutive: this.boardState.isMyTurnConsecutive }, triggered: 'putOut' }
-          },
         }
       }
     )
@@ -55,9 +40,8 @@ class Hand {
     newState && this.gameDispatch(newState)
   }
   resetStatus() {
-    const h = this.gameState.game.board.hands.map(hand => hand.replace('p', ''))
-    const newState = resetMyHandsStatus({ state: this.gameState, hands: h })
-    newState && this.gameDispatch(newState)
+    const newState = resetMyHandsStatus({ state: this.gameState, hands: this.gameState.game.board.hands })
+    newState && this.gameDispatch({...newState})
     this.boardDispatch(boardProviderInitialState)
   }
 }

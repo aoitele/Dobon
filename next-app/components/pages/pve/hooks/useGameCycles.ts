@@ -11,6 +11,7 @@ import { updateMyHandsStatus } from '../../../../utils/game/checkHand'
 import { existShouldBeSolvedEffect } from '../../../../utils/game/effect'
 import { culcBonus, culcGetScore } from '../../../../utils/game/score'
 import sleep from '../../../../utils/game/sleep'
+import { useUpdateStateFn } from '../../../../utils/game/state'
 import { handleEmit } from '../../../../utils/socket/emit'
 import { resBonusNumArray, resDobonNum } from '../../../game/score'
 import { establishWsForPve } from '../utils/webSocket'
@@ -34,6 +35,7 @@ const useGameCycles = () => {
           break
         }
         case 'playing': {
+          // TODO：敗者がturn:1になるようにした時にここは修正が必要
           boardDispatch({ ...boardState, isMyTurn: true })
           break
         }
@@ -70,6 +72,8 @@ const useGameCycles = () => {
             }
           }
           scoreDispatch(newScoreState);
+          const newGameState = useUpdateStateFn(gameState, { game: { board: { waitDobon: false } } })
+          gameDispatch(newGameState); // 盤面状態を初期化
 
           (async() => {
             await sleep(2000)
@@ -106,7 +110,7 @@ const useGameCycles = () => {
                   message:`GoTo Next →「Game${nextGameId}」`
                 }))
                 await sleep(1000)
-                handleEmit(gameState.wsClient, { event: 'prepare', gameId: nextGameId, query: router.query })
+                handleEmit(gameState.wsClient, { event: 'prepare', gameId: nextGameId, query: router.query, data: { board: {data: { speed: gameState.game.board.speed }}} }) // ゲームスピードの選択状態は維持させる
                 scoreDispatch(scoreProviderInitialState) // ScoreBoardの状態をリセット(次ゲーム終了時の表示を初期状態に戻すため)
               }
             }, 10)
@@ -119,37 +123,43 @@ const useGameCycles = () => {
     gameStatusHandler()
   },[gameState.game.status])
 
+  // board.statusに関するフック
   useEffect(() => {
-    if (!gameState.game.board.turn) return // turnに有効な値(1〜4)が入ってから実行させる
-    if (!gameDispatch || !boardDispatch) return
+    const emitBoard:EmitForPVE = { event: null, query: router.query, data: { board: { data: gameState.game.board } } }
 
-    // allowDobonがtrueとなった時は一旦CPUのドボン判定を行う
-    if (gameState.game.board.allowDobon) {
-      handleEmit(gameState.wsClient, {
-        event: 'cpuDobon',
-        query: router.query,
-        data: { board: { data: gameState.game.board } }
-      })
-      return
+    switch(gameState.game.board.status) {
+      case 'dobonCheck': {
+        handleEmit(gameState.wsClient, {...emitBoard, event: 'cpuDobon'})
+        break
+      }
+      case 'playing': {
+      if (gameState.game.board.turn === 1) {
+        const showAvoidEffectview = gameState.game.board.effect.length > 0 && existShouldBeSolvedEffect(gameState.game.board.effect)
+        boardDispatch?.({ ...boardState, isMyTurn: true, isDrawnCard: false, showAvoidEffectview })
+        const newState = updateMyHandsStatus({ state: gameState, hands: gameState.game.board.hands, trash: gameState.game.board.trash })
+        newState && gameDispatch?.(newState)
+      } else {
+        handleEmit(gameState.wsClient, {...emitBoard, event: 'cpuTurn'})
+      }
+        break
+      }
+      case 'turnChanging': {
+        /**
+         * ターン変更はプレイヤー、CPUどちらもこのボードステータスを経由して実行させる
+         * スキップ or カードを出した際にallowDobonも切り替えておき、turnchangeイベント側処理の条件分岐に利用させる
+         */
+        handleEmit(
+          gameState.wsClient, {
+            event: 'turnchange',
+            data: { board: { data: gameState.game.board, option:{ values: {}, triggered: gameState.game.board.allowDobon ? 'putOut' : 'actionBtn' } } }
+          }
+        )
+        break;
+      }
+      default: break
     }
 
-    // ドボン判定が終わった状態であれば次ユーザーのターンを開始する
-    if (gameState.game.board.turn === 1) {
-      const showAvoidEffectview = gameState.game.board.effect.length > 0 && existShouldBeSolvedEffect(gameState.game.board.effect)
-
-      boardDispatch({ ...boardState, isMyTurn: true, isDrawnCard: false, showAvoidEffectview })
-      const newState = updateMyHandsStatus({ state: gameState, hands: gameState.game.board.hands, trash: gameState.game.board.trash })
-      newState && gameDispatch(newState)
-    } else {
-      handleEmit(
-        gameState.wsClient, {
-          event: 'cpuTurn',
-          data: {board: {data: gameState.game.board }},
-          query: router.query
-        }
-      )
-    }
-  },[gameState.game.board.turn, gameState.game.board.allowDobon])
+  }, [gameState.game.board.status])
 }
 
 export { useGameCycles }

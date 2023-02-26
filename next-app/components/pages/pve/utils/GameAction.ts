@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react"
 import { BoardProviderState } from "../../../../context/BoardProvider"
 import { GameProviderState } from "../../../../context/GameProvider"
+import { useUpdateStateFn } from "../../../../utils/game/state"
 import { handleEmit } from "../../../../utils/socket/emit"
 
 /* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
@@ -20,12 +21,8 @@ class GameAction {
     this.boardDispatch(prevState => ({ ...prevState, isDrawnCard:true }))
   }
   turnChange() {
-    handleEmit(
-      this.wsClient, {
-        event: 'turnchange',
-        data: { board: { data: this.gameState.game.board, option:{ values: {}, triggered: 'actionBtn' } } }
-      }
-    )
+    const turnChangingState = useUpdateStateFn(this.gameState, { game: { board: { status: 'turnChanging' } } })
+    this.gameDispatch({ ...turnChangingState })
     this.boardDispatch(prevState => ({ ...prevState, isMyTurn: false }))
   }
   dobon() {
@@ -38,12 +35,8 @@ class GameAction {
     )
   }
   notDobon() {
-    handleEmit(
-      this.wsClient, {
-        event: 'turnchange',
-        data: { board: { data: this.gameState.game.board, option:{ values: {}, triggered: 'actionBtn' } } }
-      }
-    )
+    const turnChangingState = useUpdateStateFn(this.gameState, { game: { board: { allowDobon: false, status: 'turnChanging' } } })
+    this.gameDispatch({ ...turnChangingState })
     this.gameDispatch(prevState => ({ ...prevState, game:{...prevState.game, board: {...prevState.game.board, waitDobon: false}} }))
   }
 }
