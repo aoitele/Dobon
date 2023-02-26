@@ -24,6 +24,7 @@ interface Args {
   trashKey: string
   handsKey: string
   haveNum?: boolean
+  speed: CpuMainProcessArgs['speed']
 }
 
 /**
@@ -35,7 +36,7 @@ interface Args {
  *  - スキップする
  */
 const putoutPhase = async({
-  user, io, hands, trash, data, adapterPubClient, pveKey, trashKey, handsKey, haveNum
+  user, io, hands, trash, data, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed
 }: Args) => {
   const {turn, users, effect} = data.data
   if (!turn) {
@@ -72,7 +73,8 @@ const putoutPhase = async({
   console.log(`PutOut Phase :haveNum - ${haveNum}`)
 
   // 効果解決でない場合はカードを選択して出す(TODO：選択ロジック実装)
-  await sleep(500) // CPUターンに間をつけるためのsleep
+  await sleep(speed === '2x' ? 250 : 500) // CPUターンに間をつけるためのsleep
+
   console.log(`PutOut Phase : user:${user.nickname} trash - ${trashCard}`)
   adapterPubClient.lpush(trashKey, trashCard.replace('o', '')) // 最新の捨て札を先頭に追加(oは除いておく)
   adapterPubClient.srem(handsKey, trashCard)
@@ -144,7 +146,7 @@ const putoutPhase = async({
   io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 
   if (effectName) {
-    await sleep(1000)
+    await sleep(speed === '2x' ? 500 : 1000)
     resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
   }
 

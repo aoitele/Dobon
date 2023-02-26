@@ -358,7 +358,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const rule = validateRules.cpuTurn
         if (!board || !isCpuTurnEmitData(board, rule)) break
         
-        cpuMainProcess({ io, adapterPubClient, data: board, pveKey })
+        cpuMainProcess({ io, adapterPubClient, data: board, pveKey, speed: board.data.speed })
         break
       }
       case 'cpuDobon': {

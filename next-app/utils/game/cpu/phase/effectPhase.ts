@@ -17,10 +17,11 @@ interface Args {
   pveKey: CpuMainProcessArgs['pveKey']
   deckKey: string
   handsKey: string
+  speed: CpuMainProcessArgs['speed']
 }
 
 const effectPhase = async({
-  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey
+  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, speed
 }: Args) => {
   if (!data.data.otherHands) {
     throw Error('drawPhase has Error: data.data.otherHands is not provided')
@@ -95,7 +96,7 @@ const effectPhase = async({
   }
   io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 
-  await sleep(500)
+  await sleep(speed === '2x' ? 250 : 500)
 
   return {
     updateData1: { ...data, hands: updateHands },

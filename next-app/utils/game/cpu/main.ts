@@ -5,6 +5,7 @@ import { CpuTurnEmitData } from "../../../@types/emitData"
 import { drawPhase } from "./phase/drawPhase"
 import { putoutPhase } from "./phase/putoutPhase"
 import { effectPhase } from "./phase/effectPhase"
+import { GameProviderState } from "../../../context/GameProvider"
 
 /**
  * CPUのゲーム実行プロセス
@@ -18,9 +19,10 @@ export interface CpuMainProcessArgs {
   adapterPubClient: Redis
   pveKey:string
   data: CpuTurnEmitData
+  speed: GameProviderState['game']['board']['speed']
 }
 
-const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data }: CpuMainProcessArgs) => {
+const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data, speed }: CpuMainProcessArgs) => {
   console.log(`\n--- COM TURN START ---\n`)
 
   const player = data.data.users?.find(user => user.turn === data.data.turn)
@@ -40,9 +42,9 @@ const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data }: CpuMainPro
     .exec((_err, results) => results)
   const [trash, hands] = [redisData[0][1], redisData[1][1]]
 
-  const { updateData1, updateHands1, haveNum } = await effectPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey })
-  const { updateData2, updateHands2 } = await drawPhase({ user: player, io, hands: updateHands1, trash, data: updateData1, adapterPubClient, pveKey, deckKey, handsKey })
-  await putoutPhase({ user: player, io, hands: updateHands2, trash, data: updateData2, adapterPubClient, pveKey, trashKey, handsKey, haveNum })
+  const { updateData1, updateHands1, haveNum } = await effectPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, speed })
+  const { updateData2, updateHands2 } = await drawPhase({ user: player, io, hands: updateHands1, trash, data: updateData1, adapterPubClient, pveKey, deckKey, handsKey, speed })
+  await putoutPhase({ user: player, io, hands: updateHands2, trash, data: updateData2, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed })
 }
 
 export { cpuMainProcess }

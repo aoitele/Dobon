@@ -1,0 +1,10 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  .speedText {
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 4px;
+  }
+}

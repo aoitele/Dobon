@@ -16,10 +16,11 @@ interface Args {
   pveKey: CpuMainProcessArgs['pveKey']
   deckKey: string
   handsKey: string
+  speed: CpuMainProcessArgs['speed']
 }
 
 const drawPhase = async({
-  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey
+  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, speed
 }: Args) => {
   if (!data.data.otherHands) {
     throw Error('Draw Phase : has Error: data.data.otherHands is not provided')
@@ -37,7 +38,7 @@ const drawPhase = async({
     const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
     data.data.otherHands[comHandsIndex].hands = updateHands
     // 手札情報を更新
-    await sleep(500)
+    await sleep(speed === '2x' ? 250 : 500)
     const reducerPayload: reducerPayloadSpecify = {
       game: {
         board: {
