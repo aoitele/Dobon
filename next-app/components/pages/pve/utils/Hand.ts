@@ -3,7 +3,8 @@ import { EmitBoard } from "../../../../@types/socket";
 import { BoardProviderState, boardProviderInitialState } from "../../../../context/BoardProvider";
 import { GameProviderState } from "../../../../context/GameProvider";
 import { resetMyHandsStatus, updateMyHandsStatus } from "../../../../utils/game/checkHand";
-import { resEffectName, resNewEffectState } from "../../../../utils/game/effect";import { handleEmit } from "../../../../utils/socket/emit"
+import { resEffectName } from "../../../../utils/game/effect";
+import { handleEmit } from "../../../../utils/socket/emit"
 
 /* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
 class Hand {
@@ -16,8 +17,7 @@ class Hand {
   ){}
   async putOut (trash: string) {
     const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
-    const newEffectState = resNewEffectState(this.gameState.game.board.effect, effectName)
-    const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: trash, user: this.gameState.game.board.users[0] }, effect: newEffectState}
+    const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: trash, user: this.gameState.game.board.users[0] }}
 
     await handleEmit(
       this.wsClient, {

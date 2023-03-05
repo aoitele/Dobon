@@ -30,7 +30,7 @@ const effectPhase = async({
   // ドロー効果/手札公開効果がなければ何もせずドローフェイズへ
   const effect = extractShouldBeSolvedEffect(data.data.effect)[0]
   if (!effect) {
-    console.log('Effect Phase : SKIP - no effect')
+    console.log('Effect Phase : SKIP - no ShouldBeSolvedEffect')
     return { updateData1: data, updateHands1: hands }
   }
 
@@ -43,7 +43,19 @@ const effectPhase = async({
     return { updateData1: data, updateHands1: hands, haveNum: true }
   }
 
-  // 以降、効果を受ける場合
+  // 以降、効果を受ける処理
+
+  // 効果を受けた情報をクライアントへ通知
+  let reducerPayload: reducerPayloadSpecify = {
+    game: {
+      event: {
+        user: [{nickname: user.nickname, turn: user.turn}],
+        message: `affected ${effect}!`
+      }
+    }
+  }
+  io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+
   let updateHands = [...hands]
   let drawCnt = 0
 
@@ -85,7 +97,7 @@ const effectPhase = async({
   data.data.effect = data.data.effect.filter(item => item !== effect)
   const deckCount = await adapterPubClient.scard(deckKey)
 
-  const reducerPayload: reducerPayloadSpecify = {
+  reducerPayload = {
     game: {
       board: {
         effect: data.data.effect,

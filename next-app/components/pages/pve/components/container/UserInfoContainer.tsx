@@ -4,7 +4,8 @@ import UserInfo from "../../../../game/UserInfo"
 import styles from './UserInfoContainer.module.scss'
 
 const UserInfoContainer:FC = () => {
-  const { board } = useContext(GameStateContext).game
+  const gameState = useContext(GameStateContext)
+  const { board, event } = gameState.game
 
   const turnUser = board.users.filter(user => user.turn === board.turn)[0]
 
@@ -21,6 +22,10 @@ const UserInfoContainer:FC = () => {
           />
           {/* TODO 強さラベルの表示 */}
           {/* <span>{user.mode}</span> */}
+          {/* 効果を受けた時にメッセージを表示させている */}
+          <div className={styles.eventWrap}>
+            {event.message && event.user[0].nickname === user.nickname && <span className={styles.eventMessage}>{event.message}</span>}
+          </div>
         </div>
       )}
     </div>

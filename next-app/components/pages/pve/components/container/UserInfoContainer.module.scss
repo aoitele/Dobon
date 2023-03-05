@@ -6,3 +6,23 @@
   border-bottom: 1px solid lightgrey;
   justify-content: space-around;
 }
+.eventWrap {
+  height: 16px;
+  .eventMessage {
+    font-size: 14px;
+    font-weight: bold;
+    background-color: burlywood;
+    border-radius: 5px;
+    animation: flash .5s infinite linear;
+  }
+}
+
+@keyframes flash {
+  0%,
+  100% {
+    opacity: 1;
+  }
+	50% {
+    opacity: 0;
+  }
+}

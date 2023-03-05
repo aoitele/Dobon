@@ -10,7 +10,6 @@ import { cpuMainProcess } from "../utils/game/cpu/main"
 import { getBonus } from "../utils/game/cpu/utils/getBonus"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { dobonJudge } from "../utils/game/dobonJudge"
-// import { dobonJudge } from "../utils/game/dobonJudge"
 import { isAddableEffect, resEffectName, resNewEffectState } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 import sleep from "../utils/game/sleep"
@@ -210,15 +209,14 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const byPutout = board.option?.triggered === 'putOut'
         const byActionBtn = board.option?.triggered === 'actionBtn'
 
-        // ボードデータ取得、連続した自分のターンかどうかの判定(=skip効果によるturnchange?)
+        // ボードデータ取得
         const { users, turn, trash, effect } = board.data
-        const isMyTurnConsecutive = board.option?.values.isMyTurnConsecutive
         let updatedEffect: Effect[] = []
 
         if (users && turn && trash?.card) {
-          // Skipカード効果で得た自分の連続ターンでない、純粋に自分のターンが来てカードを出した場合のみeffectNameを取得する
-          const effectName = (!isMyTurnConsecutive && byPutout) ? resEffectName({ card: [trash.card], selectedWildCard: null }) : ''
-          const isReversed = Array.isArray(effect) && effect.includes('reverse') && effectName !==  'reverse'
+          // カードを出してターンが変更された場合のみeffectNameを取得する
+          const effectName = byPutout ? resEffectName({ card: [trash.card], selectedWildCard: null }) : ''
+          const isReversed = effect?.includes('reverse') ?? false // 盤面にターンリバース効果が発動中か
           const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed)
 
           if (effect && effectName && isAddableEffect(effectName)) {
@@ -229,7 +227,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             game: {
               board: {
                 turn: nextTurn,
-                effect: updatedEffect.length ? updatedEffect : undefined,
+                effect: updatedEffect,
                 status: 'playing',
               }
             }
@@ -275,7 +273,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
                 hands: newHands,
                 effect: resolvedEffect,
                 deckCount,
-              }
+              },
+              event: gameInitialState.game.event,
             }
           }
         io.in(pveKey).emit('updateStateSpecify', reducerPayload)
@@ -357,7 +356,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             board: {
               hands,
               effect: resolvedEffect
-            }
+            },
+            event: gameInitialState.game.event,
           }
         }
         io.in(pveKey).emit('updateStateSpecify', reducerPayload)

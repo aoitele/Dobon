@@ -6,11 +6,12 @@ import { cardsICanPutOut, sepalateSuitNum } from "../../checkHand"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
 import { CpuMainProcessArgs } from '../main'
-import { isAddableEffect, resEffectName, resNewEffectState } from "../../effect"
+import { resEffectName } from "../../effect"
 import { DOBON_CARD_NUMBER_WILD } from "../../../../constant"
 import { resetEvent } from "../../../../server/cpuModeHandler"
 import { loadDobonRedisKeys } from "../../../../server/redis/loadDobonRedisKeys"
 import { dobonJudge } from "../../dobonJudge"
+import { gameInitialState } from "../../../../context/state/gameInitialState"
 
 interface Args {
   user: NestedPartial<Player>
@@ -54,7 +55,8 @@ const putoutPhase = async({
         board: {
           allowDobon: false,
           status: 'turnChanging',
-        }
+        },
+        event: gameInitialState.game.event,
       }
     }
     console.log(`\n--- COM TURN END for SKIP ---\n`)
@@ -62,7 +64,7 @@ const putoutPhase = async({
     return
   }
 
-  // カード効果をeffectPhaseで回避している場合は、回避用のカードを優先して出す
+  // (2か13の)カード効果をeffectPhaseで回避している場合は、回避用のカードを優先して出す
   const trashCard = haveNum
   ? putableCards.filter(card => sepalateSuitNum([card])[0].num === sepalateSuitNum([trash[0]])[0].num)[0]
   : putableCards[0]
@@ -102,21 +104,7 @@ const putoutPhase = async({
 
   // 場の効果を解決、trashが追加すべき効果カードであればeffectに追加する
   const effectName = resEffectName({ card:[trashCard], selectedWildCard: { isSelected: true, suit: mostOwnedSuit } })
-  const existsEffect = data.data.effect.length > 0
-  const isReversed = data.data.effect.includes('reverse') // 解決前の反転状態を取得して後続のculcNextUserTurnに次ターンを計算させている
   console.log(`PutOut Phase : trash card effect - ${effectName}`)
-  console.log(`PutOut Phase : isReversed before resolve effect - ${isReversed}`)
-
-  if (existsEffect) {
-    const newEffectState = resNewEffectState(data.data.effect, effectName)
-    data.data.effect = newEffectState
-    console.log(`PutOut Phase : new Effect state - ${newEffectState}`)
-  } else if(effectName) {
-    if (isAddableEffect(effectName)){
-      data.data.effect.push(effectName)
-      console.log(`PutOut Phase : add Effect - ${effectName}`)
-    }
-  }
 
   // playerユーザーがドボン可能なカードを出した時はターンを更新せずドボン判断フェイズを挟ませる
   const [handKey] = loadDobonRedisKeys([
@@ -137,7 +125,7 @@ const putoutPhase = async({
         allowDobon: true,
         waitDobon: canIDobon ? true : undefined,
       },
-      event: effectName ? { user: [user], action: effectName } : undefined
+      event: effectName ? { user: [user], action: effectName } : gameInitialState.game.event,
     }
   }
   io.in(pveKey).emit('updateStateSpecify', reducerPayload)
