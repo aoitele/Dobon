@@ -36,7 +36,7 @@ const userInfo: React.FC<Props> = ({ user, hands, turnUser }) => {
           height={50}
         />
         <div>
-          <p>{user.nickname}<span className={ isTurnUser ? style.onTurnMark : '' }>⚫︎</span></p>
+          <p>{user.nickname}<span className={isTurnUser ? style.onTurnMark : undefined}>⚫︎</span></p>
           <p><span className={style.star}>⭐️</span>{user.score}</p>
         </div>
       </div>
