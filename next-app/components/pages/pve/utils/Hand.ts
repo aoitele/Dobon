@@ -18,7 +18,6 @@ class Hand {
   async putOut (trash: string) {
     const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
     const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: trash, user: this.gameState.game.board.users[0] }}
-
     await handleEmit(
       this.wsClient, {
         event: 'playcard',
@@ -37,7 +36,9 @@ class Hand {
     // putable状態をリセットして判定に回す
     const h = this.gameState.game.board.hands.map(hand => hand.replace('p', ''))
     const newState = updateMyHandsStatus({ state: this.gameState, hands: h, trash: this.gameState.game.board.trash })
-    newState && this.gameDispatch(newState)
+    console.log(h, 'updateStatus - h')
+    console.log(newState, 'updateStatus - newState')
+    newState && this.gameDispatch({...newState})
   }
   resetStatus() {
     const newState = resetMyHandsStatus({ state: this.gameState, hands: this.gameState.game.board.hands })
