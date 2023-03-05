@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { EmitBoard } from "../../../../@types/socket";
 import { BoardProviderState, boardProviderInitialState } from "../../../../context/BoardProvider";
 import { GameProviderState } from "../../../../context/GameProvider";
-import { resetMyHandsStatus, updateMyHandsStatus } from "../../../../utils/game/checkHand";
+import { updateMyHandsStatus } from "../../../../utils/game/checkHand";
 import { resEffectName } from "../../../../utils/game/effect";
 import { handleEmit } from "../../../../utils/socket/emit"
 
@@ -30,6 +30,7 @@ class Hand {
         }
       }
     )
+    this.resetStatus() // カードを出して自分のターンが終了する時にboardStateをリセットする
   }
   updateStatus() {
     // putable状態をリセットして判定に回す
@@ -38,8 +39,6 @@ class Hand {
     newState && this.gameDispatch({...newState})
   }
   resetStatus() {
-    const newState = resetMyHandsStatus({ state: this.gameState, hands: this.gameState.game.board.hands })
-    newState && this.gameDispatch({...newState})
     this.boardDispatch(boardProviderInitialState)
   }
 }
