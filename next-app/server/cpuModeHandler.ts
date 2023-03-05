@@ -178,7 +178,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         .srem(handsKey, trash.card.replace('p', '')) // `${suit}${num}p`でデータがくるため、redisはpなしでsrem
         .exec((_err, results) => results)
         .then(async() => {
-          const newHands = hands.filter(card => card !== trash.card)
+          const newHands = hands.filter(card => card !== trash.card).map(hand => hand.replace('p', '')) // 自分のターンが終わるため、putable状態を外す
 
           let reducerPayload: reducerPayloadSpecify = {
             game: {
