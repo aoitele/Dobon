@@ -113,12 +113,15 @@ const putoutPhase = async({
   const userMeHand = await adapterPubClient.smembers(handKey)
   const canIDobon = dobonJudge(trashCard, userMeHand)
 
+  // 捨て札はo(公開状態)で場に出す、元々oがついている手札を出す場合を考慮してtrashCard文字列を生成
+  const trashCardStr = sepTrash.isOpen ? trashCard : `${trashCard}o`
+
   let reducerPayload: reducerPayloadSpecify = {
     game: {
       board: {
         effect: data.data.effect,
         trash: {
-          card: `${trashCard}o`,
+          card: trashCardStr,
           user,
         },
         otherHands: data.data.otherHands,
