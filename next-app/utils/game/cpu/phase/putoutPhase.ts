@@ -71,7 +71,8 @@ const putoutPhase = async({
   console.log(`PutOut Phase :haveNum - ${haveNum}`)
 
   // 効果解決でない場合はカードを選択して出す(TODO：選択ロジック実装)
-  await sleep(speed === '2x' ? 250 : 500) // CPUターンに間をつけるためのsleep
+  const waitTime1 = speed === '1x' ? 420 : speed === '2x' ? 210 : 140
+  await sleep(waitTime1) // CPUターンに間をつけるためのsleep
 
   console.log(`PutOut Phase : user:${user.nickname} trash - ${trashCard}`)
   adapterPubClient.lpush(trashKey, trashCard.replace('o', '')) // 最新の捨て札を先頭に追加(oは除いておく)
@@ -134,7 +135,8 @@ const putoutPhase = async({
   io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 
   if (effectName) {
-    await sleep(speed === '2x' ? 500 : 1000)
+    const waitTime2 = speed === '1x' ? 900 : speed === '2x' ? 450 : 300
+    await sleep(waitTime2)
     resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
   }
 

@@ -56,7 +56,7 @@ export type Board = {
   bonusCards: string[]
   allowDobon: boolean
   waitDobon?: boolean
-  speed?: '1x' | '2x' // 進行速度(2Xは倍速モード)
+  speed?: '1x' | '2x' | '3x' // 進行速度(2X, 3Xは倍速モード)
   status?: 'playing' | 'dobonCheck' | 'turnChanging'
 }
 

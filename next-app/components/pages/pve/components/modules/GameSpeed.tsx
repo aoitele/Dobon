@@ -8,7 +8,8 @@ const GameSpeed = () => {
   const speed = gameState.game.board.speed
 
   const changeSpeed = () => {
-    const newState = useUpdateStateFn(gameState, {game: {board: {speed: speed === '1x' ? '2x' : '1x'}}})
+    const updateSpeed = (speed === '1x') ? '2x' : (speed === '2x') ? '3x' : '1x'
+    const newState = useUpdateStateFn(gameState, {game: {board: {speed: updateSpeed}}})
     gameDispatch?.({...newState})    
   }
 
