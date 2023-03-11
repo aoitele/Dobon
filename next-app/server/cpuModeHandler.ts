@@ -211,11 +211,12 @@ const cpuModeHandler = (io: Socket, socket: any) => {
 
         // ボードデータ取得
         const { users, turn, trash, effect } = board.data
+        const selectedWildCard = board.option?.values.selectedWildCard ?? null
         let updatedEffect: Effect[] = []
 
         if (users && turn && trash?.card) {
           // カードを出してターンが変更された場合のみeffectNameを取得する
-          const effectName = byPutout ? resEffectName({ card: [trash.card], selectedWildCard: null }) : ''
+          const effectName = byPutout ? resEffectName({ card: [trash.card], selectedWildCard }) : ''
           const isReversed = effect?.includes('reverse') ?? false // 盤面にターンリバース効果が発動中か
           const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed)
 

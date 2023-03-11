@@ -4,7 +4,7 @@
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
 import { EmitForPVE } from '../../../../@types/socket'
-import { BoardStateContext, BoardDispathContext } from '../../../../context/BoardProvider'
+import { BoardStateContext, BoardDispathContext, boardProviderInitialState } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
 import { ScoreDispathContext, ScoreProviderState, ScoreStateContext, scoreProviderInitialState } from '../../../../context/ScoreProvider'
 import { updateMyHandsStatus } from '../../../../utils/game/checkHand'
@@ -151,9 +151,20 @@ const useGameCycles = () => {
         handleEmit(
           gameState.wsClient, {
             event: 'turnchange',
-            data: { board: { data: gameState.game.board, option:{ values: {}, triggered: gameState.game.board.allowDobon ? 'putOut' : 'actionBtn' } } }
+            data: {
+              board: {
+                data: gameState.game.board,
+                option:{ 
+                  values: { selectedWildCard: boardState.selectedWildCard },
+                  triggered: gameState.game.board.allowDobon ? 'putOut' : 'actionBtn'
+                }
+              }
+            }
           }
         )
+
+        // ターン終了時に自分のカード選択状態などを初期化させる
+        boardDispatch?.(boardProviderInitialState)
         break;
       }
       default: break

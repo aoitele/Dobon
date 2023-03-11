@@ -3,7 +3,7 @@
  */
 
 import { HandCards } from "../../@types/card"
-import { AddableEffects, Effect, InitialBoardState, SolvableEffects, WildEffect } from "../../@types/game"
+import { AddableEffects, Effect, SolvableEffects, WildEffect } from "../../@types/game"
 import { DOBON_CARD_NUMBER_DRAW_2, DOBON_CARD_NUMBER_WILD, DOBON_CARD_NUMBER_OPENCARD } from "../../constant"
 import spreadCardState from "./spreadCardState"
 
@@ -72,7 +72,10 @@ const resEffectNumber = (effectName: SolvableEffects) => {
 
 interface resEffectNameProps {
   card: HandCards[] | string[]
-  selectedWildCard:InitialBoardState['selectedWildCard'] | null
+  selectedWildCard: {
+    isSelected: boolean;
+    suit: string | null | undefined;
+  } | null
 }
 
 /**

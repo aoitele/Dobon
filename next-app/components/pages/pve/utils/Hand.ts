@@ -16,6 +16,9 @@ class Hand {
     private boardDispatch: Dispatch<SetStateAction<BoardProviderState>>,
   ){}
   async putOut (trash: string) {
+    // カードを出した時点で柄選択状態をコミット（turnChangingフェイズでの効果反映に利用している）
+    this.boardDispatch(prevState => ({ ...prevState, selectedWildCard: this.boardState.selectedWildCard }))
+    
     const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
     const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: trash, user: this.gameState.game.board.users[0] }}
     await handleEmit(
@@ -30,7 +33,6 @@ class Hand {
         }
       }
     )
-    this.resetStatus() // カードを出して自分のターンが終了する時にboardStateをリセットする
   }
   updateStatus() {
     // putable状態をリセットして判定に回す
