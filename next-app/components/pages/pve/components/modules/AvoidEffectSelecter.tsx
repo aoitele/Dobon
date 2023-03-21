@@ -76,7 +76,6 @@ const AvoidEffectSelecter = () => {
           { localState.cardSelectMode &&
             <div>
               <p className={styles.attention}>カードを選択してください</p>
-              {/* {states.cards:効果回避ができる同数字のカードのみをputableにしてHandsに渡す} */}
               <Hands isAvoidSelectMode/>
               <span
                 className={styles.backBtn}

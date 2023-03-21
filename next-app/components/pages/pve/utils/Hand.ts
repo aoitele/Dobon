@@ -17,7 +17,7 @@ class Hand {
   ){}
   async putOut (trash: string) {
     // カードを出した時点で柄選択状態をコミット（turnChangingフェイズでの効果反映に利用している）
-    this.boardDispatch(prevState => ({ ...prevState, selectedWildCard: this.boardState.selectedWildCard }))
+    this.boardDispatch(prevState => ({ ...prevState, selectedWildCard: this.boardState.selectedWildCard, showAvoidEffectview: false }))
     
     const effectName = resEffectName({card:[trash], selectedWildCard: this.boardState.selectedWildCard})
     const boardState:EmitBoard['data'] = {...this.gameState.game.board, trash: { card: trash, user: this.gameState.game.board.users[0] }}
