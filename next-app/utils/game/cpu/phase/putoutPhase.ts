@@ -103,7 +103,7 @@ const putoutPhase = async({
     console.log(`PutOut Phase : user:${user.nickname} select suit - ${mostOwnedSuit}`)
   }
 
-  // 場の効果を解決、trashが追加すべき効果カードであればeffectに追加する
+  // 効果カードを出した場合はクライアント側でエフェクトを見せるためeffectNameを取得する
   const effectName = resEffectName({ card:[trashCard], selectedWildCard: { isSelected: true, suit: mostOwnedSuit } })
   console.log(`PutOut Phase : trash card effect - ${effectName}`)
 

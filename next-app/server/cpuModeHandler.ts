@@ -10,7 +10,7 @@ import { cpuMainProcess } from "../utils/game/cpu/main"
 import { getBonus } from "../utils/game/cpu/utils/getBonus"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { dobonJudge } from "../utils/game/dobonJudge"
-import { isAddableEffect, resEffectName, resNewEffectState } from "../utils/game/effect"
+import { resEffectName, resNewEffectState } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 import sleep from "../utils/game/sleep"
 import { initialState } from "../utils/game/state"
@@ -212,7 +212,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         // ボードデータ取得
         const { users, turn, trash, effect } = board.data
         const selectedWildCard = board.option?.values.selectedWildCard ?? null
-        let updatedEffect: Effect[] = []
+        let updatedEffect: Effect[] = effect ?? []
 
         if (users && turn && trash?.card) {
           // カードを出してターンが変更された場合のみeffectNameを取得する
@@ -220,8 +220,9 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           const isReversed = effect?.includes('reverse') ?? false // 盤面にターンリバース効果が発動中か
           const nextTurn = culcNextUserTurn(turn, users, effectName, isReversed)
 
-          if (effect && effectName && isAddableEffect(effectName)) {
-            updatedEffect = resNewEffectState(effect, effectName)
+          // カードを出してターンが変更された場合のみ場の効果を更新する
+          if (byPutout) {
+            updatedEffect = resNewEffectState(updatedEffect, effectName)
           }
 
           const reducerPayload: reducerPayloadSpecify = {
