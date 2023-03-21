@@ -424,21 +424,6 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             // 判定結果でクライアント側の盤面状態を更新させる
             if (dobonPlayer.length) {
               // ドボンプレイヤーが出たらゲームを終了させる
-              let reducerPayload: reducerPayloadSpecify = {
-                game: {
-                  event: {
-                    user: dobonPlayer, action: 'dobon'
-                  }
-                }
-              }
-              console.log(reducerPayload, 'reducerPayload')
-              io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-
-              // モーダル表示を終了させるためにクライアント側のstateを更新
-              await sleep(1000)
-              resetEvent(io, pveKey)
-
-              // ドボン結果を通知
               const dobonPlayersName = dobonPlayer.map(player => player.nickname)
               const newUsersState = users.map(u => {
                 if (u.nickname && dobonPlayersName.includes(u.nickname)) { u.isWinner = true}
@@ -446,9 +431,11 @@ const cpuModeHandler = (io: Socket, socket: any) => {
                 return u
               })
 
-              reducerPayload = {
+              let reducerPayload: reducerPayloadSpecify = {
                 game: {
-                  event: { action: 'dobonsuccess' },
+                  event: {
+                    user: dobonPlayer, action: 'dobon'
+                  },
                   board: { users: newUsersState },
                   result: { dobonHandsCount: hands.length }
                 }
