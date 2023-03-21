@@ -21,7 +21,7 @@ class GameAction {
     this.boardDispatch(prevState => ({ ...prevState, isDrawnCard:true }))
   }
   turnChange() {
-    const newHands = this.gameState.game.board.hands.map(hand=>hand.replace('p', '')) // 手札のputable状態を外す
+    const newHands = this.gameState.game.board.hands.map(hand => hand.replace('p', '')) // 手札のputable状態を外す
     const turnChangingState = useUpdateStateFn(this.gameState, { game: { board: { status: 'turnChanging', hands: newHands } } })
     this.gameDispatch({ ...turnChangingState })
     this.boardDispatch(boardProviderInitialState)

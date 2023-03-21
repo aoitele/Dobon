@@ -5,6 +5,7 @@ import { resetMyHandsStatus, updateMyHandsStatus } from "../../../../utils/game/
 import { EmitForPVE } from "../../../../@types/socket";
 import { handleEmit } from "../../../../utils/socket/emit"
 import { Effect as EffectType } from '../../../../@types/game'
+import { useUpdateStateFn } from "../../../../utils/game/state";
 
 /* eslint-disable no-unused-vars, no-useless-constructor, no-empty-function */
 class Effect {
@@ -29,6 +30,9 @@ class Effect {
     }
     await handleEmit(this.wsClient, actionEmit)
     this.boardDispatch({ ...this.boardState, showAvoidEffectview: false })
+    // 効果を受けたタイミングでallowDobonをfalseにして、自ターンをスキップした時にはtriggerdがactionBtnになるようにしておく
+    const newState = useUpdateStateFn(this.gameState, { game: { board: { allowDobon: false } }})
+    this.gameDispatch({ ...newState })
   }
   get description() {
     const searchEffects:EffectType[] = ['draw2', 'draw4', 'draw6', 'draw8', 'opencard']
