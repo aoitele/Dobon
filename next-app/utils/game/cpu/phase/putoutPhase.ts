@@ -135,8 +135,7 @@ const putoutPhase = async({
   io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 
   if (effectName) {
-    const waitTime2 = speed === '1x' ? 900 : speed === '2x' ? 450 : 300
-    await sleep(waitTime2)
+    await sleep(1000)
     resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
   }
 
