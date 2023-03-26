@@ -496,28 +496,17 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           return u
         })
 
-        // ドボン結果を通知
-        reducerPayload = {
-          game: {
-            event: {
-              action: judge ? 'dobonsuccess' : 'dobonfailure'
-            },
-            board: {
-              users: newUsersState,
-            },
-            result: {
-              dobonHandsCount: board.data.hands.length
-            }
-          }
-        }
-        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-        await sleep(1000)
-
         if (judge) {
           // ドボン成功ならスコア計算画面へ移行
           reducerPayload = {
             game: {
-              status: 'ended'
+              status: 'ended',
+              board: {
+                users: newUsersState,
+              },
+              result: {
+                dobonHandsCount: board.data.hands.length
+              }
             }
           }
           io.in(pveKey).emit('updateStateSpecify', reducerPayload)
