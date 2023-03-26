@@ -3,7 +3,7 @@
  */
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
-import { EmitForPVE } from '../../../../@types/socket'
+import { EmitForPVE, Event } from '../../../../@types/socket'
 import { BoardStateContext, BoardDispathContext, boardProviderInitialState } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
 import { ScoreDispathContext, ScoreProviderState, ScoreStateContext, scoreProviderInitialState } from '../../../../context/ScoreProvider'
@@ -171,6 +171,28 @@ const useGameCycles = () => {
     }
 
   }, [gameState.game.board.status])
+
+  // game.event.actionに関するフック
+  useEffect(() => {
+    // PVE戦ではCPUが柄選択をした場合の選択柄情報がturnChange処理まで渡せないため、プレイヤーのboardtStateを利用して柄選択を反映している
+    const { action } = gameState.game.event
+    const handlingEventActions:Event[] = ['wildclub', 'wilddia', 'wildheart', 'wildspade']
+
+    const isCpuTurn = gameState.game.board.turn !== 1
+    const isWildEffectEvent = handlingEventActions.includes(action)
+
+    let selectedSuit = null
+    if (isWildEffectEvent) {
+      selectedSuit =
+      action === 'wildclub' ? 'c' :
+      action === 'wilddia' ? 'd' :
+      action === 'wildheart' ? 'h' : 's' as ('c' | 'd' | 'h' | 's')
+    }
+
+    if (isCpuTurn && selectedSuit) {
+      boardDispatch?.({ ...boardState, selectedWildCard:{isSelected: true, suit: selectedSuit } })
+    }
+  },[gameState.game.event.action])
 }
 
 export { useGameCycles }

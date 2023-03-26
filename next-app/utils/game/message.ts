@@ -32,6 +32,10 @@ const createMsg = ({ action, card }:Props) => {
     case 'joker'           : return `「ジョーカー」\n手札合計21ならどぼん可能!全てのカードが出せます`
     case 'skip'            : return `「スキップ(1)」\n次のユーザーをスキップします`
     case 'wild'            : return `「ワイルド(8)」\n選択した柄なら全て出せます`
+    case 'wildclub'        : return `「ワイルド(8) - クラブ」\nクラブ柄なら全て出せます`
+    case 'wilddia'         : return `「ワイルド(8) - ダイヤ」\nダイヤ柄なら全て出せます`
+    case 'wildheart'       : return `「ワイルド(8) - ハート」\nハート柄なら全て出せます`
+    case 'wildspade'       : return `「ワイルド(8) - スペード」\nスペード柄なら全て出せます`
     case 'reverse'         : return `「リバース(11)」\nターン順を反転します`
     case 'opencard'        : return `「手札公開(13)」\n次のユーザーは手札を公開!`
     case 'draw2'           : return `「ドロー2」\n次のユーザーはカードを2枚ドロー!`
