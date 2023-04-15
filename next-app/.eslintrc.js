@@ -54,6 +54,7 @@ module.exports = {
     'capitalized-comments': 'off',
     'multiline-comment-style': 'off',
     'no-unused-expressions': 'off',
+    'func-style': 'off' // 関数のfunction形式による宣言を許可
   },
   settings: {
     react: {

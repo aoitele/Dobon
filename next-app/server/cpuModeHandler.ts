@@ -5,8 +5,10 @@ import { EmitForPVE } from "../@types/socket"
 import { PVE_COM_USER_NAMES, PVE_UNREGISTERED_NAMES } from "../constant"
 import { gameInitialState } from "../context/state/gameInitialState"
 import { hasValidQueries, HasValidQueriesArgs } from "../utils/function/hasValidQueries"
+import { assertExists } from "../utils/function/nonNullable"
 import { sepalateSuitNum } from "../utils/game/checkHand"
 import { cpuMainProcess } from "../utils/game/cpu/main"
+import { checkDobonPlayers } from "../utils/game/cpu/utils/checkDobonPlayers"
 import { getBonus } from "../utils/game/cpu/utils/getBonus"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { dobonJudge } from "../utils/game/dobonJudge"
@@ -71,18 +73,18 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const otherHands: Board['otherHands'] = []
 
         for (let i = 0; i < users.length; i += 1) {
-          const isCom = PVE_COM_USER_NAMES.includes(users[i])
-          const mode = isCom ? query?.[users[i]] : undefined
+          const isCpu = PVE_COM_USER_NAMES.includes(users[i])
+          const mode = isCpu ? query?.[users[i]] : undefined
 
           // Hands initialize
-          const nickname = isCom ? users[i] : 'me'
+          const nickname = isCpu ? users[i] : 'me'
           const redisKeys = loadDobonRedisKeys([
             {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: nickname},
             {mode:'pve', type: 'user', firstKey: pveKey, secondKey: nickname},
           ])
 
           const hands = await redisHandsInit(adapterPubClient, deckKey, redisKeys[0]) // eslint-disable-line no-await-in-loop
-          isCom ? otherHands.push({ userId: 0, hands, nickname }) : myHands = hands
+          isCpu ? otherHands.push({ userId: 0, hands, nickname }) : myHands = hands
 
           // Score update
           let score = 0
@@ -95,7 +97,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             }
           }
 
-          userData.push({ id: 0, nickname: users[i], turn: i + 1, score, isWinner: false, isLoser: false, mode: (typeof mode === 'string' && isCpuLevelValue(mode)) ? mode : undefined })
+          userData.push({ id: 0, nickname: users[i], turn: i + 1, score, isWinner: false, isLoser: false, mode: (typeof mode === 'string' && isCpuLevelValue(mode)) ? mode : undefined, isCpu })
         }
 
         // Trash initialize
@@ -387,9 +389,10 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const trashUser = board?.data.trash?.user
         const users = board?.data.users
         const hands = board?.data.hands
-        if (!(trashCard && trashUser && users && hands)) return {}
-
-        let [canCom1Dobon, canCom2Dobon, canCom3Dobon] = [false, false, false]
+        assertExists(trashCard)
+        assertExists(trashUser)
+        assertExists(hands)
+        assertExists(users)
 
         const [handsKey_1, handsKey_2, handsKey_3, handsKey_4] = loadDobonRedisKeys([
           {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com1' },
@@ -405,39 +408,25 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         .smembers(handsKey_4)
         .exec((_err, results) => {
           (async() => {
-            const com1Hands = results[0][1]
-            const com2Hands = results[1][1]
-            const com3Hands = results[2][1]
-            const myHands   = results[3][1]
-            canCom1Dobon = trashUser.nickname !== 'com1' && dobonJudge(trashCard, com1Hands)
-            canCom2Dobon = trashUser.nickname !== 'com2' && dobonJudge(trashCard, com2Hands)
-            canCom3Dobon = trashUser.nickname !== 'com3' && dobonJudge(trashCard, com3Hands)
-
-            console.log(`com1 - ${com1Hands} - ${canCom1Dobon}`)
-            console.log(`com2 - ${com2Hands} - ${canCom2Dobon}`)
-            console.log(`com3 - ${com3Hands} - ${canCom3Dobon}`)
-            console.log(`\n--- DOBON CHECK END ---\n`)
-
-            const dobonPlayer: Pick<Player, 'nickname'| 'turn'>[] = []
-            canCom1Dobon && dobonPlayer.push({ nickname: 'com1', turn: 2 })
-            canCom2Dobon && dobonPlayer.push({ nickname: 'com2', turn: 3 })
-            canCom3Dobon && dobonPlayer.push({ nickname: 'com3', turn: 4 })
+            const { dobonPlayers, com1Hands, com2Hands, com3Hands, myHands } = checkDobonPlayers({ redisPipeLineResults: results, trashUser, trashCard, users })
 
             // 判定結果でクライアント側の盤面状態を更新させる
-            if (dobonPlayer.length) {
+            if (dobonPlayers.length) {
               /**
                * ドボンプレイヤーが出たらゲームを終了させる
                * ドボンされた人がもし手札でドボンされた数値を作れる場合、ドボン返しとなる
                */
-              let trashUserHands: string[] = trashUser.mode ? [] : myHands
+              let trashUserHands: string[] = trashUser.isCpu ? [] : myHands
+
               if (!trashUserHands.length) {
                 trashUserHands =
                 trashUser.nickname === 'com1' ? com1Hands :
                 trashUser.nickname === 'com2' ? com2Hands :
                 com3Hands
               }
+
               const isReverseDobon = dobonJudge(trashCard, trashUserHands)
-              const dobonPlayersTurn = dobonPlayer.map(player => player.turn)
+              const dobonPlayersTurn = dobonPlayers.map(player => player.turn)
               const newUsersState = users.map(u => {
                 u.turn && dobonPlayersTurn.includes(u.turn) && (u.isWinner = true)
                 u.turn === trashUser.turn && (u.isLoser = true)
@@ -447,7 +436,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
               let reducerPayload: reducerPayloadSpecify = {
                 game: {
                   event: {
-                    user: dobonPlayer, action: 'dobon'
+                    user: dobonPlayers, action: 'dobon'
                   },
                   board: { users: newUsersState },
                   result: { dobonHandsCount: hands.length }
@@ -509,52 +498,100 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         break
       }
       case 'dobon': {
-        if (!board?.data.trash?.card || !board.data.hands) break
-        if (!user) break
+        const { trash, hands, users } = board?.data ?? {}
+        assertExists(user)
+        assertExists(users)
+        assertExists(hands)
 
-        // 全ユーザーにドボン発生を通知
-        let reducerPayload: reducerPayloadSpecify = {
-          game: {
-            event: {
-              user: [user],
-              action: 'dobon'
-            }
-          }
-        }
-        io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-        await sleep(1000)
-        resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+        const trashUser = trash?.user
+        const trashCard = trash?.card
 
-        const lastTrashUser = board.data.trash.user
-        // const judge = dobonJudge(board.data.trash.card, board.data.hands)
-        const judge = true
+        const [handsKey_1, handsKey_2, handsKey_3, handsKey_4] = loadDobonRedisKeys([
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com1' },
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com2' },
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com3' },
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me'   },
+        ])
+        adapterPubClient.pipeline()
+        .smembers(handsKey_1)
+        .smembers(handsKey_2)
+        .smembers(handsKey_3)
+        .smembers(handsKey_4)
+        .exec((_err, redisPipeLineResults) => {
+          (async() => {
+            assertExists(trashUser)
+            assertExists(trashCard)
 
-        // ドボン成功ならユーザーデータのwiner/loserを更新させる
-        const newUsersState = board.data.users?.map(u => {
-          if (judge) {
-            if (u.nickname === user?.nickname) { u.isWinner = true}
-            if (u.nickname === lastTrashUser?.nickname) { u.isLoser = true }
-          }
-          return u
-        })
+            const { dobonPlayers, com1Hands, com2Hands, com3Hands } = checkDobonPlayers({ redisPipeLineResults, trashUser, trashCard, users })
+            const dobonPlayersTurn = dobonPlayers.map(player => player.turn)
+            const trashUserHands =
+            trashUser.nickname === 'com1' ? com1Hands :
+            trashUser.nickname === 'com2' ? com2Hands :
+            com3Hands
 
-        if (judge) {
-          // ドボン成功ならスコア計算画面へ移行
-          reducerPayload = {
-            game: {
-              status: 'ended',
-              board: {
-                users: newUsersState,
-              },
-              result: {
-                dobonHandsCount: board.data.hands.length
+            if (!dobonJudge(trashCard, hands)) return {} // UIでドボン可能な場合しか実行されないようにしているため実質この処理は起きえない
+
+            // ドボン成功ならユーザーデータのwiner/loserを更新させる
+            const newUsersState = users.map(u => {
+              u.turn && dobonPlayersTurn.includes(u.turn) && (u.isWinner = true)
+              u.turn === trashUser.turn && (u.isLoser = true)
+              return u
+            })
+
+            let reducerPayload: reducerPayloadSpecify = {
+              game: {
+                event: {
+                  user: dobonPlayers, action: 'dobon' // 自身と他のCPUの同時ドボンもありえるためuserを結合してeventに渡す
+                },
+                board: { users: newUsersState },
+                result: { dobonHandsCount: hands.length }
               }
             }
-          }
-          io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-          await sleep(1000)
-        }
-        resetEvent(io, pveKey)
+            io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+            await sleep(3000)
+            resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+
+            // もしドボンされた人がもし手札でドボンされた数値を作れる場合、ドボン返しとなる
+            const isReverseDobon = dobonJudge(trashCard, trashUserHands)
+
+            if (isReverseDobon) {
+              const updateUsersState = users.map(u => {
+                if (u.nickname === user?.nickname) {
+                  u.isWinner = false
+                  u.isLoser = true
+                }
+                if (u.nickname === trashUser.nickname) {
+                  u.isLoser = false
+                  u.isWinner = true
+                }
+                return u
+              })
+              reducerPayload = {
+                game: {
+                  event: {
+                    user: [trashUser],
+                    action: 'dobonreverse'
+                  },
+                  board: { users: updateUsersState },
+                  result: { isReverseDobon: true },
+                }
+              }
+              io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+              await sleep(3000)
+            }
+
+            // スコア計算画面へ移行
+            reducerPayload = {
+              game: {
+                status: 'ended',
+              }
+            }
+            io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+            await sleep(1000)
+            resetEvent(io, pveKey)
+            return {}
+          })()
+        })
         break
       }
       case 'getbonus': {

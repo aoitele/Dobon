@@ -35,6 +35,7 @@ export type Player = {
   isWinner: boolean
   isLoser: boolean
   mode?: CPULevel // for PVE
+  isCpu?: boolean // for PVE
 }
 export type OtherHands = {
   userId: number
