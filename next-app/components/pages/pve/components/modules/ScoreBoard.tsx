@@ -20,7 +20,7 @@ const ScoreBoard = () => {
     // ボーナスカード取得
     (async() => {
       await handleEmit(gameState.wsClient, { event: 'getbonus' })
-      scoreDispatch && scoreDispatch({
+      scoreDispatch?.({
         ...scoreState,
         bonusCards: gameState.game.board.bonusCards
       })
@@ -35,8 +35,9 @@ const ScoreBoard = () => {
             user={winner}
             score={scoreState.winerScore}
           />
-          <span className={styles.heading}>どぼん成功！</span>
-  
+          <span className={styles.heading}>
+            {gameState.game.result.isReverseDobon ? 'どぼん返し\n成功！' : 'どぼん成功！'}
+          </span>
           <div className={styles.winAndBonusInfoContainer}>
             <div className={styles.winAndBonusInfo}>
               <div className={styles.winCardInfoContainer}>

@@ -82,6 +82,7 @@ export type InitialBoardState = {
 
 export interface GameResult {
   dobonHandsCount?: number // ドボン発生時にドボン手札のカード枚数が入る
+  isReverseDobon?: boolean // ドボン返しの場合にtrueとする
 }
 
 export type Action = 'avoidEffect' | 'notAvoidEffect'

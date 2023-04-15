@@ -29,15 +29,17 @@ const userInfo: React.FC<Props> = ({ user, hands, turnUser }) => {
     <OtherHandsInfo user={user} hands={cardWithStatus} />
   </ModalDialog>
     <div className={style.wrap}>
-      <div className={isTurnUser ? style.iconNameOnTurn :style.iconName }>
-        <Image
-          src={`/images/game/userIcon/${user.turn}.png`}
-          width={50}
-          height={50}
-        />
-        <div>
-          <p>{user.nickname}<span className={isTurnUser ? style.onTurnMark : undefined}>⚫︎</span></p>
-          <p><span className={style.star}>⭐️</span>{user.score}</p>
+      <div className={user.isLoser ? style.loserAnimation : undefined}>
+        <div className={isTurnUser ? style.iconNameOnTurn :style.iconName }>
+          <Image
+            src={`/images/game/userIcon/${user.turn}.png`}
+            width={50}
+            height={50}
+          />
+          <div>
+            <p>{user.nickname}<span className={isTurnUser ? style.onTurnMark : undefined}>⚫︎</span></p>
+            <p><span className={style.star}>⭐️</span>{user.score}</p>
+          </div>
         </div>
       </div>
       { cards.length > 0 &&

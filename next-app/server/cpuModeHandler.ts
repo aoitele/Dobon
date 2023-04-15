@@ -391,25 +391,27 @@ const cpuModeHandler = (io: Socket, socket: any) => {
 
         let [canCom1Dobon, canCom2Dobon, canCom3Dobon] = [false, false, false]
 
-        const [handsKey_1, handsKey_2, handsKey_3] = loadDobonRedisKeys([
+        const [handsKey_1, handsKey_2, handsKey_3, handsKey_4] = loadDobonRedisKeys([
           {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com1' },
           {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com2' },
           {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'com3' },
+          {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me'   },
         ])
 
         adapterPubClient.pipeline()
         .smembers(handsKey_1)
         .smembers(handsKey_2)
         .smembers(handsKey_3)
+        .smembers(handsKey_4)
         .exec((_err, results) => {
           (async() => {
             const com1Hands = results[0][1]
             const com2Hands = results[1][1]
             const com3Hands = results[2][1]
+            const myHands   = results[3][1]
             canCom1Dobon = trashUser.nickname !== 'com1' && dobonJudge(trashCard, com1Hands)
             canCom2Dobon = trashUser.nickname !== 'com2' && dobonJudge(trashCard, com2Hands)
             canCom3Dobon = trashUser.nickname !== 'com3' && dobonJudge(trashCard, com3Hands)
-            console.log(trashCard, 'trashCard')
 
             console.log(`com1 - ${com1Hands} - ${canCom1Dobon}`)
             console.log(`com2 - ${com2Hands} - ${canCom2Dobon}`)
@@ -420,15 +422,25 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             canCom1Dobon && dobonPlayer.push({ nickname: 'com1', turn: 2 })
             canCom2Dobon && dobonPlayer.push({ nickname: 'com2', turn: 3 })
             canCom3Dobon && dobonPlayer.push({ nickname: 'com3', turn: 4 })
-            console.log(dobonPlayer, 'dobonPlayer')
 
             // 判定結果でクライアント側の盤面状態を更新させる
             if (dobonPlayer.length) {
-              // ドボンプレイヤーが出たらゲームを終了させる
-              const dobonPlayersName = dobonPlayer.map(player => player.nickname)
+              /**
+               * ドボンプレイヤーが出たらゲームを終了させる
+               * ドボンされた人がもし手札でドボンされた数値を作れる場合、ドボン返しとなる
+               */
+              let trashUserHands: string[] = trashUser.mode ? [] : myHands
+              if (!trashUserHands.length) {
+                trashUserHands =
+                trashUser.nickname === 'com1' ? com1Hands :
+                trashUser.nickname === 'com2' ? com2Hands :
+                com3Hands
+              }
+              const isReverseDobon = dobonJudge(trashCard, trashUserHands)
+              const dobonPlayersTurn = dobonPlayer.map(player => player.turn)
               const newUsersState = users.map(u => {
-                if (u.nickname && dobonPlayersName.includes(u.nickname)) { u.isWinner = true}
-                if (u.nickname === trashUser.nickname) { u.isLoser = true }
+                u.turn && dobonPlayersTurn.includes(u.turn) && (u.isWinner = true)
+                u.turn === trashUser.turn && (u.isLoser = true)
                 return u
               })
 
@@ -443,8 +455,38 @@ const cpuModeHandler = (io: Socket, socket: any) => {
               }
               io.in(pveKey).emit('updateStateSpecify', reducerPayload)
 
-              await sleep(1000)
+              await sleep(3000)
               resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+
+              if (isReverseDobon) {
+              // ドボン返しの場合はwiner/loserが逆転する
+              const updateUsersState = users.map(u => {
+                if (u.turn && dobonPlayersTurn.includes(u.turn)) {
+                  u.isWinner = false
+                  u.isLoser = true
+                }
+                if (u.turn === trashUser.turn) {
+                  u.isWinner = true
+                  u.isLoser = false
+                }
+                return u
+              })
+
+
+                reducerPayload = {
+                  game: {
+                    event: {
+                      user: [trashUser],
+                      action: 'dobonreverse'
+                    },
+                    board: { users: updateUsersState },
+                    result: { isReverseDobon: true },
+                  }
+                }
+                io.in(pveKey).emit('updateStateSpecify', reducerPayload)
+                await sleep(3000)
+                resetEvent(io, pveKey) // モーダル表示を終了させるためにクライアント側のstateを更新
+              }
 
               // スコア計算画面へ移行
               reducerPayload = { game: { status: 'ended' } }

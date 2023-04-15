@@ -1,6 +1,10 @@
 .wrap {
   display: flex;
   flex-flow: column;
+  .loserAnimation {
+    display: inline-block;
+    animation: tremble .1s  infinite;
+  }
   .iconName {
     display: flex;
   }
@@ -55,4 +59,12 @@
     transform: translateY(-5px);
     opacity: 0.6;
   }
+}
+
+@keyframes tremble {
+  0% {transform: translate(0px, 0px) rotateZ(0deg)}
+  25% {transform: translate(2px, 2px) rotateZ(1deg)}
+  50% {transform: translate(0px, 2px) rotateZ(0deg)}
+  75% {transform: translate(2px, 0px) rotateZ(-1deg)}
+  100% {transform: translate(0px, 0px) rotateZ(0deg)}
 }

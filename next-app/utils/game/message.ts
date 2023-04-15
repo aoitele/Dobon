@@ -29,6 +29,7 @@ const createMsg = ({ action, card }:Props) => {
     case 'dobon'           : return `「${cardInfo.suit}の${cardInfo.num}」でどぼん！`
     case 'dobonsuccess'    : return `どぼん成功！`
     case 'dobonfailure'    : return `どぼん失敗！`
+    case 'dobonreverse'    : return `どぼん返し！`
     case 'joker'           : return `「ジョーカー」\n手札合計21ならどぼん可能!全てのカードが出せます`
     case 'skip'            : return `「スキップ(1)」\n次のユーザーをスキップします`
     case 'wild'            : return `「ワイルド(8)」\n選択した柄なら全て出せます`

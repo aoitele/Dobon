@@ -59,7 +59,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
   const [ values, setValues ] = useState(createInitialState(winner, loser))
 
   const dobonCard = boardState.trash.card
-  const isReverseDobon = state.game.event.action === 'dobonreverse'
+  const isReverseDobon = state.game.result.isReverseDobon
   const bonusCards = state.game.board.bonusCards
   const dobonNum = resDobonNum(dobonCard) // 計算に使われる上がりカードの数値
   const existAddBonus = values.addBonus.isReverseDobon || values.addBonus.isSingleDobon || values.addBonus.jokerCount > 0
@@ -101,7 +101,7 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
         roundUpScore,
         addBonus: {
           isSingleDobon,
-          isReverseDobon,
+          isReverseDobon : Boolean(isReverseDobon),
           jokerCount
         }
       }

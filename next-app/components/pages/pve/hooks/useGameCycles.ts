@@ -3,7 +3,7 @@
  */
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
-import { EmitForPVE, Event } from '../../../../@types/socket'
+import { EmitForPVE } from '../../../../@types/socket'
 import { BoardStateContext, BoardDispathContext, boardProviderInitialState } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
 import { ScoreDispathContext, ScoreProviderState, ScoreStateContext, scoreProviderInitialState } from '../../../../context/ScoreProvider'
@@ -49,7 +49,7 @@ const useGameCycles = () => {
           const isSingleDobon = gameState.game.result.dobonHandsCount === 1
           const bonusTotal = culcBonus(bonusNums)
           const dobonNum = resDobonNum(gameState.game.board.trash.card) // 計算に使われる上がりカードの数値
-          const isReverseDobon = gameState.game.event.action === 'dobonreverse'
+          const isReverseDobon = gameState.game.result.isReverseDobon
 
           if (!dobonNum) return
 
@@ -67,7 +67,7 @@ const useGameCycles = () => {
             loserScore: loser.score,
             addBonus: {
               isSingleDobon,
-              isReverseDobon,
+              isReverseDobon: Boolean(isReverseDobon),
               jokerCount
             }
           }
@@ -174,24 +174,28 @@ const useGameCycles = () => {
 
   // game.event.actionに関するフック
   useEffect(() => {
-    // PVE戦ではCPUが柄選択をした場合の選択柄情報がturnChange処理まで渡せないため、プレイヤーのboardtStateを利用して柄選択を反映している
     const { action } = gameState.game.event
-    const handlingEventActions:Event[] = ['wildclub', 'wilddia', 'wildheart', 'wildspade']
 
-    const isCpuTurn = gameState.game.board.turn !== 1
-    const isWildEffectEvent = handlingEventActions.includes(action)
+    switch (action) {
+      case 'wildclub' :
+      case 'wilddia'  :
+      case 'wildheart':
+      case 'wildspade': {
+        // PVE戦ではCPUが柄選択をした場合の選択柄情報がturnChange処理まで渡せないため、プレイヤーのboardtStateを利用して柄選択を反映している
+        const isCpuTurn = gameState.game.board.turn !== 1
+        const selectedSuit =
+        action === 'wildclub' ? 'c' :
+        action === 'wilddia' ? 'd' :
+        action === 'wildheart' ? 'h' : 's' as ('c' | 'd' | 'h' | 's')
 
-    let selectedSuit = null
-    if (isWildEffectEvent) {
-      selectedSuit =
-      action === 'wildclub' ? 'c' :
-      action === 'wilddia' ? 'd' :
-      action === 'wildheart' ? 'h' : 's' as ('c' | 'd' | 'h' | 's')
+        if (isCpuTurn) {
+          boardDispatch?.({ ...boardState, selectedWildCard:{isSelected: true, suit: selectedSuit } })
+        }
+        break
+      }
+      default: break
     }
 
-    if (isCpuTurn && selectedSuit) {
-      boardDispatch?.({ ...boardState, selectedWildCard:{isSelected: true, suit: selectedSuit } })
-    }
   },[gameState.game.event.action])
 }
 

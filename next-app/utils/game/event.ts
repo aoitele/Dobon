@@ -20,7 +20,8 @@ const modalEvents: ModalEffect['action'][] = [
   'opencard',
   'dobon',
   'dobonsuccess',
-  'dobonfailure'
+  'dobonfailure',
+  'dobonreverse',
 ]
 
 const isModalEvent = (event: Event) => event !== null && modalEvents.includes(event)

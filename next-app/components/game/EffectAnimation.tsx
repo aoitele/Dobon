@@ -12,6 +12,7 @@ import { OpenCardEffect } from './effect/OpenCardEffect'
 import { SkipEffect } from './effect/SkipEffect'
 import { WildEffect } from './effect/WildEffect'
 import { ReverseEffect } from './effect/ReverseEffect'
+import { DobonGaeshiEffect } from './effect/DobonGaeshiEffect'
 
 const effectAnimation:React.FC<ModalEffect> = ({ user, action, message }) => {
   const isJokerEffect = action === 'joker'
@@ -20,20 +21,21 @@ const effectAnimation:React.FC<ModalEffect> = ({ user, action, message }) => {
       <div className={style.wrap}>
         <div className={style.imageWrap}>
           <div className={isJokerEffect ? style.JokerEffectWrap : style.EffectWrap}>
-          {action === 'dobon'     && <DobonEffect/>}
-          {action === 'draw2'     && <Draw2Effect/>}
-          {action === 'draw4'     && <Draw4Effect/>}
-          {action === 'draw6'     && <Draw6Effect/>}
-          {action === 'draw8'     && <Draw8Effect/>}
-          {action === 'joker'     && <JokerEffect/>}
-          {action === 'opencard'  && <OpenCardEffect/>}
-          {action === 'skip'      && <SkipEffect/>}
-          {action === 'reverse'   && <ReverseEffect/>}
-          {action === 'wild'      && <WildEffect/>}
-          {action === 'wildclub'  && <WildEffect/>}
-          {action === 'wilddia'   && <WildEffect/>}
-          {action === 'wildheart' && <WildEffect/>}
-          {action === 'wildspade' && <WildEffect/>}
+          {action === 'dobon'        && <DobonEffect/>}
+          {action === 'dobonreverse' && <DobonGaeshiEffect/>}
+          {action === 'draw2'        && <Draw2Effect/>}
+          {action === 'draw4'        && <Draw4Effect/>}
+          {action === 'draw6'        && <Draw6Effect/>}
+          {action === 'draw8'        && <Draw8Effect/>}
+          {action === 'joker'        && <JokerEffect/>}
+          {action === 'opencard'     && <OpenCardEffect/>}
+          {action === 'skip'         && <SkipEffect/>}
+          {action === 'reverse'      && <ReverseEffect/>}
+          {action === 'wild'         && <WildEffect/>}
+          {action === 'wildclub'     && <WildEffect/>}
+          {action === 'wilddia'      && <WildEffect/>}
+          {action === 'wildheart'    && <WildEffect/>}
+          {action === 'wildspade'    && <WildEffect/>}
           </div>
         </div>
         <div className={style.imageBg}/>
