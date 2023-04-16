@@ -7,12 +7,15 @@ import dynamic from 'next/dynamic'
 import { GameProvider } from '../context/GameProvider'
 import { BoardProvider } from '../context/BoardProvider'
 import { ScoreProvider } from '../context/ScoreProvider'
+import { useRouteChangeEvent } from '../hooks/useRouteChangeEvent'
 
 const ErrorPage = dynamic(() => import('./_error'))
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   if (pageProps.error) return <ErrorPage />
 
+  useRouteChangeEvent()
+  
   return (
     <AuthProvider>
       <GameProvider>
