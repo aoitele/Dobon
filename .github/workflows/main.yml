@@ -23,7 +23,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: API Deploy to Heroku #set the whatever name you want to this step
-        uses: akhileshns/heroku-deploy@v3.12.12
+        uses: akhileshns/heroku-deploy@v3.12.13
         with:
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
