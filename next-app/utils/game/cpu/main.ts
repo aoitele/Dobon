@@ -42,8 +42,8 @@ const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data, speed }: Cpu
     .exec((_err, results) => results)
   const [trash, hands] = [redisData[0][1], redisData[1][1]]
 
-  const { updateData1, updateHands1, haveNum } = await effectPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, speed })
-  const { updateData2, updateHands2 } = await drawPhase({ user: player, io, hands: updateHands1, trash, data: updateData1, adapterPubClient, pveKey, deckKey, handsKey, speed })
+  const { updateData1, updateHands1, haveNum } = await effectPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed })
+  const { updateData2, updateHands2 } = await drawPhase({ user: player, io, hands: updateHands1, trash, data: updateData1, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed })
   await putoutPhase({ user: player, io, hands: updateHands2, trash, data: updateData2, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed })
 }
 

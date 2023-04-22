@@ -17,11 +17,12 @@ interface Args {
   pveKey: CpuMainProcessArgs['pveKey']
   deckKey: string
   handsKey: string
+  trashKey: string
   speed: CpuMainProcessArgs['speed']
 }
 
 const effectPhase = async({
-  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, speed
+  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed
 }: Args) => {
   if (!data.data.otherHands) {
     throw Error('drawPhase has Error: data.data.otherHands is not provided')
@@ -66,10 +67,26 @@ const effectPhase = async({
     case 'draw8': {
       // ドロー実行
       drawCnt = Number(effect.substring(effect.length - 1))
-      const newCard = await adapterPubClient.spop(deckKey, drawCnt)
-      adapterPubClient.sadd(handsKey, newCard)
-      updateHands.push(...newCard)
-      data.data.deckCount -= drawCnt
+      const deckCountBefore = await adapterPubClient.scard(deckKey)
+      const willDeckBeEmpty = deckCountBefore - drawCnt <= 0
+
+      if (willDeckBeEmpty) {
+        // ドローによりデッキが0枚になる場合、デッキを再生成する
+        const lastDeckCards = await adapterPubClient.spop(deckKey, deckCountBefore) // デッキに残っているカードを取得
+        const trashCards = await adapterPubClient.lrange(trashKey, 1, -1) // 最後の捨て札(先頭)を除くカードを取得
+        adapterPubClient.sadd(deckKey, trashCards) // deckにtrashcardを戻す(順番はランダムに追加される)
+        adapterPubClient.ltrim(trashKey, 0, 0) // Trashは先頭だけ残す
+        const newCards = await adapterPubClient.spop(deckKey, drawCnt - deckCountBefore)
+        const adds = [...lastDeckCards, ...newCards]
+        adapterPubClient.sadd(handsKey, adds)
+        updateHands.push(...adds)
+        // data.data.deckCount = trashCards.length - (drawCnt - deckCountBefore)
+      } else {
+        const newCard = await adapterPubClient.spop(deckKey, drawCnt)
+        adapterPubClient.sadd(handsKey, newCard)
+        updateHands.push(...newCard)
+        // data.data.deckCount -= drawCnt
+      }
       console.log(`Effect Phase : user:${user.nickname} accept effect - ${effect}`)
       break
     }

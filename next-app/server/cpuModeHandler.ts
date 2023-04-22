@@ -257,24 +257,43 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const mat = effect.match(/[0-9]/u)
         if (mat === null) break
 
-        const drawCardNum = Number(mat)
         const loadRedisKey = loadDobonRedisKeys([
           {mode:'pve', type: 'deck', firstKey: pveKey},
           {mode:'pve', type: 'hands', firstKey: pveKey, secondKey: 'me' },
+          {mode:'pve', type: 'trash', firstKey: pveKey },
         ])
-        const [deckKey, handsKey] = loadRedisKey
+        const [deckKey, handsKey, trashKey] = loadRedisKey
 
-        const newCard = await adapterPubClient.spop(deckKey, drawCardNum)
-        adapterPubClient.sadd(handsKey, newCard)
+        const deckCountBefore = await adapterPubClient.scard(deckKey)
+        const drawCardNum = Number(mat)
+        const willDeckBeEmpty = deckCountBefore - drawCardNum <= 0
 
-        const newHands = [...prevHands, ...newCard]
+        let drawnCards:string[] = []
+
+        if (willDeckBeEmpty) {
+          // ドローによりデッキが0枚になる場合、デッキを再生成する
+          const lastDeckCards = await adapterPubClient.spop(deckKey, deckCountBefore) // デッキに残っているカードを取得
+          const trashCards = await adapterPubClient.lrange(trashKey, 1, -1) // 最後の捨て札(先頭)を除くカードを取得
+          await adapterPubClient.sadd(deckKey, trashCards) // deckにtrashcardを戻す(順番はランダムに追加される)
+          adapterPubClient.ltrim(trashKey, 0, 0) // Trashは先頭だけ残す
+          const newCards = await adapterPubClient.spop(deckKey, drawCardNum - deckCountBefore)
+          const adds = [...lastDeckCards, ...newCards]
+          drawnCards = [...prevHands, ...adds]
+          adapterPubClient.sadd(handsKey, adds)
+        } else {
+          // デッキが残る場合はカードを引いて追加するだけ
+          const newCards = await adapterPubClient.spop(deckKey, drawCardNum)
+          adapterPubClient.sadd(handsKey, newCards)
+          drawnCards = [...prevHands, ...newCards]
+        }
+
         const resolvedEffect = effectState.filter(state => state !== effect)
         const deckCount = await adapterPubClient.scard(deckKey)
 
         const reducerPayload: reducerPayloadSpecify = {
             game: {
               board: {
-                hands: newHands,
+                hands: drawnCards,
                 effect: resolvedEffect,
                 deckCount,
               },
