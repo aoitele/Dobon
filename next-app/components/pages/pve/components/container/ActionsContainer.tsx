@@ -13,7 +13,7 @@ const ActionsContainer:FC = () => {
   return (
     <>
       <div className={styles.wrap}>
-        { boardState.selectedWildCard.isSelected
+        {boardState.isMyTurn && boardState.selectedWildCard.isSelected
         ? <SelectSuit
             values={boardState}
             setValues={boardDispatch}
