@@ -1,5 +1,4 @@
 import React, { useContext } from "react"
-import { BoardStateContext } from "../../../../../context/BoardProvider"
 import { GameStateContext } from "../../../../../context/GameProvider"
 import { isModalEvent } from "../../../../../utils/game/event"
 import { createMsg } from "../../../../../utils/game/message"
@@ -7,7 +6,7 @@ import EffectAnimation from "../../../../game/EffectAnimation"
 import AvoidEffectSelecter from "../modules/AvoidEffectSelecter"
 
 const EffectContainer = () => {
-  const [boardState, gameState] = [useContext(BoardStateContext), useContext(GameStateContext)]
+  const gameState = useContext(GameStateContext)
 
   return (
     <>
@@ -18,7 +17,7 @@ const EffectContainer = () => {
           message={createMsg({action: gameState.game.event.action, card: gameState.game.board.trash.card})}
         />
       }
-      { boardState.showAvoidEffectview && <AvoidEffectSelecter /> }
+      { gameState.game.board.status === 'effectResolving' && <AvoidEffectSelecter /> }
     </>
   )
 }

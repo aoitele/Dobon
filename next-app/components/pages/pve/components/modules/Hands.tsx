@@ -23,9 +23,7 @@ const Hands: FC<Props> = ({ isAvoidSelectMode }) => {
   if (isAvoidSelectMode) {
     const lastTrashNum: number = spreadCardState([gameState.game.board.trash.card], true)[0].num
     hands = hands.map(card => {
-      if (card.num !== lastTrashNum) {
-        card.isPutable = false
-      }
+      card.isPutable = card.num === lastTrashNum
       return card
     })
   }

@@ -29,7 +29,6 @@ class Effect {
       }
     }
     await handleEmit(this.wsClient, actionEmit)
-    this.boardDispatch({ ...this.boardState, showAvoidEffectview: false })
     // 効果を受けたタイミングでallowDobonをfalseにして、自ターンをスキップした時にはtriggerdがactionBtnになるようにしておく
     const newState = useUpdateStateFn(this.gameState, { game: { board: { allowDobon: false } }})
     this.gameDispatch({ ...newState })

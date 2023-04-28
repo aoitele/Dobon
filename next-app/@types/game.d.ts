@@ -58,7 +58,7 @@ export type Board = {
   allowDobon: boolean
   waitDobon?: boolean
   speed?: '1x' | '2x' | '3x' // 進行速度(2X, 3Xは倍速モード)
-  status?: 'playing' | 'dobonCheck' | 'turnChanging'
+  status?: 'playing' | 'dobonCheck' | 'turnChanging' | 'effectResolving'
 }
 
 export type InitialBoardState = {

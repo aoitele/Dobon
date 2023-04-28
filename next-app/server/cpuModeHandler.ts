@@ -12,7 +12,7 @@ import { checkDobonPlayers } from "../utils/game/cpu/utils/checkDobonPlayers"
 import { getBonus } from "../utils/game/cpu/utils/getBonus"
 import { isCpuLevelValue } from "../utils/game/cpu/utils/isCPULevelValue"
 import { dobonJudge } from "../utils/game/dobonJudge"
-import { resEffectName, resNewEffectState } from "../utils/game/effect"
+import { existShouldBeSolvedEffect, resEffectName, resNewEffectState } from "../utils/game/effect"
 import { reducerPayloadSpecify } from "../utils/game/roomStateReducer"
 import sleep from "../utils/game/sleep"
 import { initialState } from "../utils/game/state"
@@ -227,12 +227,16 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             updatedEffect = resNewEffectState(updatedEffect, effectName)
           }
 
+          // 次がプレイヤーのターンで、もし解決すべき効果がある場合はstatus=effectResolvingを挟む
+          const showAvoidEffectview = nextTurn === 1 && updatedEffect.length > 0 && existShouldBeSolvedEffect(updatedEffect)
+          const boardStatus = showAvoidEffectview ? 'effectResolving' : 'playing'
+
           const reducerPayload: reducerPayloadSpecify = {
             game: {
               board: {
                 turn: nextTurn,
                 effect: updatedEffect,
-                status: 'playing',
+                status: boardStatus,
               }
             }
           }
@@ -296,6 +300,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
                 hands: drawnCards,
                 effect: resolvedEffect,
                 deckCount,
+                status: 'playing',
               },
               event: gameInitialState.game.event,
             }
@@ -378,7 +383,8 @@ const cpuModeHandler = (io: Socket, socket: any) => {
           game: {
             board: {
               hands,
-              effect: resolvedEffect
+              effect: resolvedEffect,
+              status: 'playing',
             },
             event: gameInitialState.game.event,
           }

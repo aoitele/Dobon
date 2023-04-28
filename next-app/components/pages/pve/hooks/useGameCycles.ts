@@ -8,7 +8,6 @@ import { BoardStateContext, BoardDispathContext, boardProviderInitialState } fro
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
 import { ScoreDispathContext, ScoreProviderState, ScoreStateContext, scoreProviderInitialState } from '../../../../context/ScoreProvider'
 import { updateMyHandsStatus } from '../../../../utils/game/checkHand'
-import { existShouldBeSolvedEffect } from '../../../../utils/game/effect'
 import { culcBonus, culcGetScore } from '../../../../utils/game/score'
 import sleep from '../../../../utils/game/sleep'
 import { useUpdateStateFn } from '../../../../utils/game/state'
@@ -135,8 +134,7 @@ const useGameCycles = () => {
       }
       case 'playing': {
       if (gameState.game.board.turn === 1) {
-        const showAvoidEffectview = gameState.game.board.effect.length > 0 && existShouldBeSolvedEffect(gameState.game.board.effect)
-        boardDispatch?.({ ...boardState, isMyTurn: true, isDrawnCard: false, showAvoidEffectview })
+        boardDispatch?.({ ...boardState, isMyTurn: true, isDrawnCard: false })
         const newState = updateMyHandsStatus({ state: gameState, hands: gameState.game.board.hands, trash: gameState.game.board.trash })
         newState && gameDispatch?.(newState)
       } else {
