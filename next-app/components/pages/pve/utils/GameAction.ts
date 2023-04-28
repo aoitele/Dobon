@@ -36,9 +36,8 @@ class GameAction {
     )
   }
   notDobon() {
-    const turnChangingState = useUpdateStateFn(this.gameState, { game: { board: { allowDobon: false, status: 'turnChanging' } } })
+    const turnChangingState = useUpdateStateFn(this.gameState, { game: { board: { allowDobon: true, status: 'turnChanging', waitDobon: false } } })
     this.gameDispatch({ ...turnChangingState })
-    this.gameDispatch(prevState => ({ ...prevState, game:{...prevState.game, board: {...prevState.game.board, waitDobon: false}} }))
   }
 }
 /* eslint-enable no-unused-vars, no-useless-constructor, no-empty-function */
