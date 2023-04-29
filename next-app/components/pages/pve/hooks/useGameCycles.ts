@@ -166,6 +166,10 @@ const useGameCycles = () => {
         boardDispatch?.(boardProviderInitialState)
         break;
       }
+      case 'effectResolving': {
+        boardDispatch?.({ ...boardState, showAvoidEffectview: true })
+        break;
+      }
       default: break
     }
 

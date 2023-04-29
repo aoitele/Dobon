@@ -21,6 +21,8 @@ class Effect {
     const isOpenCardEvent = this.gameState.game.board.effect.find(ef => ef.match(/opencard/u))
     if (!isDrawEvent && !isOpenCardEvent) return
 
+    this.boardDispatch({ ...this.boardState, showAvoidEffectview: false })
+
     const actionEmit:EmitForPVE = {
       event: isDrawEvent ? 'drawcard__effect' : 'opencard',
       data: {
