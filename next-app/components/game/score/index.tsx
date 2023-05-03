@@ -127,11 +127,12 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
             clearInterval(scoreCountUp)
             const nextGameId = state.game.id ? state.game.id + 1 : null
             await sleep(1000)
+            const message = nextGameId === state.game.setCount ? 'GoTo Next → Last Game' : `GoTo Next →「Game${nextGameId}」`
             setValues(() => ({
               ...valueBaseObj,
               winerScore: winner.score + i,
               loserScore: loser.score - i,
-              message:`GoTo Next →「Game${nextGameId}」`
+              message,
             }))
             await sleep(3000)
             if (winner.id !== authUser?.id) return

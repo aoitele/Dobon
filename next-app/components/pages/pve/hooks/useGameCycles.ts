@@ -102,11 +102,12 @@ const useGameCycles = () => {
 
                 const nextGameId = gameState.game.id ? gameState.game.id + 1 : null
                 await sleep(1000)
+                const message = nextGameId === gameState.game.setCount ? 'GoTo Next → Last Game' : `GoTo Next →「Game${nextGameId}」`
                 scoreDispatch(() => ({
                   ...newScoreState,
                   winerScore: winner.score + i,
                   loserScore: loser.score - i,
-                  message:`GoTo Next →「Game${nextGameId}」`
+                  message,
                 }))
                 await sleep(1000)
                 handleEmit(gameState.wsClient, { event: 'prepare', gameId: nextGameId, query: router.query, data: { board: {data: { speed: gameState.game.board.speed }}} }) // ゲームスピードの選択状態は維持させる
