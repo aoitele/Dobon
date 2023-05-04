@@ -629,7 +629,6 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const bonusCards = await getBonus(adapterPubClient, deckKey, trashKey)
         // スコアデータを更新
         // 結果をクライアントに通知
-        console.log(bonusCards, 'bonusCard')
         let reducerPayload: reducerPayloadSpecify = {
           game: {
             board: {

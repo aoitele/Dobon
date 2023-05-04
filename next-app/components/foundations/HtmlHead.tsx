@@ -18,6 +18,8 @@ const HtmlHead: React.FC<Props> = ({ title }) => {
       <Head>
         <title>{title} | {SITE_NAME}</title>
         <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover' />
+        {/* Using Font - Rubik */}
+        <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet" />
       </Head>
     </>
   )

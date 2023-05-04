@@ -1,3 +1,4 @@
+import deepcopy from "deepcopy"
 import React, { createContext, Dispatch, FC, ReactNode, SetStateAction, useState } from "react"
 import { Game } from "../@types/game"
 import { SocketClient } from "../utils/socket/client"
@@ -24,7 +25,7 @@ interface Props {
 }
 
 const GameProvider:FC<Props> = (props) => {
-  const [values, dispatch] = useState(gameInitialState)
+  const [values, dispatch] = useState(deepcopy(gameInitialState))
 
   return (
     <GameStateContext.Provider value={values}>

@@ -1,0 +1,104 @@
+.wrap {
+  text-align: center;
+  background-color:rgb(233, 181, 144);
+  padding: 14px;
+  height: 100vh;
+  .headline {
+    font-size: 24px;
+  }
+  .userInfo {
+    display: flex;
+    align-items: center;
+    width: 90%;
+    margin: 16px auto;
+    padding: 4px 10px;
+    background-color:#fff;
+    border-radius: 5px;
+    &__1 {
+      @extend .userInfo;
+      animation: fadeIn 1s ease 2s 1 backwards;
+    }
+    &__2 {
+      @extend .userInfo;
+      animation: fadeIn 1s ease 1.5s 1 backwards;
+    }
+    &__3 {
+      @extend .userInfo;
+      animation: fadeIn 1s ease 1s 1 backwards;
+    }
+    &__4 {
+      @extend .userInfo;
+      animation: fadeIn 1s ease 0.5s 1 backwards;
+    }
+    .rank {
+      display: flex;
+      min-width: 40px;
+      height: 40px;
+      border-radius: 50px;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 1px 1px #9B9B9B;
+      &__1 {
+        @extend .rank;
+        background: linear-gradient(45deg, #B67B03 0%, #DAAF08 45%, #FEE9A0 70%, #DAAF08 85%, #B67B03 90% 100%);      }
+      &__2 {
+        @extend .rank;
+        background: linear-gradient(45deg, #757575 0%, #9E9E9E 45%, #E8E8E8 70%, #9E9E9E 85%, #757575 90% 100%);
+      }
+      &__3 {
+        @extend .rank;
+        background: linear-gradient(45deg, #e9720a 0%, #e07c26 45%, #ffc795 70%, #e07c26 85%, #e9720a 90% 100%);
+
+        background-color: #EAA05E;
+      }
+      &__4 {
+        @extend .rank;
+      }
+    }
+    .userInfo {
+      display: flex;
+      margin-left: 20px;
+      .userIcon {
+        width: 40%;
+      }
+      .nameAndScore {
+        font-size: 18px;
+        margin-left: 20px;
+        width: 60%;
+        text-align: start;
+      }
+    }
+  }
+  .btnContainer {
+    display: flex;
+    justify-content: space-around;
+    .btnWrap {
+      .link {
+        display: block;
+        padding: 8px 20px;
+        border-radius: 50px;
+        box-shadow: 1px 1px 3px rgb(127, 125, 125);
+        font-size: 16px;
+        &__home {
+          @extend .link;
+          background-color: antiquewhite;
+        }
+        &__newGame {
+          @extend .link;
+          background-color: lightgreen;
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

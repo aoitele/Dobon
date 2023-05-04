@@ -15,7 +15,7 @@ export type Room = {
   modified: Date
 }
 
-export type GameStatus = | 'join' | 'created' | 'prepare' | 'playing' | 'ended' | 'showScore' | 'loading' | 'connection loss' | undefined
+export type GameStatus = | 'join' | 'created' | 'prepare' | 'playing' | 'ended' | 'showScore' | 'gameSet' | 'loading' | 'connection loss' | undefined
 
 export type Game = {
   id: number | null

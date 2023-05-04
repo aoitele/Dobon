@@ -24,7 +24,7 @@ const TopPageContent:FC = () => {
   return (
     <>
     <div className={style.wrap}>
-      {values.selectedPvE && <PVESelecterModal setValues={setValues}/>}
+      {values.selectedPvE && <PVESelecterModal initialState={initialState} setValues={setValues} isCalledByResultBoard={false} />}
       {!isAuthUserFetching(authUser) &&
         <div className={style.content}>
           <h1 className={style.heading1}>Dobon</h1>

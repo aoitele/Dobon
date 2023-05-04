@@ -7,6 +7,7 @@ import { EmitForPVE } from '../../../../@types/socket'
 import { BoardStateContext, BoardDispathContext, boardProviderInitialState } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
 import { ScoreDispathContext, ScoreProviderState, ScoreStateContext, scoreProviderInitialState } from '../../../../context/ScoreProvider'
+import { gameInitialState } from '../../../../context/state/gameInitialState'
 import { updateMyHandsStatus } from '../../../../utils/game/checkHand'
 import { culcBonus, culcGetScore } from '../../../../utils/game/score'
 import sleep from '../../../../utils/game/sleep'
@@ -71,8 +72,6 @@ const useGameCycles = () => {
             }
           }
           scoreDispatch(newScoreState);
-          const newGameState = useUpdateStateFn(gameState, { game: { board: { waitDobon: false } } })
-          gameDispatch(newGameState); // 盤面状態を初期化
 
           (async() => {
             await sleep(2000)
@@ -93,15 +92,32 @@ const useGameCycles = () => {
                   data: {
                     board: {
                       data: {
-                        users: [{ nickname: winner.mode ? winner.nickname : 'me', score: winner.score + i }, { nickname: loser.nickname, score: loser.score - i }]
+                        users: [{ nickname: winner.isCpu ? winner.nickname : 'me', score: winner.score + i }, { nickname: loser.isCpu ? loser.nickname : 'me', score: loser.score - i }]
                       }
                     }
                   }
                 }
                 handleEmit(gameState.wsClient, postProcessEmit )
 
+                const isLastGame = gameState.game.id === gameState.game.setCount
                 const nextGameId = gameState.game.id ? gameState.game.id + 1 : null
                 await sleep(1000)
+
+                if (isLastGame) {
+                  // 最終ゲームであればスコア情報を更新、結果画面へ移行させる
+                  const updatedUsers = gameState.game.board.users.map(user => {
+                    user.isWinner && (user.score = winner.score + i)
+                    user.isLoser  && (user.score = loser.score - i)
+                    return user
+                  })
+                  // game.boardの状態をリセット(次ゲーム開始時の表示を初期状態に戻すため。スピードは引き継ぐ)
+                  const newGameState = useUpdateStateFn(gameState, { game: { ...gameInitialState.game, status: 'gameSet', board: { ...gameInitialState.game.board, users: updatedUsers, speed: gameState.game.board.speed } } })
+                  gameDispatch({...newGameState})
+                  scoreDispatch(scoreProviderInitialState) // ScoreBoardの状態をリセット(次ゲーム開始時の表示を初期状態に戻すため)
+                  boardDispatch(boardProviderInitialState) // boardStateの状態をリセット(次ゲーム開始時の表示を初期状態に戻すため)
+                  return
+                }
+
                 const message = nextGameId === gameState.game.setCount ? 'GoTo Next → Last Game' : `GoTo Next →「Game${nextGameId}」`
                 scoreDispatch(() => ({
                   ...newScoreState,
