@@ -28,12 +28,17 @@ const HintText:VFC<Props> = ({ boardState }) => {
       return
     }
     const hasJokerCount = countJoker(hands)
-    if (hands.length === hasJokerCount) return
+
+    let text = ''
+    if (hands.length === hasJokerCount) {
+      text = hasJokerCount === 1 ? 'ジョーカーでドボン待ち(単騎x2ボーナス)' : ''
+      setValues(text)
+      return
+    }
 
     const nums = resNumArrayExcludeJoker(hands) // Jokerを除いた手札
     const sumIsBelow13 = sum(nums) + hasJokerCount <= DOBON_CARD_NUMBER_OPENCARD // 手札合計が13以下か
 
-    let text = ''
     switch(hands.length) {
       // 手札が1枚
       case 1: {

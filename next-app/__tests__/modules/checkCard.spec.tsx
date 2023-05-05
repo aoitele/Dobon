@@ -18,6 +18,7 @@ const HAND_JOKER_X0_OPEN = ['s1o', 'x0o', 's3o']
 const HAND_JOKER_X1 = ['s1', 's2', 'x1']
 const HAND_JOKER_X1_OPEN = ['s1o', 's2o', 'x1o']
 const HAND_TWO_JOKER = ['s1', 'x0', 'x1']
+const HAND_TWO_JOKER_ONLY = ['x0', 'x1']
 const HAND_TWO_JOKER_OPEN = ['s1o', 'x0o', 'x1o']
 
 describe('checkCard TestCases', () => {
@@ -43,6 +44,7 @@ describe('checkCard TestCases', () => {
     expect(countJoker(HAND_JOKER_X0)).toBe(1)
     expect(countJoker(HAND_JOKER_X1)).toBe(1)
     expect(countJoker(HAND_TWO_JOKER)).toBe(2)
+    expect(countJoker(HAND_TWO_JOKER_ONLY)).toBe(2)
   })
   it('extractCardNum: カードから数字を取り出す', async () => {
     expect(extractCardNum(CARD_NOJOKER)).toBe(1)

@@ -16,8 +16,15 @@ const hasSameCard = (putOutCard: number, hand: number[]): boolean =>
   hand.includes(putOutCard)
 const chkAvoidCardEffect = (action: Action) => action === 'avoidEffect'
 
+interface HandSep {
+  suit: string
+  num: string
+  isOpen: boolean
+  isPutable: boolean
+}
+
 const sepalateSuitNum = (cards: string[] | HandCards[]) => {
-  const res = []
+  const res: HandSep[] = []
   for (let i=0; i<cards.length; i+=1 ){
     const re = /(h|s|c|d|x)([0-9]+)(op|o|p|)/u
     const mat = cards[i].match(re)
@@ -30,13 +37,6 @@ const sepalateSuitNum = (cards: string[] | HandCards[]) => {
     }
   }
   return res
-}
-
-interface HandSep {
-  suit: string
-  num: string
-  isOpen: boolean
-  isPutable: boolean
 }
 
 type HandsFilterCallback = (handSep: HandSep) => boolean // eslint-disable-line no-unused-vars

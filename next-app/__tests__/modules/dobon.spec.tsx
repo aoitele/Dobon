@@ -45,6 +45,7 @@ putOutCard     | hand                        | expected
  ${'s11'}      | ${['s4', 's5', 's3', 'x0']} | ${true}
  ${'s12'}      | ${['s4', 's5', 's3', 'x1']} | ${false}
  ${'s13'}      | ${['s4', 's5', 's3', 'x0']} | ${true}
+ ${'s9'}       | ${['x0', 'x1']}             | ${false}
 `('手札がJoker(x0もしくはx1)を含む時、Jokerは+1/-1どちらでも合計値に利用できる', ({ putOutCard, hand, expected }) => {
   test(`$putOutCard - $hand returns ${expected}`, () => {
     let result = dobonJudge(putOutCard, hand)

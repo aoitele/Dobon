@@ -21,6 +21,11 @@ const dobonJudge = (putOutCard: HandCards | string, hands: HandCards[] | string[
   const existJokerInHand = existJoker(hands) // 手札にJokerがあるか
   const cntJokerInHand = countJoker(hands)   // 手札にあるJokerの枚数
 
+  // もし手札がjokerのみで2枚持つ場合は上がれるカードがないためfalseで返す
+  if (cardCnt === 2 && cardCnt === cntJokerInHand) {
+    return false
+  }
+
   const judgeMethod = cardCnt === 1 ? 'single' : cardCnt === 2 ? 'sumAndDiff' : 'sum';
   const handNums = resNumArrayExcludeJoker(hands)
 
