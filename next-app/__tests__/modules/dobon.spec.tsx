@@ -1,5 +1,4 @@
-import { HandCards } from '../../@types/card'
-import { DOBON_CARD_NUMBER_DRAW_2, DOBON_CARD_NUMBER_JOKER } from '../../constant'
+import { DOBON_CARD_NUMBER_JOKER } from '../../constant'
 import { dobonJudge, resReachNumbers } from '../../utils/game/dobonJudge'
 
 describe('Dobon Judge TestCases', () => {
