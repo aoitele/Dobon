@@ -5,7 +5,7 @@ import HtmlHead from '../../components/foundations/HtmlHead'
 const Index: React.FC = () => {
   return (
   <>
-    <HtmlHead title='ルーム一覧' />
+    <HtmlHead title='Rooms' />
     <PageContent />
   </>
   )

@@ -6,7 +6,7 @@ import HowToPageContent from '../components/pages/howto'
 const HowToPage = () => {
   return (
   <Layout>
-    <HtmlHead title={'ゲームルール'} />
+    <HtmlHead title={'Game rules'} />
     <HowToPageContent/>
   </Layout>
   )

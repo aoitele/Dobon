@@ -5,7 +5,7 @@ import TopPageContent from '../components/pages/index'
 
 const IndexPage = () => (
   <Layout>
-    <HtmlHead title='Dobon Game' />
+    <HtmlHead title='Dobon' />
     <TopPageContent/>
   </Layout>
 )

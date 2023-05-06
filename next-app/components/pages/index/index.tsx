@@ -28,7 +28,7 @@ const TopPageContent:FC = () => {
       {!isAuthUserFetching(authUser) &&
         <div className={style.content}>
           <h1 className={style.heading1}>Dobon</h1>
-          <p className={style.subTitle}>-ultimate trump game-</p>
+          <p className={style.subTitle}>playing card game</p>
           <div className={style.logo}>
             <Image
               src='/images/numa_hamaru_woman.png'

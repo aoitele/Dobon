@@ -12,7 +12,7 @@ const PvePage:FC = () => {
 
   return (
     <>
-      <HtmlHead title='vsCom' />
+      <HtmlHead title='vsCom Room' />
       {gameState.game.status === 'playing' && <Board />}
       {(gameState.game.status === 'ended' || gameState.game.status === 'showScore') && <ScoreBoard />}
       {gameState.game.status === 'gameSet' && <ResultBoard />}
