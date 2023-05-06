@@ -123,7 +123,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
               },
               effect: initialState.game.board.effect,
               bonusCards: initialState.game.board.bonusCards,
-              waitDobon: canIDobon ? true : undefined, // 自分のドボンチェックからゲームスタート
+              waitDobon: canIDobon, // 自分のドボンチェックからゲームスタート
               status: 'playing',
               speed: board?.data.speed
             },
