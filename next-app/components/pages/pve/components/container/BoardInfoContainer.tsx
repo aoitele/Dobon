@@ -12,15 +12,17 @@ const BoardInfoContainer:FC = () => {
   return (
     <div className={styles.wrap}>
       { board.trash.card &&
-        <SingleCard
-          key='trash'
-          card = {
-            Object.assign(
-              spreadCardState([board.trash.card])[0],
-              { style: { width:80, height: 120} }
-            )
-          }
-        />
+        <div className={styles.singleCardWrap}>
+          <SingleCard
+            key='trash'
+            card = {
+              Object.assign(
+                spreadCardState([board.trash.card])[0],
+                { style: { width:160, height: 240} }
+              )
+            }
+          />
+        </div>
       }
       <div>
         { turnUser &&
@@ -50,8 +52,8 @@ const BoardInfoContainer:FC = () => {
           }
         </div>
       </div>
-      <div>
-        <Image src='/images/cards/deck.png' width={70} height={105} />
+      <div className={styles.deckCardWrap}>
+        <Image src='/images/cards/deck.png' width={100} height={150} />
         <p className={styles.deckCount}>x {board.deckCount}</p>
       </div>
     </div>

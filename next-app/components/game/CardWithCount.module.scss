@@ -1,3 +1,23 @@
+.wrap {
+  img {
+    @media only screen and (max-height: 599px) {
+    width: 40px;
+    height: auto;
+    }
+    @media only screen and (min-height: 600px) and (max-height: 700px) {
+      width: 50px;
+      height: auto;
+    }
+    @media only screen and (min-height: 701px) and (max-height: 800px) {
+      width: 50px;
+      height: auto;
+    }
+    @media only screen and (min-height: 801px) {
+      width: 50px;
+      height: auto;
+    }
+  }
+}
 .wrapRight {
     width: 70px;
     display: flex;
@@ -14,6 +34,6 @@
     align-items: center;
 }
 .cardCount {
-    font-size: 12px;
+    font-size: inherit;
     font-weight: bold;
 }

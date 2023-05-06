@@ -1,16 +1,64 @@
 .wrap {
   display: flex;
   flex-flow: column;
+  @media only screen and (max-height: 599px) {
+    font-size: 14px;
+  }
+  @media only screen and (min-height: 600px) and (max-height: 700px) {
+    font-size: 16px;
+  }
+  @media only screen and (min-height: 701px) and (max-height: 800px) {
+    font-size: 18px;
+  }
+  @media only screen and (min-height: 801px) {
+    font-size: 20px;
+  }
   .loserAnimation {
     display: inline-block;
     animation: tremble .1s  infinite;
   }
   .iconName {
     display: flex;
+    img {
+      @media only screen and (max-height: 599px) {
+        width: 40px;
+        height: auto;
+      }
+      @media only screen and (min-height: 600px) and (max-height: 700px) {
+        width: 50px;
+        height: auto;
+      }
+      @media only screen and (min-height: 701px) and (max-height: 800px) {
+        width: 50px;
+        height: auto;
+      }
+      @media only screen and (min-height: 801px) {
+        width: 50px;
+        height: auto;
+      }
+    }
   }
   .iconNameOnTurn {
     display: flex;
     animation: move-y .5s infinite alternate ease-in-out;
+    img {
+      @media only screen and (max-height: 599px) {
+        width: 40px;
+        height: auto;
+      }
+      @media only screen and (min-height: 600px) and (max-height: 700px) {
+        width: 50px;
+        height: auto;
+      }
+      @media only screen and (min-height: 701px) and (max-height: 800px) {
+        width: 60px;
+        height: auto;
+      }
+      @media only screen and (min-height: 801px) {
+        width: 70px;
+        height: auto;
+      }
+    }
   }
   .onTurnMark {
     color: #ff0000;
@@ -23,6 +71,18 @@
     display: flex;
     justify-content: center;
     margin-top: 10px;
+    @media only screen and (max-height: 599px) {
+      font-size: 14px;
+    }
+    @media only screen and (min-height: 600px) and (max-height: 700px) {
+      font-size: 16px;
+    }
+    @media only screen and (min-height: 701px) and (max-height: 800px) {
+      font-size: 16px;
+    }
+    @media only screen and (min-height: 801px) {
+      font-size: 18px;
+    }
   }
 }
 .otherHandsInfoWrap {

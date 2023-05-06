@@ -1,5 +1,4 @@
 import React, { VFC } from 'react'
-import Image from 'next/image'
 import type { Player, OtherHands } from '../../@types/game'
 import style from './UserInfo.module.scss'
 import CardWithCount from './CardWithCount'
@@ -31,7 +30,7 @@ const userInfo: React.FC<Props> = ({ user, hands, turnUser }) => {
     <div className={style.wrap}>
       <div className={user.isLoser ? style.loserAnimation : undefined}>
         <div className={isTurnUser ? style.iconNameOnTurn :style.iconName }>
-          <Image
+          <img
             src={`/images/game/userIcon/${user.turn}.png`}
             width={50}
             height={50}

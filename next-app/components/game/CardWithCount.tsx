@@ -1,5 +1,4 @@
 import React from 'react'
-import Image from 'next/image'
 import { HaveAllPropertyCard } from '../../@types/card'
 import style from './CardWithCount.module.scss'
 
@@ -75,8 +74,8 @@ const CardImageWithCount: React.FC<CardImageWithCountProps> = ({isOpen, count, s
 
   return (
     <>
-      <div>
-        <Image
+      <div className={style.wrap}>
+        <img
           src={isOpen ? `/images/cards/${suit}${num}.png` : "/images/cards/z.png"}
           width={40}
           height={60}

@@ -37,6 +37,22 @@
       width: 80%;
       margin: 0 auto;
     }
+    @media only screen and (max-height: 599px) {
+      width: 100%;
+    }
+    @media only screen and (min-height: 600px) and (max-height: 700px) {
+      width: 100%;
+    }
+    @media only screen and (min-height: 701px) and (max-height: 800px) {
+      width: 100%;
+    }
+    @media only screen and (min-height: 801px) {
+      width: 100%;
+    }
+    // スマホの横幅を超える場合は幅を固定する(縦が領域をはみ出てくるため)
+    @media only screen and (min-width: 420px) {
+      width: 400px;
+    }
   }
   .imageBg {
     position: absolute;
