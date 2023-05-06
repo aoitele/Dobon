@@ -1,4 +1,7 @@
 .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 45%;
   height: 60%;
   padding: 10px;
@@ -27,6 +30,11 @@
 }
 .draw {
   @extend .btn;
+  background-color:lightgreen;
+}
+.deckSet {
+  @extend .btn;
+  font-size: 14px;
   background-color:lightgreen;
 }
 .active {
