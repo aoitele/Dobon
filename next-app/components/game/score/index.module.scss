@@ -5,9 +5,21 @@
   user-select: none; //　タップ時に文章選択をさせないように抑制
   white-space: pre-wrap;
 
+  @media only screen and (max-height: 599px) {
+    font-size: 14px;
+  }
+  @media only screen and (min-height: 600px) and (max-height: 700px) {
+    font-size: 22px;
+  }
+  @media only screen and (min-height: 701px) and (max-height: 800px) {
+    font-size: 22px;
+  }
+  @media only screen and (min-height: 801px) {
+    font-size: 22px;
+  }
+
   .heading {
     text-align: center;
-    font-size: 20px;
     font-weight: bold;
     position: absolute;
     top: 10px;
@@ -60,7 +72,18 @@
         .productMark {
           position: absolute;
           bottom: 10px;
-          font-size: 40px
+          @media only screen and (max-height: 599px) {
+            font-size: 26px;
+          }
+          @media only screen and (min-height: 600px) and (max-height: 700px) {
+            font-size: 32px;
+          }
+          @media only screen and (min-height: 701px) and (max-height: 800px) {
+            font-size: 40px;
+          }
+          @media only screen and (min-height: 801px) {
+            font-size: 40px;
+          }
         }
       }
     }
@@ -76,7 +99,18 @@
       margin-top: 8px;
       padding: 0px 0px 0px 65px;      
       span {
-        font-size: 40px;
+        @media only screen and (max-height: 599px) {
+          font-size: 24px;
+        }
+        @media only screen and (min-height: 600px) and (max-height: 700px) {
+          font-size: 32px;
+        }
+        @media only screen and (min-height: 701px) and (max-height: 800px) {
+          font-size: 40px;
+        }
+        @media only screen and (min-height: 801px) {
+          font-size: 40px;
+        }
       }
     }
      .resultScore {
@@ -98,18 +132,40 @@
       animation: fadeupDelay 5s cubic-bezier(0.33, 1, 0.68, 1) 1 forwards;
       padding: 20px;
       span {
-        font-size: 30px;
+        @media only screen and (max-height: 599px) {
+          font-size: 26px;
+        }
+        @media only screen and (min-height: 600px) and (max-height: 700px) {
+          font-size: 30px;
+        }
+        @media only screen and (min-height: 701px) and (max-height: 800px) {
+          font-size: 34px;
+        }
+        @media only screen and (min-height: 801px) {
+          font-size: 38px;
+        }
       }
     }
     .NextGameInfo {
       animation: blink .5s infinite alternate ease-in-out;
       text-align: center;
-      font-size: 24px;
       background-color: bisque;
       position: absolute;
       top: -30px;
       left: 0;
       width: 90%;
+      @media only screen and (max-height: 599px) {
+        font-size: 20px;
+      }
+      @media only screen and (min-height: 600px) and (max-height: 700px) {
+        font-size: 24px;
+      }
+      @media only screen and (min-height: 701px) and (max-height: 800px) {
+        font-size: 26px;
+      }
+      @media only screen and (min-height: 801px) {
+        font-size: 28px;
+      }
     }
   }
 }

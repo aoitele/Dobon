@@ -1,5 +1,4 @@
 import React, { VFC } from 'react'
-import Image from 'next/image'
 import style from './UserScore.module.scss'
 import { Player } from '../../../@types/game'
 import { ScoreProviderState } from '../../../context/ScoreProvider'
@@ -12,7 +11,7 @@ interface Props {
 const UserScore:VFC<Props> = ({ user, score }) => {
   return (
     <div className={style.wrap}>
-      <Image
+      <img
         src={`/images/game/userIcon/${user.turn}.png`}
         width={80}
         height={80}

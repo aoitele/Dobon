@@ -1,5 +1,16 @@
 .winCardInfo {
-  font-size: 20px;
+  @media only screen and (max-height: 599px) {
+    font-size: 12px;
+  }
+  @media only screen and (min-height: 600px) and (max-height: 700px) {
+    font-size: 22px;
+  }
+  @media only screen and (min-height: 701px) and (max-height: 800px) {
+    font-size: 24px;
+  }
+  @media only screen and (min-height: 801px) {
+    font-size: 26px;
+  }
   
   .bonusCardContainer {
     display: flex;
