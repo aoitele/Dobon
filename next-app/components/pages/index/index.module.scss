@@ -51,15 +51,7 @@
     font-size: 20px;
   }
   .loginBtn {
-    position: relative;
-    .hint {
-      position: absolute;
-      left: 22px;
-      font-size: 4px;
-      padding: 6px;
-      border-radius: 5px;
-      background-color: rgb(255, 226, 226);
-    }
+    position: relative
   }
   .bgAnimatedCard {
     animation:rotateY 2s linear infinite;
@@ -74,6 +66,12 @@
       animation:change-img-anim 2s linear infinite;
       animation-delay: 1s;
     }
+  }
+  .hint {
+    font-size: 12px;
+    padding: 6px;
+    border-radius: 5px;
+    background-color: rgb(255, 226, 226);
   }
   .card1 {
     position: absolute;

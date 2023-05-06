@@ -22,33 +22,35 @@ const PVESelecterModal:FC<Props> = ({ initialState, setValues, isCalledByResultB
         >×</button>
         <div className={styles.modalInner}>
           <>
-            <label htmlFor="max_seat">参加者</label>
-            <div className={styles.paticipantsHeader}>
-              <span>名前</span>
-              <span>強さ</span>
+            <label htmlFor="max_seat">Participant</label>
+            <div className={styles.paticipantsWrap}>
+              <div className={styles.paticipantsHeader}>
+                <span>Name</span>
+                <span>Strength</span>
+              </div>
+              <ul className={styles.paticipants}>
+                {pveSelecter.users.map((user, index) => {
+                  return (
+                    <li key={index}>
+                      <div>{user.name}{user.icon}</div>
+                      <div>
+                        <select
+                          value={user.mode}
+                          onChange={(e) => setUserMode(e, index)}
+                        >
+                          <option value='hard'>hard</option>
+                          <option value='normal'>normal</option>
+                          <option value='easy'>easy</option>
+                        </select>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
-            <ul className={styles.paticipants}>
-              {pveSelecter.users.map((user, index) => {
-                return (
-                  <li key={index}>
-                    <div>{user.name}{user.icon}</div>
-                    <div>
-                      <select
-                        value={user.mode}
-                        onChange={(e) => setUserMode(e, index)}
-                      >
-                        <option value='hard'>強い</option>
-                        <option value='normal'>ふつう</option>
-                        <option value='easy'>弱い</option>
-                      </select>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>            
           </>
           <div>
-            <label htmlFor="setCount">ゲーム数</label>
+            <label htmlFor="setCount">setCount</label>
             <div className={styles.setCount}>
               {gameSet.map(setCount => {
                 return (
@@ -66,7 +68,7 @@ const PVESelecterModal:FC<Props> = ({ initialState, setValues, isCalledByResultB
           <button 
             onClick={() => gameStart({ isCalledByResultBoard })}
             className={styles.submitBtn}
-          >ゲームを始める</button>
+          >Game Start</button>
         </div>
       </div>
       <div className={styles.modalBack} onClick={() => setValues(initialState)}/>

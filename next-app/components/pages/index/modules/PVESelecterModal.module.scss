@@ -13,9 +13,10 @@
   .submitBtn {
     background-color: #69C62F;
     color: #ffffff;
-    margin: 40px 0;
-    padding: 10px;
-    border-radius: 10px;
+    margin: 20px 0;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 18px;
   }
 }
 .modalOpen {
@@ -49,6 +50,9 @@
 .dltest {
   display: flex;
 }
+.paticipantsWrap {
+  margin: 16px 0px;
+}
 .paticipantsHeader {
   span {
     display: inline-block;
@@ -65,10 +69,14 @@
   }
 }
 .setCount {
+  margin: 10px 0px;
   span {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
     font-size: 20px;
-    padding: 10px;
-    // width: 30px;
+    text-align: center;
     border-radius: 50%;
   }
   .active {
