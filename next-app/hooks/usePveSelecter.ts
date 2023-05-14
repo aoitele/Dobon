@@ -95,12 +95,14 @@ const usePveSelecter = () => {
     
     // 前ゲームの結果画面から開始される場合はstatusを初期値(undefined)にセットしてゲーム開始のフックを発動させる
     if (isCalledByResultBoard) {
-      router.replace('/') // routerはpathnameが変更されないとqueryが更新されないため、historyスタックを更新させる
-      router.push({
-        pathname: '/pve',
-        query: queryStr,
-      }, `/`)
-      handleEmit(gameState.wsClient, { event: 'prepare', gameId: 1, query: queryDic, data: { board: {data: { speed: gameState.game.board.speed }}} }) // ゲームスピードの選択状態は維持させる
+      // routerはpathnameが変更されないとqueryが更新されないため、historyスタックを更新させる
+      router.replace('/').then(() => {
+        router.push({
+          pathname: '/pve',
+          query: queryStr,
+        }, '/')
+        handleEmit(gameState.wsClient, { event: 'prepare', gameId: 1, query: queryDic, data: { board: {data: { speed: gameState.game.board.speed }}} }) // ゲームスピードの選択状態は維持させる
+      })
     }
   }
 
