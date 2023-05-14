@@ -11,7 +11,15 @@ type AddRankPlayers =(Player & { rank: number })[]
 const ResultBoard = () => {
   const [values, setValues] = useState(initialState)
   const gameState = useContext(GameStateContext)
-  const users: AddRankPlayers = gameState.game.board.users.sort((a, b) => b.score - a.score).map((user, idx) => ({...user, rank: idx + 1}))
+  const users: AddRankPlayers = gameState.game.board.users
+    .sort((a, b) => b.score - a.score)
+    .map((user, idx) => {
+      // もし前のユーザーと同スコアならrankも同じにする
+      if (idx > 0 && user.score === gameState.game.board.users[idx - 1].score) {
+        return {...user, rank: idx}
+      }
+      return {...user, rank: idx + 1}
+    })
 
   return (
   <>
