@@ -34,6 +34,8 @@ class GameAction {
         data: { board: { data: this.gameState.game.board } }
       }
     )
+    const newGameState = useUpdateStateFn(this.gameState, { game: { board: { status: undefined } } })
+    this.gameDispatch({ ...newGameState })
   }
   notDobon() {
     const turnChangingState = useUpdateStateFn(this.gameState, { game: { board: { allowDobon: true, status: 'turnChanging', waitDobon: false } } })
