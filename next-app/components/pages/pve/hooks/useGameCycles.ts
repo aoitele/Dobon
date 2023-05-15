@@ -127,6 +127,7 @@ const useGameCycles = () => {
                 }))
                 await sleep(1000)
                 handleEmit(gameState.wsClient, { event: 'prepare', gameId: nextGameId, query: router.query, data: { board: {data: { speed: gameState.game.board.speed }}} }) // ゲームスピードの選択状態は維持させる
+                boardDispatch(boardProviderInitialState) // boardStateの状態をリセット(次ゲーム終了時の表示を初期状態に戻すため)
                 await sleep(1000) // スコアステートを初期化すると一瞬初期状態がちらつくため、初期化前に画面を次ゲームに入らせる
                 scoreDispatch(scoreProviderInitialState) // ScoreBoardの状態をリセット(次ゲーム終了時の表示を初期状態に戻すため)
               }
