@@ -1,4 +1,4 @@
-export const SITE_NAME = 'Dobon - playig card game'
+export const SITE_NAME = 'Dobon - playing card game'
 export const DESCRIPTION = 'ドボンはカードを場に出し合い、手札の計算値を合致させるトランプゲームです。'
 export const DOBON_ROOM_STATUS_WAITING = 0 // 参加者待機中
 export const DOBON_ROOM_STATUS_CLOSE = 1 // 参加者締め切り状態
