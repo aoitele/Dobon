@@ -1,10 +1,14 @@
 import React from 'react'
 import styles from './Loading.module.scss'
 
-const Loading: React.FC = () => {
+interface Props {
+  fullScreen: boolean
+}
+
+const Loading: React.FC<Props> = ({ fullScreen }) => {
   return (
-    <div className={styles.loading}>
-      <div className={styles.spinnerWrapper}>
+    <div className={fullScreen ? styles.loadingFs : styles.loadingSpinnerOnly}>
+      <div className={fullScreen ? styles.spinnerWrapperFs : styles.spinnerWrapper}>
         <span className={styles.spinner}></span>
         <span className={styles.spinnerText}>LOADING</span>
       </div>

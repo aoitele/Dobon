@@ -1,8 +1,17 @@
 .loading {
   animation:2s;
+}
+.loadingFs {
+  @extend .loading;
   position: relative;
   width: 100vw;
   height: calc(100vh - 50px);
+}
+.loadingSpinnerOnly {
+  @extend .loading;
+  display: flex;
+  justify-content: center;
+  margin: 20px;
 }
 
 .spinnerWrapper {
@@ -10,6 +19,10 @@
   height: 50px;
   background:rgba(255,255,255,0.93);
   z-index:300;
+}
+
+.spinnerWrapperFullScreen {
+  @extend .spinnerWrapper;
   position:absolute;
   top: 40%;
   left: 45%;
