@@ -60,7 +60,7 @@ const RoomIndex:VFC = () => {
       <MenuTab values={values} setValues={setValues}/>
       <div className={styles.inner}>
         {values.loading || isAuthUserFetching(authUser)
-          ? <Loading/>
+          ? <Loading fullScreen={true} />
           : values.isActiveFriend &&
           <FriendMode
             authUser={authUser}

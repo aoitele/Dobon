@@ -1,7 +1,8 @@
-import React, { Dispatch, FC, SetStateAction } from 'react'
+import React, { Dispatch, FC, SetStateAction, useState } from 'react'
 import { TopPageState } from '../index'
 import styles from './PVESelecterModal.module.scss'
 import { usePveSelecter } from '../../../../hooks/usePveSelecter'
+import Loading from '../../../feedback/Loading'
 
 interface Props {
   initialState: TopPageState
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const PVESelecterModal:FC<Props> = ({ initialState, setValues, isCalledByResultBoard }) => {
+  const [loading, setLoading] = useState(false)
   const gameSet = [3, 5, 10]
   const { pveSelecter, setPveSelecter, setUserMode, gameStart } = usePveSelecter()
 
@@ -22,53 +24,61 @@ const PVESelecterModal:FC<Props> = ({ initialState, setValues, isCalledByResultB
         >×</button>
         <div className={styles.modalInner}>
           <>
-            <label htmlFor="max_seat">Participant</label>
-            <div className={styles.paticipantsWrap}>
-              <div className={styles.paticipantsHeader}>
-                <span>Name</span>
-                <span>Strength</span>
+            <>
+              <label htmlFor="max_seat">Participant</label>
+              <div className={styles.paticipantsWrap}>
+                <div className={styles.paticipantsHeader}>
+                  <span>Name</span>
+                  <span>Strength</span>
+                </div>
+                <ul className={styles.paticipants}>
+                  {pveSelecter.users.map((user, index) => {
+                    return (
+                      <li key={index}>
+                        <div>{user.name}{user.icon}</div>
+                        <div>
+                          <select
+                            value={user.mode}
+                            onChange={(e) => setUserMode(e, index)}
+                          >
+                            <option value='hard'>hard</option>
+                            <option value='normal'>normal</option>
+                            <option value='easy'>easy</option>
+                          </select>
+                        </div>
+                      </li>
+                    )
+                  })}
+                </ul>
               </div>
-              <ul className={styles.paticipants}>
-                {pveSelecter.users.map((user, index) => {
+            </>
+            <div>
+              <label htmlFor="setCount">setCount</label>
+              <div className={styles.setCount}>
+                {gameSet.map(setCount => {
                   return (
-                    <li key={index}>
-                      <div>{user.name}{user.icon}</div>
-                      <div>
-                        <select
-                          value={user.mode}
-                          onChange={(e) => setUserMode(e, index)}
-                        >
-                          <option value='hard'>hard</option>
-                          <option value='normal'>normal</option>
-                          <option value='easy'>easy</option>
-                        </select>
-                      </div>
-                    </li>
+                    <span
+                      key={setCount}
+                      className={pveSelecter.setCount === setCount ? styles.active : undefined}
+                      onClick={() => setPveSelecter({...pveSelecter, setCount})}
+                    >
+                      {setCount}
+                    </span>
                   )
                 })}
-              </ul>
+              </div>
             </div>
+            {loading
+            ? <div className={styles.loadingWrap}><Loading fullScreen={false}/></div>
+            : <button
+                onClick={() => {
+                  setLoading(true)
+                  gameStart({ isCalledByResultBoard })
+                }}
+                className={styles.submitBtn}
+              >Game Start</button>
+            }
           </>
-          <div>
-            <label htmlFor="setCount">setCount</label>
-            <div className={styles.setCount}>
-              {gameSet.map(setCount => {
-                return (
-                  <span
-                    key={setCount}
-                    className={pveSelecter.setCount === setCount ? styles.active : undefined}
-                    onClick={() => setPveSelecter({...pveSelecter, setCount})}
-                  >
-                    {setCount}
-                  </span>
-                )
-              })}
-            </div>
-          </div>
-          <button 
-            onClick={() => gameStart({ isCalledByResultBoard })}
-            className={styles.submitBtn}
-          >Game Start</button>
         </div>
       </div>
       <div className={styles.modalBack} onClick={() => setValues(initialState)}/>
