@@ -9,6 +9,12 @@
     z-index: 1500;
     overflow-x: scroll;
     text-align: center;
+    @media only screen and (max-height: 599px) {
+      margin: 0 auto;
+    }
+    @media only screen and (min-height: 600px) and (max-height: 700px) {
+      margin: 0 auto;
+    }
   }
 }
 .stateResetArea {
