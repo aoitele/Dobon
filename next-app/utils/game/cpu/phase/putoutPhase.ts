@@ -1,5 +1,5 @@
 import { HandCards } from "../../../../@types/card"
-import { Player } from "../../../../@types/game"
+import { OtherHands, Player } from "../../../../@types/game"
 import { NestedPartial } from "../../../../@types/utility"
 import { CpuTurnEmitData } from "../../../../@types/emitData"
 import { cardsICanPutOut, sepalateSuitNum } from "../../checkHand"
@@ -12,6 +12,7 @@ import { resetEvent } from "../../../../server/cpuModeHandler"
 import { loadDobonRedisKeys } from "../../../../server/redis/loadDobonRedisKeys"
 import { dobonJudge } from "../../dobonJudge"
 import { gameInitialState } from "../../../../context/state/gameInitialState"
+import main from "../thinking/putout/main"
 
 interface Args {
   user: NestedPartial<Player>
@@ -38,7 +39,7 @@ interface Args {
 const putoutPhase = async({
   user, io, hands, trash, data, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed
 }: Args) => {
-  const {turn, effect} = data.data
+  const {turn, effect, otherHands } = data.data
   if (!turn) {
     throw Error('PutOut Phase : has Error: required data is not provided')
   }
@@ -73,6 +74,24 @@ const putoutPhase = async({
   // 効果解決でない場合はカードを選択して出す(TODO：選択ロジック実装)
   const waitTime1 = speed === '1x' ? 420 : speed === '2x' ? 210 : 140
   await sleep(waitTime1) // CPUターンに間をつけるためのsleep
+
+  console.log(`\n--- COM DETECTION START ---\n`)
+  // 操作プレイヤーの手札情報
+  const playerHands: OtherHands = {
+    userId: 0,
+    hands: data.data.hands,
+    nickname: 'me'
+  }
+  const allUserHands = [playerHands, ...otherHands]
+
+  const ownHands = allUserHands.find(hand => hand.nickname === user.nickname)
+  const otherPLayersHands = allUserHands.filter(hand => hand.nickname !== user.nickname)
+
+  if (!ownHands) {
+    throw Error('PutOut Phase : has Error: ownHands data is not provided')
+  }
+  main({ ownHands, otherHands:otherPLayersHands })
+  console.log(`\n--- COM DETECTION END ---\n`)
 
   console.log(`PutOut Phase : user:${user.nickname} trash - ${trashCard}`)
   adapterPubClient.lpush(trashKey, trashCard.replace('o', '')) // 最新の捨て札を先頭に追加(oは除いておく)
