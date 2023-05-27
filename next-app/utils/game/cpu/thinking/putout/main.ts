@@ -1,5 +1,6 @@
 import { HandCards } from "../../../../../@types/card"
 import { CPULevel, OtherHands } from "../../../../../@types/game"
+import { resRiskCard } from "./resRiskCard"
 /*
  * Import { resRemainingCard } from "./resRemainingCard"
  * import { resRiskCard } from "./resRiskCard"
@@ -19,9 +20,9 @@ export const DOBONRISK_MIN = -101
  *  - 捨て札で4枚出た数字があれば、その数字は除外して考えられる
  */
 interface CulcDobonRiskProps {
-  ownHands:HandCards[]
+  ownHands: OtherHands
   otherHands: OtherHands[]
-  cpuLevel: CPULevel
+  cpuLevel?: CPULevel
 }
 
 export type DobonRiskReturnValue = { card:HandCards, dobonRisk: number }[]
@@ -29,8 +30,8 @@ export type DobonRiskReturnValue = { card:HandCards, dobonRisk: number }[]
 const main = ({ownHands, otherHands}: CulcDobonRiskProps): DobonRiskReturnValue => { // eslint-disable-line no-unused-vars
   /*
    * 手札全公開のユーザーが存在する場合、リスクナンバーを取得
-   * const defineRiskCards = resRiskCard(otherHands)
    */
+  const defineRiskCards = resRiskCard(otherHands) // eslint-disable-line no-unused-vars
 
   /*
    * これまで場に出されたカード情報を取得

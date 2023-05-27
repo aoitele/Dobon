@@ -14,7 +14,7 @@ const resRiskCard = (otherHands: OtherHands[]): number[] => {
   for (let i=0; i<spreadCard.length; i+=1) {
     const openCardCnt = spreadCard[i].filter(item => item.isOpen).length // 公開中のカード枚数
     const handsLen = spreadCard[i].length // 検査対象ユーザーの手札数
-    if (openCardCnt !== handsLen) break // 全公開でなければ検査終了
+    if (openCardCnt !== handsLen) continue // eslint-disable-line no-continue
 
     // 手札枚数により待ち数字を計算する
     const otherHandsInfo = resReachNumbers(otherHands[i].hands)
@@ -22,7 +22,10 @@ const resRiskCard = (otherHands: OtherHands[]): number[] => {
       defineRiskCards.push(...otherHandsInfo.reachNums)
     }
   }
-  return defineRiskCards
+  // 数字を一意にして返す
+  const defineRiskCardsUnique = [...new Set(defineRiskCards)]
+
+  return defineRiskCardsUnique
 }
 
 export { resRiskCard }
