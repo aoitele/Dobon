@@ -90,7 +90,8 @@ const putoutPhase = async({
   if (!ownHands) {
     throw Error('PutOut Phase : has Error: ownHands data is not provided')
   }
-  main({ ownHands, otherHands:otherPLayersHands })
+  const trashedMemory = await adapterPubClient.lrange(trashKey, 0, -1)
+  main({ ownHands, otherHands:otherPLayersHands, trashedMemory, cpuLevel: user.mode })
   console.log(`\n--- COM DETECTION END ---\n`)
 
   console.log(`PutOut Phase : user:${user.nickname} trash - ${trashCard}`)

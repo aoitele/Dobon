@@ -1,6 +1,7 @@
-import { Card, HandCards } from "../../../../../@types/card"
+import { Card } from "../../../../../@types/card"
 import { OtherHands } from "../../../../../@types/game"
 import spreadCardState from "../../../spreadCardState"
+import { CardInfo } from "./updatePrediction"
 
 export type DeckCards = {
   [key in NonNullable<Card['num']>]: number // eslint-disable-line no-unused-vars
@@ -12,41 +13,42 @@ export type DeckCards = {
  */
 const resRemainingCard = (
   otherHands: OtherHands[],  // 他ユーザーの手札状態
-  trashedMemory: HandCards[] // 現時点で出されているカードの記憶
+  trashedMemory: string[] // 現時点で出されているカードの記憶
 ) => {
-  const deck: DeckCards = {
-    0  : 2, // Joker
-    1  : 4,
-    2  : 4,
-    3  : 4,
-    4  : 4,
-    5  : 4,
-    6  : 4,
-    7  : 4,
-    8  : 4,
-    9  : 4,
-    10 : 4,
-    11 : 4,
-    12 : 4,
-    13 : 4,
+  const cardInfo: CardInfo = {
+    0: { remain: 2, prediction: 0 }, // Joker
+    1: { remain: 4, prediction: 0 },
+    2: { remain: 4, prediction: 0 },
+    3: { remain: 4, prediction: 0 },
+    4: { remain: 4, prediction: 0 },
+    5: { remain: 4, prediction: 0 },
+    6: { remain: 4, prediction: 0 },
+    7: { remain: 4, prediction: 0 },
+    8: { remain: 4, prediction: 0 },
+    9: { remain: 4, prediction: 0 },
+    10: { remain: 4, prediction: 0 },
+    11: { remain: 4, prediction: 0 },
+    12: { remain: 4, prediction: 0 },
+    13: { remain: 4, prediction: 0 },
   }
 
   const otherHandCards = otherHands.map(item => item.hands).flat()
-  let seed = [...trashedMemory, ...otherHandCards]
+  const addOpenTrashedMemory = trashedMemory.map(trash => `${trash}o`)
+  let seed = [...addOpenTrashedMemory, ...otherHandCards]
 
   // Joker'x1o'は先に処理しておく
   if (seed.includes('x1o')) {
     seed = seed.filter(item => item !== 'x1o')
-    deck[0] -= 1
+    cardInfo[0].remain -= 1
   }
 
   const trashNums = spreadCardState(seed).filter(item => item.isOpen).map<keyof DeckCards>(card => card.num)
   for (let i=0; i < trashNums.length; i+=1) {
     const key:keyof DeckCards = trashNums[i]
-    deck[key] -= 1
+    cardInfo[key].remain -= 1
   }
 
-  return deck
+  return cardInfo
 }
 
 export { resRemainingCard }
