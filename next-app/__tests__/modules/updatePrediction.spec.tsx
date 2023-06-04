@@ -72,7 +72,9 @@ describe('updatePrediction TestCases', () => {
     }
     const result = updatePrediction(args)
     // 全数字のpredictionが0以上になっているか
-    const test = (obj: UpdatePredictionArgs['cardInfo']) => {
+    const test = (obj: UpdatePredictionArgs['cardInfo'] | undefined) => {
+      if (!obj) return false
+
       for (const [_, v] of Object.entries(obj)) {
         if (typeof v.prediction === 'undefined' || v.prediction <= 0) {
           return false

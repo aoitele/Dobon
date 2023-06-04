@@ -3,6 +3,7 @@ import { cntCloseCard, sepalateSuitNum } from "../../../checkHand"
 import { resReachNumbers } from "../../../dobonJudge"
 import { combination, CombinationProps } from "../enzan/combination"
 import deepcopy from 'deepcopy';
+import { DOBON_CARD_NUMBER_OPENCARD } from "../../../../../constant";
 
 export type CardInfo = {
   [key in number]: { // eslint-disable-line no-unused-vars
@@ -27,7 +28,7 @@ export interface UpdatePredictionArgs {
  * - 非公開状態のカードがあれば、あり得る数字の組み合わせを算出
  * - カード出現率を掛け合わせ、マチとなる数字のスコアに加算していく
  */
-const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardInfo => {
+const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardInfo|undefined => {
   const result = deepcopy(cardInfo) // 元データを書き換えないようにレスポンスデータを定義
   const combinationArgs: CombinationProps = { cards:[], maisu:0 }
   let remainingCardCnt = 0 // デッキ&全ユーザーの未公開手札の合計数
@@ -62,6 +63,8 @@ const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardI
     }
     let combinationPattern = combination(combinationArgs)
 
+    if (!combinationPattern.length) continue;
+
     // 公開カードがあれば、その数字を含む組み合わせだけ利用するためフィルタリングしておく
     if (hands.length !== cntClose) {
       combinationPattern = combinationPattern.filter(pattern => {
@@ -78,9 +81,12 @@ const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardI
     // 組み合わせパターンごとにマチを計算。確率を算出しpredictionにスコアとして加算する
     for (let k=0; k<combinationPattern.length; k+=1) {
       const pattern = combinationPattern[k] // 検証する手札のパターン
+      if (!pattern.length) continue;
+
       const reachNumArg = pattern.map(number => number === 0 ? 'x0o' : `c${number}o`)
       const { reachNums } = resReachNumbers(reachNumArg) // マチとなる数字
       if (reachNums.length === 0) continue // マチがなければ次のパターン検証へ
+      if (reachNums.filter(num => num <= DOBON_CARD_NUMBER_OPENCARD).length === 0) continue // マチが有効な数字でなければ次のパターン検証へ（14以上のみ）
 
       /**
        * テストパターンが出現する確率を計算
@@ -112,10 +118,10 @@ const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardI
       }
 
       // パターンとしての出現率をreachNumが含む数字のスコアとして加算する
-      const score = pbVals.reduce((acc, cur) => acc * cur)
+      const score = pbVals.reduce((acc, cur) => acc * cur, 1) // 乗算に初期値を与えるため
       for (let m=0; m<reachNums.length; m+=1) {
         const target = result[reachNums[m]]
-        if (typeof target.prediction === 'number') {
+        if (target && typeof target.prediction === 'number') {
           target.prediction += score
         }
       }
