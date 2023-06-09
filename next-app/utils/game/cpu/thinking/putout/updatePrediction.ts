@@ -28,7 +28,7 @@ export interface UpdatePredictionArgs {
  * - 非公開状態のカードがあれば、あり得る数字の組み合わせを算出
  * - カード出現率を掛け合わせ、マチとなる数字のスコアに加算していく
  */
-const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardInfo|undefined => {
+const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardInfo => {
   const result = deepcopy(cardInfo) // 元データを書き換えないようにレスポンスデータを定義
   const combinationArgs: CombinationProps = { cards:[], maisu:0 }
   let remainingCardCnt = 0 // デッキ&全ユーザーの未公開手札の合計数

@@ -89,7 +89,6 @@ ${OTHER_HANDS_EXIST_FULL_OPENER_DOBON_JOKER_SUM21} | ${[0, 3]}
 `('resRiskCard TestCases -> ドボンできる手札を持つユーザーが手札フル公開状態であればリスクカードとする', ({ otherHands, expected }) => {
   test(`${JSON.stringify(otherHands)} returns ${expected}`, () => {
     let result = resRiskCard(otherHands)
-    console.log(result, 'result')
 
     expect(Array.isArray(expected)).toBe(true)
     expect(expected.length).toBe(result.length)

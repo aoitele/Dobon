@@ -17,6 +17,7 @@ export const DOBON_CARD_NUMBER_WILD = 8
 export const DOBON_CARD_NUMBER_REVERSE = 11
 export const DOBON_CARD_NUMBER_OPENCARD = 13
 export const DOBON_JUDGE_NUMBER_JOKER = 21
+export const DOBON_NUMBER_OF_FACE_CARD = 14
 
 export const PVE_UNREGISTERED_NAMES = 'あなた'
 export const PVE_COM_USER_NAMES = ['com1', 'com2', 'com3']
