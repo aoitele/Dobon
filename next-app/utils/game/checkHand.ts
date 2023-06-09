@@ -16,7 +16,7 @@ const hasSameCard = (putOutCard: number, hand: number[]): boolean =>
   hand.includes(putOutCard)
 const chkAvoidCardEffect = (action: Action) => action === 'avoidEffect'
 
-interface HandSep {
+export interface HandSep {
   suit: string
   num: string
   isOpen: boolean

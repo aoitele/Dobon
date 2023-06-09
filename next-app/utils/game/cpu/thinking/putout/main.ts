@@ -1,5 +1,7 @@
 import { HandCards } from "../../../../../@types/card"
 import { CPULevel, OtherHands } from "../../../../../@types/game"
+import { DOBON_NUMBER_OF_FACE_CARD } from "../../../../../constant"
+import { countFaceCards } from "../../../checkCard"
 import { resRemainingCard } from "./resRemainingCard"
 import { resRiskCard } from "./resRiskCard"
 import { updatePrediction } from "./updatePrediction"
@@ -42,14 +44,27 @@ const main = ({ownHands, otherHands, trashedMemory, cpuLevel}: CulcDobonRiskProp
   const prediction = updatePrediction({ otherHands, cardInfo }) // eslint-disable-line no-unused-vars
 
   /*
-   * Let riskUserCnt = 0                // リスクユーザーの数
-   * let riskNumCnt = 0                 // 待ち数字と考えられる枚数
-   */
-  /*
    * Const dobonProbability = 0           // ドボンされる可能性
    * const damageRisk = 0                 // ダメージリスク
    * const positiveProbability = 0        // ポジティブ値(自分が出すことによって今後有利になる度合い)
    */
+  if (defineRiskCards.length) {
+    for (const card of defineRiskCards) {
+      prediction[card].prediction = 100 // 最大リスク値をセット
+    }
+  }
+  /**
+   * ダメージリスク
+   * 山札の残存絵札数から算出
+   */
+  // 自手札、他ユーザー公開手札、トラッシュの絵札枚数をカウント
+  const faceCountMe = countFaceCards({ cards: ownHands.hands, openOnly: false })
+  // 他ユーザー公開手札の絵札枚数をカウント
+  const otherHandsCards = otherHands.map(item => item.hands).flat()
+  const faceCountOthers = countFaceCards({ cards: otherHandsCards, openOnly: true })
+  const faceCountTrash = countFaceCards({ cards: trashedMemory, openOnly: false })
+  // 残存絵札枚数(ダメージリスク)は0〜14の範囲となる
+  const damageRisk = DOBON_NUMBER_OF_FACE_CARD - (faceCountMe + faceCountOthers + faceCountTrash) // eslint-disable-line no-unused-vars
 
   return []
   /*
