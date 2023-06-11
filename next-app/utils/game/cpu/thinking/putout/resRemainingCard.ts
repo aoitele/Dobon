@@ -1,7 +1,7 @@
 import { Card } from "../../../../../@types/card"
 import { OtherHands } from "../../../../../@types/game"
 import spreadCardState from "../../../spreadCardState"
-import { CardInfo } from "./updatePrediction"
+import { DetectionInfo } from "./updatePrediction"
 
 export type DeckCards = {
   [key in NonNullable<Card['num']>]: number // eslint-disable-line no-unused-vars
@@ -15,7 +15,7 @@ const resRemainingCard = (
   otherHands: OtherHands[],  // 他ユーザーの手札状態
   trashedMemory: string[] // 現時点で出されているカードの記憶
 ) => {
-  const cardInfo: CardInfo = {
+  const detectionInfo: DetectionInfo = {
     0: { remain: 2, prediction: 0 }, // Joker
     1: { remain: 4, prediction: 0 },
     2: { remain: 4, prediction: 0 },
@@ -39,16 +39,16 @@ const resRemainingCard = (
   // Joker'x1o'は先に処理しておく
   if (seed.includes('x1o')) {
     seed = seed.filter(item => item !== 'x1o')
-    cardInfo[0].remain -= 1
+    detectionInfo[0].remain -= 1
   }
 
   const trashNums = spreadCardState(seed).filter(item => item.isOpen).map<keyof DeckCards>(card => card.num)
   for (let i=0; i < trashNums.length; i+=1) {
     const key:keyof DeckCards = trashNums[i]
-    cardInfo[key].remain -= 1
+    detectionInfo[key].remain -= 1
   }
 
-  return cardInfo
+  return detectionInfo
 }
 
 export { resRemainingCard }

@@ -6,6 +6,8 @@ import { drawPhase } from "./phase/drawPhase"
 import { putoutPhase } from "./phase/putoutPhase"
 import { effectPhase } from "./phase/effectPhase"
 import { GameProviderState } from "../../../context/GameProvider"
+import { OtherHands } from "../../../@types/game"
+import main from "./thinking/putout/main"
 
 /**
  * CPUのゲーム実行プロセス
@@ -37,12 +39,26 @@ const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data, speed }: Cpu
   ])
 
   const redisData = await adapterPubClient.pipeline()
+    .scard(deckKey)
     .lrange(trashKey, 0, -1)
     .smembers(handsKey)
     .exec((_err, results) => results)
-  const [trash, hands] = [redisData[0][1], redisData[1][1]]
+  const [deckCount, trash, hands]:[number, string[], any] = [redisData[0][1], redisData[1][1], redisData[2][1]]
 
-  const { updateData1, updateHands1, haveNum } = await effectPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed })
+  /**
+   * 各処理フェイズに入る前段階で被ドボン/ダメージ/ポジティブ値のリスク計算を行う
+   */
+  console.log(`\n--- COM DETECTION START ---\n`)
+  const nonCPUHands: OtherHands = { userId: 0, hands: data.data.hands, nickname: 'me' } // 操作プレイヤーの手札情報
+  const allUserHands = [nonCPUHands, ...data.data.otherHands]
+  const ownHands = allUserHands.filter(hand => hand.nickname === player.nickname)[0] // ターン実行中CPUの手札情報
+  const otherPlayersHands = allUserHands.filter(hand => hand.nickname !== player.nickname) // ターン実行していないユーザーの手札情報
+
+  const detectionInfo = main({ ownHands, otherHands:otherPlayersHands, trashedMemory: trash, cpuLevel: player.mode, deckCount })
+  console.log(detectionInfo, 'detectionInfo')
+  console.log(`\n--- COM DETECTION END ---\n`)
+
+  const { updateData1, updateHands1, haveNum } = await effectPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed, detectionInfo })
   const { updateData2, updateHands2 } = await drawPhase({ user: player, io, hands: updateHands1, trash, data: updateData1, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed })
   await putoutPhase({ user: player, io, hands: updateHands2, trash, data: updateData2, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed })
 }

@@ -6,6 +6,7 @@ import { extractShouldBeSolvedEffect } from "../../effect"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
 import { CpuMainProcessArgs } from '../main'
+import { DetectionInfo } from "../thinking/putout/updatePrediction"
 
 interface Args {
   user: NestedPartial<Player>
@@ -19,6 +20,7 @@ interface Args {
   handsKey: string
   trashKey: string
   speed: CpuMainProcessArgs['speed']
+  detectionInfo: DetectionInfo
 }
 
 const effectPhase = async({
