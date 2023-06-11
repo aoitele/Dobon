@@ -1,5 +1,5 @@
 import { HandCards } from "../../../../@types/card"
-import { OtherHands, Player } from "../../../../@types/game"
+import { Player } from "../../../../@types/game"
 import { NestedPartial } from "../../../../@types/utility"
 import { CpuTurnEmitData } from "../../../../@types/emitData"
 import { cardsICanPutOut, sepalateSuitNum } from "../../checkHand"
@@ -12,7 +12,6 @@ import { resetEvent } from "../../../../server/cpuModeHandler"
 import { loadDobonRedisKeys } from "../../../../server/redis/loadDobonRedisKeys"
 import { dobonJudge } from "../../dobonJudge"
 import { gameInitialState } from "../../../../context/state/gameInitialState"
-import main from "../thinking/putout/main"
 
 interface Args {
   user: NestedPartial<Player>
@@ -75,32 +74,13 @@ const putoutPhase = async({
   const waitTime1 = speed === '1x' ? 420 : speed === '2x' ? 210 : 140
   await sleep(waitTime1) // CPUターンに間をつけるためのsleep
 
-  console.log(`\n--- COM DETECTION START ---\n`)
-  // 操作プレイヤーの手札情報
-  const playerHands: OtherHands = {
-    userId: 0,
-    hands: data.data.hands,
-    nickname: 'me'
-  }
-  const allUserHands = [playerHands, ...otherHands]
-
-  const ownHands = allUserHands.find(hand => hand.nickname === user.nickname)
-  const otherPLayersHands = allUserHands.filter(hand => hand.nickname !== user.nickname)
-
-  if (!ownHands) {
-    throw Error('PutOut Phase : has Error: ownHands data is not provided')
-  }
-  const trashedMemory = await adapterPubClient.lrange(trashKey, 0, -1)
-  main({ ownHands, otherHands:otherPLayersHands, trashedMemory, cpuLevel: user.mode })
-  console.log(`\n--- COM DETECTION END ---\n`)
-
   console.log(`PutOut Phase : user:${user.nickname} trash - ${trashCard}`)
   adapterPubClient.lpush(trashKey, trashCard.replace('o', '')) // 最新の捨て札を先頭に追加(oは除いておく)
   adapterPubClient.srem(handsKey, trashCard)
 
   updateHands = updateHands.filter(card => card !== trashCard)
-  const comHandsIndex = data.data.otherHands.findIndex(hand => hand.nickname === user.nickname)
-  data.data.otherHands[comHandsIndex].hands = updateHands
+  const comHandsIndex = otherHands.findIndex(hand => hand.nickname === user.nickname)
+  otherHands[comHandsIndex].hands = updateHands
 
   // 8(wild)を出す場合、自分の手札に最も多い柄を選択(TODO：柄選択にもロジックを追加する)
   const sepTrash = sepalateSuitNum([trashCard])[0]
@@ -145,7 +125,7 @@ const putoutPhase = async({
           card: trashCardStr,
           user,
         },
-        otherHands: data.data.otherHands,
+        otherHands,
         allowDobon: true,
         waitDobon: canIDobon ? true : undefined,
       },

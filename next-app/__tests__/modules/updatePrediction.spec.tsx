@@ -1,7 +1,7 @@
 import deepcopy from 'deepcopy'
 import { updatePrediction, UpdatePredictionArgs } from '../../utils/game/cpu/thinking/putout/updatePrediction'
 
-const CARD_INFO_INIT: UpdatePredictionArgs['cardInfo'] = {
+const CARD_INFO_INIT: UpdatePredictionArgs['detectionInfo'] = {
   0: { remain:2, prediction:0 },
   1: { remain:4, prediction:0 },
   2: { remain:4, prediction:0 },
@@ -58,7 +58,7 @@ describe('updatePrediction TestCases', () => {
       otherHands:[
         { userId: 1, hands: ['c10o', 'c11o']}
       ],
-      cardInfo: CARD_INFO_INIT,
+      detectionInfo: CARD_INFO_INIT,
     }
     const result = updatePrediction(args)
     expect(result).toEqual(CARD_INFO_INIT)
@@ -68,11 +68,11 @@ describe('updatePrediction TestCases', () => {
       otherHands:[
         { userId: 1, hands: ['z', 'z']}
       ],
-      cardInfo: CARD_INFO_INIT,
+      detectionInfo: CARD_INFO_INIT,
     }
     const result = updatePrediction(args)
     // 全数字のpredictionが0以上になっているか
-    const test = (obj: UpdatePredictionArgs['cardInfo'] | undefined) => {
+    const test = (obj: UpdatePredictionArgs['detectionInfo'] | undefined) => {
       if (!obj) return false
 
       for (const [_, v] of Object.entries(obj)) {
@@ -85,14 +85,14 @@ describe('updatePrediction TestCases', () => {
     expect(test(result)).toBe(true)
   })
   it('クローズ1枚、オープン1枚 - マチとなる数字のみprediction値が入る', () => {
-    const cardInfo = updateRemain({
+    const detectionInfo = updateRemain({
       zeroNumbers: [0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     }) // 1, 2, 3のカードのみ残っている状態に
     const args: UpdatePredictionArgs = {
       otherHands:[
         { userId: 1, hands: ['c10o', 'z']}
       ],
-      cardInfo,
+      detectionInfo,
     }
     const expected = {
       0: { remain: 0,  prediction: 0 },

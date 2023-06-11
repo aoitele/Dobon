@@ -5,16 +5,17 @@ import { combination, CombinationProps } from "../enzan/combination"
 import deepcopy from 'deepcopy';
 import { DOBON_CARD_NUMBER_OPENCARD } from "../../../../../constant";
 
-export type CardInfo = {
+export type DetectionInfo = {
   [key in number]: { // eslint-disable-line no-unused-vars
     remain: number // 捨て札や公開手札に出ていない残り枚数
-    prediction?: number
+    prediction?: number // ドボンされる確率の推論値
+    damageRisk?: number // 被ドボン時に受けるダメージの推論値
   }
 }
 
 export interface UpdatePredictionArgs {
   otherHands: OtherHands[]
-  cardInfo: CardInfo
+  detectionInfo: DetectionInfo
 }
 
 /**
@@ -28,13 +29,13 @@ export interface UpdatePredictionArgs {
  * - 非公開状態のカードがあれば、あり得る数字の組み合わせを算出
  * - カード出現率を掛け合わせ、マチとなる数字のスコアに加算していく
  */
-const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardInfo => {
-  const result = deepcopy(cardInfo) // 元データを書き換えないようにレスポンスデータを定義
+const updatePrediction = ({ otherHands, detectionInfo }: UpdatePredictionArgs): DetectionInfo => {
+  const result = deepcopy(detectionInfo) // 元データを書き換えないようにレスポンスデータを定義
   const combinationArgs: CombinationProps = { cards:[], maisu:0 }
   let remainingCardCnt = 0 // デッキ&全ユーザーの未公開手札の合計数
 
   // CardInfoから各関数で利用する引数を準備する前処理
-  for (const [key, value] of Object.entries(cardInfo)) {
+  for (const [key, value] of Object.entries(detectionInfo)) {
     result[Number(key)].prediction = 0 // レスポンスの予測値を初期化
     combinationArgs.cards.push({ number: Number(key), remain: value.remain }) // 掛け合わせ生成関数で利用する情報をセット
     if (value.remain > 0) {
@@ -97,7 +98,7 @@ const updatePrediction = ({ otherHands, cardInfo }: UpdatePredictionArgs): CardI
        */
       const pbVals: number[] = [] // 出現確率値の配列を入れる
       let tmpCardCnt = remainingCardCnt // 計算に使うカード枚数
-      const tmpCardInfo = deepcopy(cardInfo) // 計算に使うカード情報のコピー
+      const tmpCardInfo = deepcopy(detectionInfo) // 計算に使うカード情報のコピー
       
       // 公開手札のカードは出現率計算で考慮させないために除外する
       for (let t=0; t<openCardNums.length; t+=1) {
