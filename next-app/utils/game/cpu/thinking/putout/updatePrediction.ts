@@ -9,7 +9,8 @@ export type DetectionInfo = {
   [key in number]: { // eslint-disable-line no-unused-vars
     remain: number // 捨て札や公開手札に出ていない残り枚数
     prediction?: number // ドボンされる確率の推論値
-    damageRisk?: number // 被ドボン時に受けるダメージの推論値
+    damageRisk: number // 被ドボン時に受けるダメージの推論値
+    positiveScore: number // カードを出したら有利に働くと考えられる推論値
   }
 }
 

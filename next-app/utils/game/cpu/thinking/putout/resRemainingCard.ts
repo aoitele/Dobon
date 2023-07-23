@@ -16,20 +16,20 @@ const resRemainingCard = (
   trashedMemory: string[] // 現時点で出されているカードの記憶
 ) => {
   const detectionInfo: DetectionInfo = {
-    0: { remain: 2, prediction: 0 }, // Joker
-    1: { remain: 4, prediction: 0 },
-    2: { remain: 4, prediction: 0 },
-    3: { remain: 4, prediction: 0 },
-    4: { remain: 4, prediction: 0 },
-    5: { remain: 4, prediction: 0 },
-    6: { remain: 4, prediction: 0 },
-    7: { remain: 4, prediction: 0 },
-    8: { remain: 4, prediction: 0 },
-    9: { remain: 4, prediction: 0 },
-    10: { remain: 4, prediction: 0 },
-    11: { remain: 4, prediction: 0 },
-    12: { remain: 4, prediction: 0 },
-    13: { remain: 4, prediction: 0 },
+    0: { remain: 2, prediction: 0, damageRisk:0, positiveScore: 0 }, // Joker
+    1: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    2: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    3: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    4: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    5: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    6: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    7: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    8: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    9: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    10: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    11: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    12: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    13: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
   }
 
   const otherHandCards = otherHands.map(item => item.hands).flat()

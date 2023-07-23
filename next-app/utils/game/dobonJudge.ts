@@ -134,8 +134,10 @@ const resReachNumbers = (hands: HandCards[] | string[]) => {
        * 2枚の場合:ジョーカー以外のカード合計値 -2, +-0の値
        * を上がり数値に加える
        */
+      const addJokerDiff = baseSumNum - hasJokerCount
+      const diffIsBelow13 = addJokerDiff <= DOBON_CARD_NUMBER_OPENCARD // ジョーカーでのまインスを加味した場合の手札合計が13以下か
 
-      if (hasJokerCount > 0) {
+      if (hasJokerCount > 0 && diffIsBelow13) {
         const diffNum = diff(baseSumNum, hasJokerCount)
         const diffIsNot0 = diffNum !== 0
         if (diffIsNot0) {
