@@ -18,6 +18,7 @@
     "test": "jest --collect-coverage",
     "test:watch": "jest --collect-coverage --watch",
     "test:rmcache": "jest --clearCache",
+    "test:watch:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --watch",
     "prepare": "cd .. && husky install",
     "lint-staged": "lint-staged",
     "prisma:generate": "npx prisma generate --schema=./prisma/schema.prisma",

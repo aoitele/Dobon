@@ -2,6 +2,7 @@ import { HandCards } from "../../../../../@types/card"
 import { CPULevel, OtherHands } from "../../../../../@types/game"
 import { DOBON_CARD_NUMBER_JOKER, DOBON_JUDGE_NUMBER_JOKER, DOBON_NUMBER_OF_FACE_CARD } from "../../../../../constant"
 import { countFaceCards } from "../../../checkCard"
+import { culcPositiveScore } from "./culcPositiveScore"
 import { resRemainingCard } from "./resRemainingCard"
 import { resRiskCard } from "./resRiskCard"
 import { DetectionInfo, updatePrediction } from "./updatePrediction"
@@ -42,7 +43,7 @@ const main = ({ownHands, otherHands, trashedMemory, cpuLevel, deckCount}: CulcDo
   /*
    * カード数字ごとに被ドボン率を算出
    */
-  const prediction = updatePrediction({ otherHands, detectionInfo }) // eslint-disable-line no-unused-vars
+  let prediction = updatePrediction({ otherHands, detectionInfo }) // eslint-disable-line no-unused-vars
 
   /*
    * Const dobonProbability = 0           // ドボンされる可能性
@@ -74,6 +75,16 @@ const main = ({ownHands, otherHands, trashedMemory, cpuLevel, deckCount}: CulcDo
     const damageBaseNum = (keyNum === DOBON_CARD_NUMBER_JOKER) ? DOBON_JUDGE_NUMBER_JOKER : keyNum
     // ダメージリスクは「ドボンされた値の大きさ + 絵札の出現率」
     prediction[keyNum].damageRisk = (damageBaseNum / 10) + damageRisk
+  }
+
+  /**
+   * ポジティブ値
+   * ドボン返し状態である/リーチ状態にできる/次のターンでドボン返しにできる/出すことでリーチに近づける
+   * という条件よりカードを出すモチベーションを算出する
+   */
+
+  if (ownHands.hands.length >= 2) {
+    prediction = culcPositiveScore({ ownHands, prediction })
   }
 
   return prediction
