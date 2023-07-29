@@ -5,7 +5,7 @@ import { CpuTurnEmitData } from "../../../../@types/emitData"
 import { cardsICanPutOut, sepalateSuitNum } from "../../checkHand"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
-import { CpuMainProcessArgs } from '../main'
+import { CpuMainProcessArgs } from '../cpuMainProcess'
 import { resEffectName } from "../../effect"
 import { DOBON_CARD_NUMBER_WILD } from "../../../../constant"
 import { resetEvent } from "../../../../server/cpuModeHandler"

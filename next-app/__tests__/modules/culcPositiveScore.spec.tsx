@@ -21,40 +21,60 @@ const OWNHANDS_HAS_DOBON: CulcPositiveScoreParams['ownHands'] = {
   hands: ['d1', 'd5', 'd6', 'd12'] // 特定のカード(d12)を出せばドボン返しを作れる手札である
 }
 
+const OWNHANDS_HAS_JOKER: CulcPositiveScoreParams['ownHands'] = {
+  userId: 0,
+  hands: ['d5', 'd8', 'x0', 'x1'] // どのカードを出してもリーチが作れる
+}
+
 const CASE_NOT_SCORE = { ownHands: OWNHANDS_HASNOT_REACH_HASNOT_SCORE, prediction:DETECTION_INFO_INIT_DATA }
 const CASE_ADD_SCORE = { ownHands: OWNHANDS_HASNOT_REACH_HAS_SCORE, prediction:DETECTION_INFO_INIT_DATA }
 const CASE_HAS_DOBON_ALL = { ownHands: OWNHANDS_HAS_DOBON_ALL, prediction:DETECTION_INFO_INIT_DATA }
 const CASE_HAS_DOBON_D12 = { ownHands: OWNHANDS_HAS_DOBON, prediction:DETECTION_INFO_INIT_DATA }
+const CASE_HAS_DOBON_JOKER = { ownHands: OWNHANDS_HAS_JOKER, prediction:DETECTION_INFO_INIT_DATA }
 
 describe('culcPositiveScore TestCases', () => {
   it('手札でドボン返し/リーチともに作れず、次のターンでもリーチを作れない場合 - positiveScoreは加算されない', () => {
     const result = culcPositiveScore(CASE_NOT_SCORE)
-    expect(result).toEqual(DETECTION_INFO_INIT_DATA)
+    const expected = deepcopy(DETECTION_INFO_INIT_DATA)
+    expected[5].positiveSuit = 'd'
+    expected[8].positiveSuit = 'd'
+    expected[9].positiveSuit = 'd'
+    expected[11].positiveSuit = 's'
+    expected[13].positiveSuit = 's'
+    expect(result).toEqual(expected)
   })
   it('手札でドボン返し/リーチともに作れず、次のターンでリーチを作れる場合 - positiveScoreは加算される', () => {
     const result = culcPositiveScore(CASE_ADD_SCORE)
     const expected = deepcopy(DETECTION_INFO_INIT_DATA)
-    expected[5].positiveScore = 30  // 10 * reachNums.length(3)
-    expected[8].positiveScore = 30  // 10 * reachNums.length(3)
-    expected[9].positiveScore = 40  // 10 * reachNums.length(4)
-    expected[11].positiveScore = 40 // 10 * reachNums.length(4)
+    expected[5]  = {...expected[5], positiveScore: 30, positiveSuit: 'd'}   // 10 * reachNums.length(3)
+    expected[8]  = {...expected[8], positiveScore: 30, positiveSuit: 'd'}   // 10 * reachNums.length(3)
+    expected[9]  = {...expected[8], positiveScore: 40, positiveSuit: 'd'}   // 10 * reachNums.length(4)
+    expected[11] = {...expected[11], positiveScore: 40, positiveSuit: 's'} // 10 * reachNums.length(4)
     expect(result).toEqual(expected)
   })
-  it('どのカードを出してもドボン返しを作れる場合 - positiveScoreが加算される', () => {
+  it('どのカードを出してもドボン返しを作れる場合 - POSITIVESCORE_REVERSE_DOBONが加算される', () => {
     const result = culcPositiveScore(CASE_HAS_DOBON_ALL)
     const expected = deepcopy(DETECTION_INFO_INIT_DATA)
-    expected[1].positiveScore = POSITIVESCORE_REVERSE_DOBON + 60 // 20 * reachNums.length(3)
-    expected[6].positiveScore = POSITIVESCORE_REVERSE_DOBON + 60 // 20 * reachNums.length(3)
-    expected[7].positiveScore = POSITIVESCORE_REVERSE_DOBON + 60 // 20 * reachNums.length(3)
+    expected[1] = {...expected[5], positiveScore: POSITIVESCORE_REVERSE_DOBON, positiveSuit: 'd'}
+    expected[6] = {...expected[8], positiveScore: POSITIVESCORE_REVERSE_DOBON, positiveSuit: 'd'}
+    expected[7] = {...expected[8], positiveScore: POSITIVESCORE_REVERSE_DOBON, positiveSuit: 'd'}
     expect(result).toEqual(expected)
   })
   it('特定のカード(d12)を出せばドボン返しを作れる手札の場合 - 12を高スコアとしてpositiveScoreが加算される', () => {
     const result = culcPositiveScore(CASE_HAS_DOBON_D12)
     const expected = deepcopy(DETECTION_INFO_INIT_DATA)
-    expected[1].positiveScore = 40 // 10 * reachNums.length(4)
-    expected[5].positiveScore = 50 // 10 * reachNums.length(5)
-    expected[6].positiveScore = 50 // 10 * reachNums.length(5)
-    expected[12].positiveScore = POSITIVESCORE_REVERSE_DOBON + 80 // 20 * reachNums.length(1) + 10 * reachNums.length(6)
+    expected[1] = {...expected[1], positiveScore: 40, positiveSuit: 'd'}// 10 * reachNums.length(4)
+    expected[5] = {...expected[5], positiveScore: 50, positiveSuit: 'd'}// 10 * reachNums.length(5)
+    expected[6] = {...expected[6], positiveScore: 50, positiveSuit: 'd'}// 10 * reachNums.length(5)
+    expected[12] = {...expected[12], positiveScore: POSITIVESCORE_REVERSE_DOBON, positiveSuit: 'd'}
+    expect(result).toEqual(expected)
+  })
+  it('どのカードを出してもリーチを作れる場合（Jokerあり） - 加算される', () => {
+    const result = culcPositiveScore(CASE_HAS_DOBON_JOKER)
+    const expected = deepcopy(DETECTION_INFO_INIT_DATA)
+    expected[0] = {...expected[0], positiveScore: 80, positiveSuit: null} // 10 * reachNums.length(6) + 20 * reachNums.length(1)
+    expected[5] = {...expected[5], positiveScore: 160, positiveSuit: 'd'} // 10 * reachNums.length(5) + 20 * reachNums.length(3) + POSITIVESCORE_REVERSE_DOBON_NEXT_TURN(50)
+    expected[8] = {...expected[8], positiveScore: 160, positiveSuit: 'd'} // 10 * reachNums.length(5) + 20 * reachNums.length(3) + POSITIVESCORE_REVERSE_DOBON_NEXT_TURN(50)
     expect(result).toEqual(expected)
   })
 })

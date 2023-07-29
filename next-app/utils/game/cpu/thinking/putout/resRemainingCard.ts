@@ -7,34 +7,38 @@ export type DeckCards = {
   [key in NonNullable<Card['num']>]: number // eslint-disable-line no-unused-vars
 }
 
-/**
- * 過去に出されたカードと他ユーザーの公開手札から
- * 各数字の残り枚数を計算する関数
- */
-const resRemainingCard = (
+interface Params {
+  ownHands: OtherHands,  // 他ユーザーの手札状態
   otherHands: OtherHands[],  // 他ユーザーの手札状態
   trashedMemory: string[] // 現時点で出されているカードの記憶
-) => {
+}
+
+/**
+ * 過去に出されたカードと他ユーザーの公開手札、自分の手札から
+ * 各数字の残り枚数を計算する関数
+ */
+const resRemainingCard = ({ ownHands, otherHands, trashedMemory }: Params) => {
   const detectionInfo: DetectionInfo = {
-    0: { remain: 2, prediction: 0, damageRisk:0, positiveScore: 0 }, // Joker
-    1: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    2: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    3: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    4: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    5: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    6: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    7: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    8: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    9: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    10: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    11: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    12: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
-    13: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0 },
+    0: { remain: 2, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null }, // Joker
+    1: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    2: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    3: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    4: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    5: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    6: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    7: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    8: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    9: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    10: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    11: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    12: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+    13: { remain: 4, prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
   }
 
+  const ownHandCards = ownHands.hands.map(item => `${item}o`)
   const otherHandCards = otherHands.map(item => item.hands).flat()
   const addOpenTrashedMemory = trashedMemory.map(trash => `${trash}o`)
-  let seed = [...addOpenTrashedMemory, ...otherHandCards]
+  let seed = [...addOpenTrashedMemory, ...otherHandCards, ...ownHandCards]
 
   // Joker'x1o'は先に処理しておく
   if (seed.includes('x1o')) {

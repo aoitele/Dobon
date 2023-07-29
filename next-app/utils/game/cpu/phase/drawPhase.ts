@@ -4,7 +4,7 @@ import { NestedPartial } from "../../../../@types/utility"
 import { cardsICanPutOut } from "../../checkHand"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
-import { CpuMainProcessArgs } from '../main'
+import { CpuMainProcessArgs } from '../cpuMainProcess'
 
 interface Args {
   user: NestedPartial<Player>

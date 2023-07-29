@@ -79,20 +79,20 @@ describe('updatePrediction TestCases', () => {
       detectionInfo,
     }
     const expected = {
-      0: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0 },
-      1: { remain: 4,  prediction: 0, damageRisk:0, positiveScore: 0 },
-      2: { remain: 4,  prediction: 0, damageRisk:0, positiveScore: 0 },
-      3: { remain: 4,  prediction: 0, damageRisk:0, positiveScore: 0 },
-      4: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0 },
-      5: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0 },
-      6: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0 },
-      7: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0 }, // 4(remain)/12(全remain) = 0.666となる
-      8: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0 },
-      9: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0 },
-      10: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0 },
-      11: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0 },
-      12: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0 },
-      13: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0 }
+      0: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      1: { remain: 4,  prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      2: { remain: 4,  prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      3: { remain: 4,  prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      4: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      5: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      6: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      7: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0, positiveSuit: null }, // 4(remain)/12(全remain) = 0.666となる
+      8: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      9: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      10: { remain: 0,  prediction: 0, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      11: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      12: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0, positiveSuit: null },
+      13: { remain: 0,  prediction: 0.6666666666666666, damageRisk:0, positiveScore: 0, positiveSuit: null }
     }
     const result = updatePrediction(args)
     expect(result).toEqual(expected)

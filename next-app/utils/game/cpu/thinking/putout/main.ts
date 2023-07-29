@@ -1,5 +1,5 @@
 import { HandCards } from "../../../../../@types/card"
-import { CPULevel, OtherHands } from "../../../../../@types/game"
+import { OtherHands } from "../../../../../@types/game"
 import { DOBON_CARD_NUMBER_JOKER, DOBON_JUDGE_NUMBER_JOKER, DOBON_NUMBER_OF_FACE_CARD } from "../../../../../constant"
 import { countFaceCards } from "../../../checkCard"
 import { culcPositiveScore } from "./culcPositiveScore"
@@ -23,36 +23,30 @@ interface CulcDobonRiskProps {
   ownHands: OtherHands
   otherHands: OtherHands[]
   trashedMemory: string[]
-  cpuLevel?: CPULevel
   deckCount: number
 }
 
 export type DobonRiskReturnValue = { card:HandCards, dobonRisk: number }[]
 
-const main = ({ownHands, otherHands, trashedMemory, cpuLevel, deckCount}: CulcDobonRiskProps): DetectionInfo => { // eslint-disable-line no-unused-vars
+const main = ({ownHands, otherHands, trashedMemory, deckCount}: CulcDobonRiskProps): DetectionInfo => { // eslint-disable-line no-unused-vars
   /*
    * 手札全公開のユーザーが存在する場合、リスクナンバーを取得
    */
   const defineRiskCards = resRiskCard(otherHands) // eslint-disable-line no-unused-vars
 
   /*
-   * 場に出されたカードと他ユーザーの公開手札から 数字毎にデッキor手札に残っている枚数を計算
+   * 場に出されたカードと他ユーザーの公開手札と自分の手札から 数字毎にデッキor手札に残っている枚数を計算
    */
-  const detectionInfo = resRemainingCard(otherHands, trashedMemory)
+  const detectionInfo = resRemainingCard({ ownHands, otherHands, trashedMemory })
 
   /*
    * カード数字ごとに被ドボン率を算出
    */
   let prediction = updatePrediction({ otherHands, detectionInfo }) // eslint-disable-line no-unused-vars
 
-  /*
-   * Const dobonProbability = 0           // ドボンされる可能性
-   * const damageRisk = 0                 // ダメージリスク
-   * const positiveProbability = 0        // ポジティブ値(自分が出すことによって今後有利になる度合い)
-   */
   if (defineRiskCards.length) {
     for (const card of defineRiskCards) {
-      prediction[card].prediction = 100 // 最大リスク値をセット
+      prediction[card].prediction = DOBONRISK_MAX // 出すとドボンを受ける数字は最大リスク値をセット
     }
   }
   /**
@@ -88,15 +82,6 @@ const main = ({ownHands, otherHands, trashedMemory, cpuLevel, deckCount}: CulcDo
   }
 
   return prediction
-  /*
-   * CPU難易度によってリスク計算ロジックを変える
-   * switch (cpuLevel) {
-   *   case 'easy'  : return dobonProbability * 0 + damageRisk * 0 - positiveProbability
-   *   case 'normal': return dobonProbability + damageRisk * 0 - positiveProbability
-   *   case 'hard'  : return dobonProbability * 2 + damageRisk - positiveProbability
-   *   default      : return DOBONRISK_MEDIAN
-   * }
-   */
 }
 
 export default main

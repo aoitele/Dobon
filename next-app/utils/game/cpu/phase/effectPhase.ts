@@ -5,7 +5,7 @@ import { sepalateSuitNum } from "../../checkHand"
 import { extractShouldBeSolvedEffect } from "../../effect"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
-import { CpuMainProcessArgs } from '../main'
+import { CpuMainProcessArgs } from '../cpuMainProcess'
 import { DetectionInfo } from "../thinking/putout/updatePrediction"
 
 interface Args {
@@ -42,6 +42,8 @@ const effectPhase = async({
   const _hands = sepalateSuitNum(hands).map(card => card.num)
 
   if (_hands.includes(cardNum)) {
+    // 計算した被ドボンリスクより、同じ数字のカードを出しても問題なければ回避する
+
     console.log('Effect Phase : SKIP - have num')
     return { updateData1: data, updateHands1: hands, haveNum: true }
   }
