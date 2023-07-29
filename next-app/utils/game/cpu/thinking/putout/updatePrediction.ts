@@ -8,9 +8,10 @@ import { DOBON_CARD_NUMBER_OPENCARD } from "../../../../../constant";
 export type DetectionInfo = {
   [key in number]: { // eslint-disable-line no-unused-vars
     remain: number // 捨て札や公開手札に出ていない残り枚数
-    prediction?: number // ドボンされる確率の推論値
+    prediction: number // ドボンされる確率の推論値
     damageRisk: number // 被ドボン時に受けるダメージの推論値
     positiveScore: number // カードを出したら有利に働くと考えられる推論値
+    positiveSuit: string | null // 同じ数字内で出すと有利に働くと考えられる柄
   }
 }
 

@@ -8,6 +8,8 @@ import { effectPhase } from "./phase/effectPhase"
 import { GameProviderState } from "../../../context/GameProvider"
 import { OtherHands } from "../../../@types/game"
 import main from "./thinking/putout/main"
+import { decidePutOut } from "./thinking/putout/decidePutOut"
+import { cardsICanPutOut } from "../checkHand"
 
 /**
  * CPUのゲーム実行プロセス
@@ -28,7 +30,7 @@ const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data, speed }: Cpu
   console.log(`\n--- COM TURN START turn: ${data.data.turn} ---\n`)
 
   const player = data.data.users?.find(user => user.turn === data.data.turn)
-  if (!player?.nickname) {
+  if (!player?.nickname || !player.mode) {
     throw Error('cpuMainProcess has Error: required data is not provided')
   }
 
@@ -54,9 +56,17 @@ const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data, speed }: Cpu
   const ownHands = allUserHands.filter(hand => hand.nickname === player.nickname)[0] // ターン実行中CPUの手札情報
   const otherPlayersHands = allUserHands.filter(hand => hand.nickname !== player.nickname) // ターン実行していないユーザーの手札情報
 
-  const detectionInfo = main({ ownHands, otherHands:otherPlayersHands, trashedMemory: trash, cpuLevel: player.mode, deckCount })
-  console.log(detectionInfo, 'detectionInfo')
+  const detectionInfo = main({ ownHands, otherHands:otherPlayersHands, trashedMemory: trash, deckCount })
   console.log(`\n--- COM DETECTION END ---\n`)
+  const putableCards = cardsICanPutOut(ownHands.hands, trash[0], data.data.effect)
+  const decition1 = decidePutOut({ cpuLevel: player.mode, detectionInfo, putableCards })
+  console.log(decition1, 'decition1')
+
+  /**
+   * カードが出せる場合
+   * 手札のカードを出すかどうか？ → リスクが一定値を超えた場合は出さずにドローする
+   * 一定値以下のリスクカードがある場合
+   */
 
   const { updateData1, updateHands1, haveNum } = await effectPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed, detectionInfo })
   const { updateData2, updateHands2 } = await drawPhase({ user: player, io, hands: updateHands1, trash, data: updateData1, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed })
