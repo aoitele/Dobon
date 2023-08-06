@@ -46,7 +46,7 @@ const culcPositiveScore = ({ ownHands, prediction }: CulcPositiveScoreParams): D
       return
     }
     if (reachNums.length) {
-      addPositiveScore({ reachNums, result, addScore: 20, cardNum })
+      addPositiveScore({ reachNums, result, addScore: 0.2, cardNum })
     }
     // 次のターンでドボン返しにできるか、またはリーチにできるかチェック
     let nextTurnCanReverseDobon = false
@@ -62,7 +62,7 @@ const culcPositiveScore = ({ ownHands, prediction }: CulcPositiveScoreParams): D
       r.score += 10 * testReachNums.length
  
       if (testReachNums.length) {
-        addPositiveScore({ reachNums: testReachNums, result, addScore: 10, cardNum })
+        addPositiveScore({ reachNums: testReachNums, result, addScore: 0.1, cardNum })
       }
     }
     if (nextTurnCanReverseDobon) {

@@ -6,7 +6,9 @@ import { extractShouldBeSolvedEffect } from "../../effect"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
 import { CpuMainProcessArgs } from '../cpuMainProcess'
+import { DecidePutOutResponse } from "../thinking/putout/decidePutOut"
 import { DetectionInfo } from "../thinking/putout/updatePrediction"
+import { getDangerThreshold } from "../utils/getDangerThreshold"
 
 interface Args {
   user: NestedPartial<Player>
@@ -21,12 +23,13 @@ interface Args {
   trashKey: string
   speed: CpuMainProcessArgs['speed']
   detectionInfo: DetectionInfo
+  decition: DecidePutOutResponse['decition']
 }
 
 const effectPhase = async({
-  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed
+  user, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed, decition
 }: Args) => {
-  if (!data.data.otherHands) {
+  if (!data.data.otherHands || !user.mode) {
     throw Error('drawPhase has Error: data.data.otherHands is not provided')
   }
 
@@ -38,14 +41,15 @@ const effectPhase = async({
   }
 
   // 手札を出せる場合は回避してドローフェイズへ
-  const cardNum = sepalateSuitNum([trash[0]])[0].num
-  const _hands = sepalateSuitNum(hands).map(card => card.num)
-
-  if (_hands.includes(cardNum)) {
-    // 計算した被ドボンリスクより、同じ数字のカードを出しても問題なければ回避する
-
-    console.log('Effect Phase : SKIP - have num')
-    return { updateData1: data, updateHands1: hands, haveNum: true }
+  if (decition.length) {
+    // CPU難易度に設定された被ドボンリスクの閾値より低ければ、同数字のカードを出して回避する
+    const cardNum = sepalateSuitNum([trash[0]])[0].num
+    const sameNumberCard = decition.find(item => sepalateSuitNum([item.card])[0].num === cardNum)
+    const dangerThreshold = getDangerThreshold({ mode: user.mode, phase: 'avoidEffect' })
+    if (sameNumberCard && sameNumberCard.score < dangerThreshold) {
+      console.log('Effect Phase : SKIP - have num WITH decition')
+      return { updateData1: data, updateHands1: hands, haveNum: true }
+    }
   }
 
   // 以降、効果を受ける処理

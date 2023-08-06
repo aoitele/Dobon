@@ -67,8 +67,8 @@ const main = ({ownHands, otherHands, trashedMemory, deckCount}: CulcDobonRiskPro
   for (const [k, ] of Object.entries(prediction)) {
     const keyNum = Number(k)
     const damageBaseNum = (keyNum === DOBON_CARD_NUMBER_JOKER) ? DOBON_JUDGE_NUMBER_JOKER : keyNum
-    // ダメージリスクは「ドボンされた値の大きさ + 絵札の出現率」
-    prediction[keyNum].damageRisk = (damageBaseNum / 10) + damageRisk
+    // ダメージリスクは「ドボンされた値の大きさ * 絵札の出現率」
+    prediction[keyNum].damageRisk = (damageBaseNum * damageRisk) / 10
   }
 
   /**
