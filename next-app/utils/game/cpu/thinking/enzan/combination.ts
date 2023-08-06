@@ -29,7 +29,7 @@ export const combination = ({ cards, maisu }: CombinationProps) => {
       if (maisu === 2) {
         result.push([first, second])
       }
-      // 指定が2枚の場合、最大2743通りについて計算
+      // 指定が3枚の場合、最大2743通りについて計算
       if (maisu === 3) {
         cards[j].remain -= 1 // 2枚目の残カードを減らす
         for (let k=0; k<cards.length; k+=1) {
