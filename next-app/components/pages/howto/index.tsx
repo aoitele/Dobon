@@ -6,7 +6,7 @@ const HowToPage = () => {
   return (
     <div className={style.wrap}>
       <section className={style.section}>
-        <h2>Dobonとは</h2>
+        <h1>Dobonとは</h1>
         <p><span className={style.emphasisTxt}>相手の捨て札でドボンを狙い、獲得スコアを争うトランプゲーム</span>です</p>
         <p>手札に存在するカード数字の合計（もしくは差分）を相手が出したとき「ドボン」でスコアを獲得できます。</p>
       </section>
