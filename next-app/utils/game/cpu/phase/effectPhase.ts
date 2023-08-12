@@ -6,9 +6,7 @@ import { extractShouldBeSolvedEffect } from "../../effect"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
 import { CpuMainProcessArgs } from '../cpuMainProcess'
-import { DecidePutOutResponse } from "../thinking/putout/decidePutOut"
-import { DetectionInfo } from "../thinking/putout/updatePrediction"
-import { getDangerThreshold } from "../utils/getDangerThreshold"
+import { AddDecitionScoreResponse, decidePutOut } from "../thinking/putout/decidePutOut"
 
 interface Args {
   user: NestedPartial<Player>
@@ -22,8 +20,7 @@ interface Args {
   handsKey: string
   trashKey: string
   speed: CpuMainProcessArgs['speed']
-  detectionInfo: DetectionInfo
-  decition: DecidePutOutResponse['decition']
+  decition: AddDecitionScoreResponse['decition']
 }
 
 const effectPhase = async({
@@ -43,13 +40,13 @@ const effectPhase = async({
   // 手札を出せる場合は回避してドローフェイズへ
   if (decition.length) {
     // CPU難易度に設定された被ドボンリスクの閾値より低ければ、同数字のカードを出して回避する
-    const cardNum = sepalateSuitNum([trash[0]])[0].num
-    const sameNumberCard = decition.find(item => sepalateSuitNum([item.card])[0].num === cardNum)
-    const dangerThreshold = getDangerThreshold({ mode: user.mode, phase: 'avoidEffect' })
-    if (sameNumberCard && sameNumberCard.score < dangerThreshold) {
+    const trashNum = sepalateSuitNum([trash[0]])[0].num
+    const isPutOut = decidePutOut({ trash, decition, mode: user.mode, phase: 'putOut', sameNumberOnly: true })
+    if (isPutOut) {
       console.log('Effect Phase : SKIP - have num WITH decition')
       return { updateData1: data, updateHands1: hands, haveNum: true }
     }
+    console.log(`\n\n\nEffect Phase : NOT SKIP - ${trashNum} thought high lisk!\n\n\n`)
   }
 
   // 以降、効果を受ける処理

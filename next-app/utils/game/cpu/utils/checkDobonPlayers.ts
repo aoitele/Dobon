@@ -16,8 +16,8 @@ const checkDobonPlayers = ({
   users,
 }: Args) => {
   let [canCom1Dobon, canCom2Dobon, canCom3Dobon, canIDobon] = [false, false, false, false]
-  console.log(redisPipeLineResults, '------------------------redisPipeLineResults------------------------')
-  console.log(trashUser, '------------------------trashUser------------------------')
+  // console.log(redisPipeLineResults, '------------------------redisPipeLineResults------------------------')
+  // console.log(trashUser, '------------------------trashUser------------------------')
 
   const com1Hands = redisPipeLineResults[0][1]
   const com2Hands = redisPipeLineResults[1][1]
