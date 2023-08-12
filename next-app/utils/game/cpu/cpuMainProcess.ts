@@ -8,7 +8,7 @@ import { effectPhase } from "./phase/effectPhase"
 import { GameProviderState } from "../../../context/GameProvider"
 import { OtherHands } from "../../../@types/game"
 import main from "./thinking/putout/main"
-import { decidePutOut } from "./thinking/putout/decidePutOut"
+import { addDecitionScore } from "./thinking/putout/decidePutOut"
 import { cardsICanPutOut } from "../checkHand"
 
 /**
@@ -56,10 +56,11 @@ const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data, speed }: Cpu
   const ownHands = allUserHands.filter(hand => hand.nickname === player.nickname)[0] // ターン実行中CPUの手札情報
   const otherPlayersHands = allUserHands.filter(hand => hand.nickname !== player.nickname) // ターン実行していないユーザーの手札情報
 
-  const detectionInfo = main({ ownHands, otherHands:otherPlayersHands, trashedMemory: trash, deckCount })
+  const detectionInfo1 = main({ ownHands, otherHands:otherPlayersHands, trashedMemory: trash, deckCount })
   console.log(`\n--- COM DETECTION END ---\n`)
   const putableCards = cardsICanPutOut(ownHands.hands, trash[0], data.data.effect)
-  const decition1 = decidePutOut({ cpuLevel: player.mode, detectionInfo, putableCards })
+  const decition1 = addDecitionScore({ cpuLevel: player.mode, detectionInfo: detectionInfo1, putableCards })
+  console.log(detectionInfo1, 'detectionInfo1')
   console.log(decition1, 'decition1')
 
   /**
@@ -68,9 +69,17 @@ const cpuMainProcess = async ({ io, adapterPubClient, pveKey, data, speed }: Cpu
    * 一定値以下のリスクカードがある場合
    */
 
-  const { updateData1, updateHands1, haveNum } = await effectPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed, detectionInfo, decition: decition1.decition })
+  const { updateData1, updateHands1, haveNum } = await effectPhase({ user: player, io, hands, trash, data, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed, decition: decition1.decition })
   const { updateData2, updateHands2 } = await drawPhase({ user: player, io, hands: updateHands1, trash, data: updateData1, adapterPubClient, pveKey, deckKey, handsKey, trashKey, speed })
-  await putoutPhase({ user: player, io, hands: updateHands2, trash, data: updateData2, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed })
+
+  const updateOwnHands = { ...ownHands, hands:updateHands2 }
+  const updateDeckCount = await adapterPubClient.scard(deckKey)
+
+  const detectionInfo2 = main({ ownHands: updateOwnHands, otherHands:otherPlayersHands, trashedMemory: trash, deckCount: updateDeckCount })
+  const decition2 = addDecitionScore({ cpuLevel: player.mode, detectionInfo: detectionInfo2, putableCards })
+  console.log(decition2, 'decition2')
+
+  await putoutPhase({ user: player, io, hands: updateHands2, trash, data: updateData2, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed, detectionInfo: detectionInfo2, decition: decition2.decition })
 }
 
 export { cpuMainProcess }

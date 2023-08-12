@@ -2,7 +2,7 @@ import { HandCards } from "../../../../@types/card"
 import { Player } from "../../../../@types/game"
 import { NestedPartial } from "../../../../@types/utility"
 import { CpuTurnEmitData } from "../../../../@types/emitData"
-import { cardsICanPutOut, sepalateSuitNum } from "../../checkHand"
+import { sepalateSuitNum } from "../../checkHand"
 import { reducerPayloadSpecify } from "../../roomStateReducer"
 import sleep from "../../sleep"
 import { CpuMainProcessArgs } from '../cpuMainProcess'
@@ -12,6 +12,8 @@ import { resetEvent } from "../../../../server/cpuModeHandler"
 import { loadDobonRedisKeys } from "../../../../server/redis/loadDobonRedisKeys"
 import { dobonJudge } from "../../dobonJudge"
 import { gameInitialState } from "../../../../context/state/gameInitialState"
+import { AddDecitionScoreResponse, decidePutOut } from "../thinking/putout/decidePutOut"
+import { DetectionInfo } from "../thinking/putout/updatePrediction"
 
 interface Args {
   user: NestedPartial<Player>
@@ -25,6 +27,8 @@ interface Args {
   handsKey: string
   haveNum?: boolean
   speed: CpuMainProcessArgs['speed']
+  detectionInfo: DetectionInfo
+  decition: AddDecitionScoreResponse['decition']
 }
 
 /**
@@ -36,20 +40,25 @@ interface Args {
  *  - スキップする
  */
 const putoutPhase = async({
-  user, io, hands, trash, data, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed
+  user, io, hands, trash, data, adapterPubClient, pveKey, trashKey, handsKey, haveNum, speed, decition
 }: Args) => {
-  const {turn, effect, otherHands } = data.data
-  if (!turn) {
+  const {turn, otherHands } = data.data
+  if (!turn || !user.mode) {
     throw Error('PutOut Phase : has Error: required data is not provided')
   }
   let updateHands = [...hands]
 
   // 手札を場に出せるかを判定する
-  const putableCards = cardsICanPutOut(hands, trash[0], effect)
-  console.log(putableCards, 'putableCards')
+  // const putableCards = cardsICanPutOut(hands, trash[0], effect)
+  // console.log(putableCards, 'putableCards')
 
-  // 出せない場合はスキップ
-  if (!putableCards.length) {
+  /**
+   * 出せるカードがない場合、もしくは
+   * カードは出せるがリスクがuser.modeの閾値を超える場合はスキップ
+   */
+  const isPutOut = decidePutOut({ trash, decition, mode: user.mode, phase: 'putOut', sameNumberOnly: false })
+
+  if (!decition.length || !isPutOut) {
     const reducerPayload: reducerPayloadSpecify = {
       game: {
         board: {
@@ -60,14 +69,24 @@ const putoutPhase = async({
       }
     }
     console.log(`\n--- COM TURN END for SKIP ---\n`)
+    if (!isPutOut) {
+      console.log(`\n--- CAUSE DANGER THRESHOLD ---\n`)
+    }
     io.in(pveKey).emit('updateStateSpecify', reducerPayload)
     return
   }
 
-  // (2か13の)カード効果をeffectPhaseで回避している場合は、回避用のカードを優先して出す
-  const trashCard = haveNum
-  ? putableCards.filter(card => sepalateSuitNum([card])[0].num === sepalateSuitNum([trash[0]])[0].num)[0]
-  : putableCards[0]
+  /**
+   * 最も低リスクのカードを出すが、
+   * (2か13の)カード効果をeffectPhaseで回避している場合は、回避カードを優先する
+   */
+  let trashCard = decition[0].card
+
+  if (haveNum) {
+    const trashNum = sepalateSuitNum([trash[0]])[0].num
+    trashCard = decition.find(item => sepalateSuitNum([item.card])[0].num === trashNum)?.card ?? trashCard
+  }
+
   console.log(`PutOut Phase :haveNum - ${haveNum}`)
 
   // 効果解決でない場合はカードを選択して出す(TODO：選択ロジック実装)
@@ -82,7 +101,7 @@ const putoutPhase = async({
   const comHandsIndex = otherHands.findIndex(hand => hand.nickname === user.nickname)
   otherHands[comHandsIndex].hands = updateHands
 
-  // 8(wild)を出す場合、自分の手札に最も多い柄を選択(TODO：柄選択にもロジックを追加する)
+  // 8(wild)を出す場合、自分の手札に最も多い柄を選択
   const sepTrash = sepalateSuitNum([trashCard])[0]
   const is8 = Number(sepTrash.num) === DOBON_CARD_NUMBER_WILD
 

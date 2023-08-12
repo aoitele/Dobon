@@ -1,6 +1,6 @@
 import { CPULevel } from "../../../../@types/game";
 
-type CheckDangerThresholdPhase = 'avoidEffect'
+type CheckDangerThresholdPhase = 'putOut'
 
 // 危険予測スコアがここで定義する値より下回る場合はカードを出して良いと判断する
 type DangerThresholds = {
@@ -10,16 +10,16 @@ type DangerThresholds = {
 }
 
 const dangerThresholds: DangerThresholds = {
-  avoidEffect: {
+  putOut: {
     hard: 1,
     normal: 2,
     easy: 3,
-  }
+  },
 }
 
 const DANGER_THRESHOLD_DEFAULT = 0
 
-type GetDangerThresholdParams = {
+export type GetDangerThresholdParams = {
   mode: CPULevel
   phase: CheckDangerThresholdPhase
 }

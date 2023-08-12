@@ -61,7 +61,7 @@ const drawPhase = async({
       }
     }
     io.in(pveKey).emit('updateStateSpecify', reducerPayload)
-    console.log(`Draw Phase : user:${user.nickname} draw - ${newCard}`)
+    console.log(`\nDraw Phase : user:${user.nickname} draw - ${newCard}\n`)
   }
   return {
     updateData2: data,
