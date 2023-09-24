@@ -1,3 +1,4 @@
+import { Player } from "../../@types/game"
 import { DOBON_JUDGE_NUMBER_JOKER } from "../../constant"
 /**
  * @param dobonNum ドボンしたカードの数字
@@ -21,9 +22,14 @@ interface Props {
   bonusCards: number[]
   isReverseDobon?: boolean
   isSingleDobon?: boolean
+  winner: Player[]
+  loser: Player[]
 }
 
-const culcGetScore = ({ dobonNum, bonusCards, isReverseDobon=false, isSingleDobon=false }:Props) => {
+const culcGetScore = ({ dobonNum, bonusCards, isReverseDobon=false, isSingleDobon=false, winner, loser }:Props) => {
+  // 敗者がいない場合はスコアなし
+  if(!loser.length) return 0
+
   // ジョーカドボンならドボン数値を21にする
   const isJokerDobon = dobonNum === 0
   const dobonBaseNum = isJokerDobon ? DOBON_JUDGE_NUMBER_JOKER : dobonNum
@@ -39,11 +45,13 @@ const culcGetScore = ({ dobonNum, bonusCards, isReverseDobon=false, isSingleDobo
    * 最終返却時に積算される値を計算(squareRateは1,2,4,8のいずれかとなる)
    * baseRate:どぼん返し&&単騎なら4倍、片方が真なら2倍、ともに偽であれば1倍
    * jokerRate:Jokerの枚数だけ2倍
+   * winRate: 1人勝ちで敗者が複数いる場合、敗者分だけ2倍or3倍
    */
   const baseRate = (isReverseDobon && isSingleDobon) ? 4 : (isReverseDobon || isSingleDobon) ? 2 : 1
   const jokerRate = existJocker ? jokerCardCount * 2 : 1
   const squareRate = baseRate * jokerRate
-  const result = dobonBaseNum * bonusCardScore * squareRate
+  const winRate = (winner.length === 1 && loser.length > 1) ? loser.length : 1
+  const result = dobonBaseNum * bonusCardScore * squareRate * winRate
 
   return result
 }

@@ -1,4 +1,5 @@
 import React, { createContext, Dispatch, FC, ReactNode, SetStateAction, useState } from "react"
+import { Player } from "../@types/game"
 
 export interface ScoreProviderState {
   bonusCards: string[]
@@ -10,8 +11,8 @@ export interface ScoreProviderState {
   }
   resultScore: number
   roundUpScore: number
-  winerScore: number | null
-  loserScore: number | null
+  winner: Player[] | null
+  loser: Player[] | null
   message: string
 }
 
@@ -27,8 +28,8 @@ const scoreProviderInitialState: ScoreProviderState = {
   },
   resultScore: 0,
   roundUpScore: 0,
-  winerScore: null,
-  loserScore: null,
+  winner: null,
+  loser: null,
   message: '',
 }
 

@@ -3,6 +3,7 @@
  */
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
+import { Player } from '../../../../@types/game'
 import { EmitForPVE } from '../../../../@types/socket'
 import { BoardStateContext, BoardDispathContext, boardProviderInitialState } from '../../../../context/BoardProvider'
 import { GameStateContext, GameDispathContext } from '../../../../context/GameProvider'
@@ -41,21 +42,31 @@ const useGameCycles = () => {
         }
         case 'showScore': {
           if (!scoreDispatch) return
-
-          const winner = gameState.game.board.users.filter(user => user.isWinner)[0]
-          const loser = gameState.game.board.users.filter(user => user.isLoser)[0]
+          /**
+           * スコア計算
+           * 勝者が1人で敗者が複数いる場合、最終スコアは「獲得スコア×敗者の人数」となる
+           * 勝者の合計値を敗者で分配負担させる
+           */
+          const winner = gameState.game.board.users.filter(user => user.isWinner)
+          const loser = gameState.game.board.users.filter(user => user.isLoser)
           const bonusCards = gameState.game.board.bonusCards
           const bonusNums = resBonusNumArray(bonusCards)
           const isSingleDobon = gameState.game.result.dobonHandsCount === 1
           const bonusTotal = culcBonus(bonusNums)
           const dobonNum = resDobonNum(gameState.game.board.trash.card) // 計算に使われる上がりカードの数値
           const isReverseDobon = gameState.game.result.isReverseDobon
+          const existMultiLoser = loser.length > 1
 
           if (!dobonNum) return
 
-          const resultScore = culcGetScore({ dobonNum, bonusCards: bonusNums, isReverseDobon, isSingleDobon })
-          const roundUpScore = Math.ceil(resultScore / 10) * 10
+          const resultScore = culcGetScore({ dobonNum, bonusCards: bonusNums, isReverseDobon, isSingleDobon, winner, loser })
+          let roundUpScore = Math.ceil(resultScore / 10) * 10
           const jokerCount = bonusNums.filter(card => card === 0).length
+
+          // 複数名が敗者となった場合、スコア×人数分のスコアを獲得する
+          if (winner.length === 1 && existMultiLoser) {
+            roundUpScore *= loser.length
+          }
 
           const newScoreState: ScoreProviderState = {
             ...scoreState,
@@ -63,8 +74,8 @@ const useGameCycles = () => {
             bonusTotal,
             resultScore,
             roundUpScore,
-            winerScore: winner.score,
-            loserScore: loser.score,
+            winner,
+            loser,
             addBonus: {
               isSingleDobon,
               isReverseDobon: Boolean(isReverseDobon),
@@ -76,23 +87,33 @@ const useGameCycles = () => {
           (async() => {
             await sleep(2000)
             let i = 0
+            const loseScorePerPlayer = roundUpScore * winner.length / loser.length
 
             const scoreCountUp = setInterval(async() => {
-              i += 1
+              i += 2 // アニメーションの速度となる
+              const isReachLoseScoreCount = loseScorePerPlayer <= i
+
               scoreDispatch({
                 ...newScoreState,
-                winerScore: winner.score + i,
-                loserScore: loser.score - i,
+                winner: winner.map(w => ({...w, score: w.score + i})),
+                loser: loser.map(l => ({...l, score: isReachLoseScoreCount ? l.score - loseScorePerPlayer : l.score - i}))
               })
               if (i === roundUpScore) {
                 clearInterval(scoreCountUp)
-                // スコア更新
+                // スコア更新があるユーザーのデータを送る
+                const updateUserScores: Pick<Player, 'nickname' | 'score' | 'isCpu'>[] = [...winner, ...loser].map(player => {
+                  return {
+                    nickname: player.isCpu ? player.nickname : 'me',
+                    score: player.isWinner ? player.score + i : existMultiLoser ? player.score - loseScorePerPlayer : player.score - i,
+                    isCpu: player.isCpu,
+                   }
+                })
                 const postProcessEmit:EmitForPVE = {
                   event: 'postprocess',
                   data: {
                     board: {
                       data: {
-                        users: [{ nickname: winner.isCpu ? winner.nickname : 'me', score: winner.score + i }, { nickname: loser.isCpu ? loser.nickname : 'me', score: loser.score - i }]
+                        users: updateUserScores
                       }
                     }
                   }
@@ -106,8 +127,12 @@ const useGameCycles = () => {
                 if (isLastGame) {
                   // 最終ゲームであればスコア情報を更新、結果画面へ移行させる
                   const updatedUsers = gameState.game.board.users.map(user => {
-                    user.isWinner && (user.score = winner.score + i)
-                    user.isLoser  && (user.score = loser.score - i)
+                    const newScore = user.isCpu
+                      ? updateUserScores.find(u => u.nickname === user.nickname)?.score
+                      : updateUserScores.find(u => !u.isCpu)?.score // nonCPUはログインユーザーの場合もあるためnicknameチェックは通さない
+                    if (typeof newScore === 'number') {
+                      user.score = newScore
+                    }
                     return user
                   })
                   // game.boardの状態をリセット(次ゲーム開始時の表示を初期状態に戻すため。スピードは引き継ぐ)
@@ -119,12 +144,7 @@ const useGameCycles = () => {
                 }
 
                 const message = nextGameId === gameState.game.setCount ? 'GoTo Next → Last Game' : `GoTo Next →「Game${nextGameId}」`
-                scoreDispatch(() => ({
-                  ...newScoreState,
-                  winerScore: winner.score + i,
-                  loserScore: loser.score - i,
-                  message,
-                }))
+                scoreDispatch(prevState => ({ ...prevState, message }))
                 await sleep(1000)
                 handleEmit(gameState.wsClient, { event: 'prepare', gameId: nextGameId, query: router.query, data: { board: {data: { speed: gameState.game.board.speed }}} }) // ゲームスピードの選択状態は維持させる
                 boardDispatch(boardProviderInitialState) // boardStateの状態をリセット(次ゲーム終了時の表示を初期状態に戻すため)

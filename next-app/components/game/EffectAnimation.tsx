@@ -14,8 +14,10 @@ import { WildEffect } from './effect/WildEffect'
 import { ReverseEffect } from './effect/ReverseEffect'
 import { DobonGaeshiEffect } from './effect/DobonGaeshiEffect'
 
-const effectAnimation:React.FC<ModalEffect> = ({ user, action, message }) => {
+const EffectAnimation:React.FC<ModalEffect> = ({ user, action, message }) => {
   const isJokerEffect = action === 'joker'
+  const calledByMultiPlayers = user.length > 1
+
   return (
     <>
       <div className={style.wrap}>
@@ -40,11 +42,8 @@ const effectAnimation:React.FC<ModalEffect> = ({ user, action, message }) => {
         </div>
         <div className={style.imageBg}/>
       </div>
-      <div className={style.userInfo}>
-        { Array.isArray(user)
-          ? user.map(u => <UserInfo key={u.turn} user={u} message={message} />)
-          : <UserInfo user={user} message={message} />
-        }
+      <div className={calledByMultiPlayers ? style.userInfoWrapMulti : style.userInfoWrap}>
+        { user.map(u => <UserInfo key={u.turn} user={u} message={message} />)}
       </div>
     </>
   )
@@ -57,7 +56,7 @@ interface UserInfoProps {
 
 const UserInfo:FC<UserInfoProps> = ({ user, message }) => {
   return (
-    <>
+    <div className={style.userInfo}>
       <Image
         src={`/images/game/userIcon/${user.turn}.png`}
         width={60}
@@ -68,8 +67,8 @@ const UserInfo:FC<UserInfoProps> = ({ user, message }) => {
         <p className={style.nickName}>{user.nickname}</p>
         <p style={{whiteSpace: 'pre-line'}}>{message}</p>
       </div>
-    </>
+    </div>
   )
 }
 
-export default effectAnimation
+export default EffectAnimation

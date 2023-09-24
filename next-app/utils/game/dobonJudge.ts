@@ -16,6 +16,7 @@ const dobonJudge = (putOutCard: HandCards | string, hands: HandCards[] | string[
   const isPutOutJoker = isJoker(putOutCard)  // Jokerが出されたか
   const judgeNumber = isPutOutJoker ? DOBON_JUDGE_NUMBER_JOKER : extractCardNum(putOutCard) // Jokerが出された場合は21で判定
   if (judgeNumber === null) return false
+  if (!hands.length) return false
 
   const cardCnt = hands.length               // 手札の枚数
   const existJokerInHand = existJoker(hands) // 手札にJokerがあるか

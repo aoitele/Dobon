@@ -38,6 +38,13 @@ class GameAction {
     this.gameDispatch({ ...newGameState })
   }
   notDobon() {
+    // ゲーム開始時に「どぼんしない」を選択した場合、turnChangingは行わない
+    if (!this.gameState.game.board.trash.user.nickname) {
+      const turnChangingState = useUpdateStateFn(this.gameState, { game: { board: { allowDobon: false, waitDobon: false } } })
+      this.gameDispatch({ ...turnChangingState })
+      return
+    }
+
     const turnChangingState = useUpdateStateFn(this.gameState, { game: { board: { allowDobon: true, status: 'turnChanging', waitDobon: false } } })
     this.gameDispatch({ ...turnChangingState })
   }
