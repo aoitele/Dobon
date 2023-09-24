@@ -10,11 +10,24 @@ import WinCardInfo from "../../../../game/score/WinCardInfo"
 const ScoreBoard = () => {
   const [gameState, scoreState, scoreDispatch] = [useContext(GameStateContext), useContext(ScoreStateContext), useContext(ScoreDispathContext)]
 
-  const winner = gameState.game.board.users.filter(user => user.isWinner)[0]
-  const loser = gameState.game.board.users.filter(user => user.isLoser)[0]
+  const winner = gameState.game.board.users.filter(user => user.isWinner)
+  const loser = gameState.game.board.users.filter(user => user.isLoser)
   const dobonCard = gameState.game.board.trash.card
   const dobonNum = resDobonNum(dobonCard) // 計算に使われる上がりカードの数値
   const existAddBonus = scoreState.addBonus.isReverseDobon || scoreState.addBonus.isSingleDobon || scoreState.addBonus.jokerCount > 0
+  const existMultiWinner = winner.length > 1
+  const existMultiLoser = loser.length > 1
+  const loserMinusScore = scoreState.roundUpScore * winner.length / loser.length
+  const dobonDesc = gameState.game.result.isReverseDobon
+    ? 'どぼん返し\n成功！'
+    : existMultiWinner
+      ?  winner.length === 2
+        ? 'ダブルどぼん成功！'
+        : 'トリプルどぼん成功！'
+      : 'どぼん成功！'
+  const getScoreDesc = winner.length === 1 && existMultiLoser
+  ? `(${scoreState.roundUpScore / loser.length} × ${loser.length})`
+  : `(roundUp : ${scoreState.resultScore} )`
 
   useEffect(() => {
     // ボーナスカード取得
@@ -30,14 +43,20 @@ const ScoreBoard = () => {
   return (
       <div className={styles.wrap}>
         <div className={styles.winerInfoContainer}>
-          <UserScore
-            key='userScore-winer'
-            user={winner}
-            score={scoreState.winerScore}
-          />
-          <span className={styles.heading}>
-            {gameState.game.result.isReverseDobon ? 'どぼん返し\n成功！' : 'どぼん成功！'}
-          </span>
+          <div className={existMultiWinner ? styles.winerScoreWrapMultiWin : styles.winerScoreWrap}>
+            {winner.map(user => {
+              const winerScore = scoreState.winner?.find(u => u.turn === user.turn)?.score
+              return (
+                <UserScore
+                  key={`userScore-winner-${user.turn}`}
+                  user={user}
+                  score={winerScore}
+                  imgSize={existMultiWinner ? 60 : undefined}
+                />
+              )}
+            )}
+          </div>
+          <span className={existMultiWinner ? styles.headingMultiWin : styles.heading}>{dobonDesc}</span>
           <div className={styles.winAndBonusInfoContainer}>
             <div className={styles.winAndBonusInfo}>
               <div className={styles.winCardInfoContainer}>
@@ -67,18 +86,25 @@ const ScoreBoard = () => {
             </div>
           }
           <div className={styles.winScoreContainer}>
-            <span>{`= +${scoreState.roundUpScore}`}</span>
+            <span>{`+${scoreState.roundUpScore}`}<span className={styles.resultScore}> {getScoreDesc}</span></span>
           </div>
-          <p className={styles.resultScore}>(roundUp : {scoreState.resultScore} )</p>
         </div>
         <div className={styles.loserInfoContainer}>
-          <UserScore 
-            key='userScore-loser'
-            user={loser}
-            score={scoreState.loserScore}
-          />
-          <div className={styles.loserScoreContainer}>
-            <span>{`-${scoreState.roundUpScore}`}</span>
+          <div className={existMultiLoser ? styles.loserScoreWrapMultiLose : styles.loserScoreWrap}>
+            {loser.map(user => {
+              const loserScore = scoreState.loser?.find(u => u.turn === user.turn)?.score
+              return (
+                <UserScore
+                  key={`userScore-loser-${user.turn}`}
+                  user={user}
+                  score={loserScore}
+                  imgSize={loser.length > 1 ? 60 : undefined}
+                />
+              )
+            })}
+             <div className={styles.loserScoreContainer}>
+              <span>{`-${loserMinusScore}`}</span>
+            </div>
           </div>
           {scoreState.message.length > 0 &&
             <div className={styles.NextGameInfo}>

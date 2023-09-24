@@ -70,19 +70,28 @@
   }
 }
 
-.userInfo {
+.userInfoWrap {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 100px;
+  z-index: 2500;
+}
+.userInfoWrapMulti {
+  @extend .userInfoWrap;
+  bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
+.userInfo {
   margin: auto;
   display: flex;
   background-color: honeydew;
   width: 95%;
-  height: 100px;
+  height: 75px;
   border-radius: 20px;
   padding: 10px;
-  z-index: 2500;
+  margin-top: 2px;
   .nickName {
     font-size: 20px;
   }

@@ -28,12 +28,12 @@ export interface ScoreBoardState {
   }
   resultScore: number
   roundUpScore: number
-  winerScore: number
-  loserScore: number
+  winer: Player[]
+  loser: Player[]
   message: string
 }
 
-export const createInitialState = (winner: Player, loser: Player) => {
+export const createInitialState = (winner: Player[], loser: Player[]) => {
   const initialState: ScoreBoardState = {
     bonusCards: [],
     bonusTotal: 0,
@@ -44,8 +44,8 @@ export const createInitialState = (winner: Player, loser: Player) => {
     },
     resultScore: 0,
     roundUpScore: 0,
-    winerScore: winner?.score ?? 0,
-    loserScore: loser?.score ?? 0,
+    winer: winner,
+    loser,
     message: '',
   }
   return initialState
@@ -54,8 +54,8 @@ export const createInitialState = (winner: Player, loser: Player) => {
 
 const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
   const boardState = state.game.board
-  const winner = boardState.users.filter(user => user.isWinner)[0]
-  const loser = boardState.users.filter(user => user.isLoser)[0]
+  const winner = boardState.users.filter(user => user.isWinner)
+  const loser = boardState.users.filter(user => user.isLoser)
   const [ values, setValues ] = useState(createInitialState(winner, loser))
 
   const dobonCard = boardState.trash.card
@@ -63,9 +63,10 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
   const bonusCards = state.game.board.bonusCards
   const dobonNum = resDobonNum(dobonCard) // 計算に使われる上がりカードの数値
   const existAddBonus = values.addBonus.isReverseDobon || values.addBonus.isSingleDobon || values.addBonus.jokerCount > 0
+  const existMultiLoser = loser.length > 1
 
   useEffect(() => {
-    if (winner.id !== authUser?.id) return
+    if (winner[0].id !== authUser?.id) return
     // ゲームの勝者がボーナスカード取得のリクエストを実行する
     const reqBonusCards = async() => {
       const emit:Emit = {
@@ -89,9 +90,14 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
 
     if (winner && loser && dobonNum && bonusNums) {
       const bonusTotal = culcBonus(bonusNums)
-      const resultScore = culcGetScore({ dobonNum, bonusCards: bonusNums, isReverseDobon, isSingleDobon })
-      const roundUpScore = Math.ceil(resultScore / 10) * 10
+      const resultScore = culcGetScore({ dobonNum, bonusCards: bonusNums, isReverseDobon, isSingleDobon, winner, loser })
       const jokerCount = bonusNums.filter(card => card === 0).length
+      let roundUpScore = Math.ceil(resultScore / 10) * 10
+
+      // 複数名が敗者となった場合、スコア×人数分のスコアを獲得する
+      if (winner.length === 1 && existMultiLoser) {
+        roundUpScore *= loser.length
+      }
 
       const valueBaseObj = {
         ...values,
@@ -108,53 +114,72 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
 
       setValues(() => ({
         ...valueBaseObj,
-        winerScore: winner.score,
-        loserScore: loser.score,
+        winer: winner,
+        loser,
       }))
 
-      const scoreAnimation = async() => {
-        await sleep(3000)
-        let i = 0
+      let i = 0
+      const loseScorePerPlayer = roundUpScore * winner.length / loser.length
 
+      const scoreAnimation = async() => {
+        await sleep(3000)       
         const scoreCountUp = setInterval(async() => {
           i += 1
+          const isReachLoseScoreCount = loseScorePerPlayer <= i
+
           setValues(() => ({
             ...valueBaseObj,
-            winerScore: winner.score + i,
-            loserScore: loser.score - i,
+            winer: winner.map(w => ({...w, score: w.score + i})),
+            loser: loser.map(l => ({...l, score: isReachLoseScoreCount ? l.score - loseScorePerPlayer : l.score - i})),
           }))
           if (i === roundUpScore) {
             clearInterval(scoreCountUp)
+
+            /**
+             * ゲームの勝者にスコア更新を実行させる
+             * スコア更新があるユーザーのデータを送る
+             */
+            if (winner[0].id === authUser?.id) {
+              const updateUserScores: Pick<Player, 'id' | 'score'>[] = [...winner, ...loser].map(player => {
+                return {
+                  id: player.id,
+                  score: player.isWinner ? player.score + i : existMultiLoser ? player.score - loseScorePerPlayer : player.score - i,
+                }
+              })
+              const postProcessEmit:Emit = {
+                roomId: room.id,
+                event: 'postprocess',
+                data: {
+                  type: 'board',
+                  data: {
+                    users: updateUserScores
+                  }
+                }
+              }
+              handleEmit(postProcessEmit)
+            }
+
             const nextGameId = state.game.id ? state.game.id + 1 : null
             await sleep(1000)
             const message = nextGameId === state.game.setCount ? 'GoTo Next → Last Game' : `GoTo Next →「Game${nextGameId}」`
-            setValues(() => ({
-              ...valueBaseObj,
-              winerScore: winner.score + i,
-              loserScore: loser.score - i,
-              message,
-            }))
-            await sleep(3000)
-            if (winner.id !== authUser?.id) return
-            const emit: Emit = {
-              roomId: room.id,
-              gameId: nextGameId,
-              userId: authUser?.id,
-              event: 'prepare',
+            setValues(prevState => ({ ...prevState, message }))
+            await sleep(1000)
+
+            if (winner[0].id === authUser?.id) {
+              const emit: Emit = {
+                roomId: room.id,
+                gameId: nextGameId,
+                userId: authUser?.id,
+                event: 'prepare',
+              }
+              handleEmit(emit)
+              await sleep(1000) // スコアステートを初期化すると一瞬初期状態がちらつくため、初期化前に画面を次ゲームに入らせる
+              setValues(createInitialState([], [])) // ScoreBoardの状態をリセット(次ゲーム終了時の表示を初期状態に戻すため)
             }
-            handleEmit(emit)
           }
         }, 10)
       }
       scoreAnimation()
-
-      // ゲームの勝者にスコア更新を実行させる
-      if (winner.id === authUser?.id) {
-        sendScore({
-          data: { roomId: room.id, winner, loser, roundUpScore },
-          fn: { handleEmit }
-        })
-      }
     }
   },[state.game.status])
 
@@ -163,11 +188,16 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
   return (
     <div className={styles.wrap}>
       <div className={styles.winerInfoContainer}>
-        <UserScore
-          key='userScore-winer'
-          user={winner}
-          score={values.winerScore}
-        />
+        {winner.map(player => {
+          const winnerScore = values.winer.filter(w => w.id === player.id)[0].score;
+          return (
+            <UserScore
+              key='userScore-winer'
+              user={player}
+              score={winnerScore}
+            />
+          )
+        })}
         <span className={styles.heading}>どぼん成功！</span>
 
         <div className={styles.winAndBonusInfoContainer}>
@@ -211,11 +241,16 @@ const ScoreBoard:React.FC<Props> = ({ room, state, handleEmit, authUser }) => {
       }
       
       <div className={styles.loserInfoContainer}>
-        <UserScore 
-          key='userScore-loser'
-          user={loser}
-          score={values.loserScore}
-        />
+        {loser.map(player => {
+          const loserScore = values.loser.filter(l => l.id === player.id)[0].score;
+          return (
+            <UserScore
+              key='userScore-loser'
+              user={player}
+              score={loserScore}
+            />
+          )
+        })}
         <div className={styles.loserScoreContainer}>
           <span>{`-${values.roundUpScore}`}</span>
         </div>
@@ -248,40 +283,6 @@ export const resBonusNumArray = (bonusCards: string[]): number[] => {
   const mat = joinedStr.match(/\d+/gu)
   if (mat === null) return []
   return mat.map(_ => Number(_))
-}
-
-/**
- * Redisユーザーデータのスコア更新関数
- */
-interface SendScoreProps {
-  data: {
-    roomId: number,
-    winner: Player,
-    loser:Player,
-    roundUpScore: number,
-  }
-  fn: {
-    handleEmit: HandleEmitFn
-  }
-}
-
-const sendScore = ({ data, fn }: SendScoreProps) => {
-  const winnerScore = data.winner.score + data.roundUpScore
-  const loserScore = data.loser.score - data.roundUpScore
-  const emit:Emit = {
-    roomId: data.roomId,
-    event: 'postprocess',
-    data: {
-      type: 'board',
-      data: {
-        users: [
-          { id: data.winner.id, score: winnerScore },
-          { id: data.loser.id, score: loserScore }
-        ]
-      }
-    }
-  }
-  fn.handleEmit(emit)
 }
 
 export default ScoreBoard

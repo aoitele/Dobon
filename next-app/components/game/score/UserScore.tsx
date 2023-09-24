@@ -1,20 +1,20 @@
 import React, { VFC } from 'react'
 import style from './UserScore.module.scss'
 import { Player } from '../../../@types/game'
-import { ScoreProviderState } from '../../../context/ScoreProvider'
 
 interface Props {
   user: Player
-  score: ScoreProviderState['winerScore'] | ScoreProviderState['loserScore']
+  score?: number
   roundUpScore?: number
+  imgSize?: number
 }
-const UserScore:VFC<Props> = ({ user, score }) => {
+const UserScore:VFC<Props> = ({ user, score, imgSize }) => {
   return (
     <div className={style.wrap}>
       <img
         src={`/images/game/userIcon/${user.turn}.png`}
-        width={80}
-        height={80}
+        width={imgSize ?? 80}
+        height={imgSize ?? 80}
       />
       <div>
         <p><span className={style.nickname}>{user.nickname}</span></p>

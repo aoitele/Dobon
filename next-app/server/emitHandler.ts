@@ -46,15 +46,16 @@ const emitHandler = (io: Socket, socket: any) => {
         const redisUserId = await adapterPubClient.hget(userKey, 'id')
         // Redisにユーザーデータがない場合、参加者をDBに保存
         if (redisUserId === null) {
+          // Redisにユーザーデータセット
+          const userDataMini = [{ id: userId, nickname, score: 0 }]
+          adapterPubClient.hset(userKey, userDataMini)
+
           const data:Prisma.ParticipantUncheckedCreateInput = {
             user_id: userId,
             room_id: roomId
           }
           try {
-            await prisma.participant.create({ data })
-            // Redisにユーザーデータセット
-            const userDataMini = [{ id: userId, nickname, score: 0 }]
-            await adapterPubClient.hset(userKey, userDataMini)
+            prisma.participant.create({ data })
           } catch(e) {
             console.log(e,'e')
           }
@@ -568,9 +569,10 @@ const emitHandler = (io: Socket, socket: any) => {
         if (users && users.length > 0) {
           for (let i=0; i<users.length; i+=1) {
             const updateUser: typeof users[number] = users[i]
-            if (updateUser.id && updateUser.score) {
+
+            if (updateUser.id && typeof updateUser.score === 'number') {
               const userKey = `room:${roomId}:user:${updateUser.id}`
-              adapterPubClient.hset(userKey, 'score', updateUser.score)
+              adapterPubClient.hmset(userKey, 'score', updateUser.score)
             }
           }
         }

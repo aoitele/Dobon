@@ -547,12 +547,25 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             assertExists(trashUser)
             assertExists(trashCard)
 
+            /**
+             * 以降、勝者敗者の確定も含めドボン処理を行う
+             * 勝敗のパターンは以下となる
+             * - 勝者1名、敗者1名（通常のドボン or ドボン返し）
+             * - 勝者2〜3名、敗者1名（誰かが出したカードで同時ドボンが発生した場合）
+             * - 勝者1名、敗者2〜3名（同時ドボンがドボン返しされた場合）
+             * - 勝者1名、敗者3名（ゲーム開始時に天和ドボンした場合）
+             * - 勝者2〜3名、敗者1〜2名（天和ドボンが複数名で発生した場合）
+             * - 勝者0名、敗者0名（全員が天和ドボンした場合）
+             */
+
             const { dobonPlayers, com1Hands, com2Hands, com3Hands } = checkDobonPlayers({ redisPipeLineResults, trashUser, trashCard, users })
             const dobonPlayersTurn = dobonPlayers.map(player => player.turn)
-            const trashUserHands =
+            const trashUserHands: string[] =
             trashUser.nickname === 'com1' ? com1Hands :
             trashUser.nickname === 'com2' ? com2Hands :
-            com3Hands
+            trashUser.nickname === 'com2' ? com3Hands : []
+
+            const isInitDobon = !trashUserHands.length
 
             if (!dobonJudge(trashCard, hands)) return {} // UIでドボン可能な場合しか実行されないようにしているため実質この処理は起きえない
 
@@ -560,6 +573,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
             const newUsersState = users.map(u => {
               u.turn && dobonPlayersTurn.includes(u.turn) && (u.isWinner = true)
               u.turn === trashUser.turn && (u.isLoser = true)
+              isInitDobon && u.turn && !dobonPlayersTurn.includes(u.turn) && (u.isLoser = true)
               return u
             })
 
@@ -656,7 +670,7 @@ const cpuModeHandler = (io: Socket, socket: any) => {
         const { users } = board.data
 
         for (const u of users) {
-          if (u.nickname && u.score) {
+          if (u.nickname && typeof u.score === 'number') {
             const loadRedisKey = loadDobonRedisKeys([
               {mode:'pve', type: 'user', firstKey: pveKey, secondKey: u.nickname},
             ])
