@@ -154,7 +154,7 @@ const HowToPage = () => {
         </section>
         <div>
           <Link href="/">
-            <a className={style.link}>TOPに戻る</a>
+            <a className={style.link}>ドボンゲームへ</a>
           </Link>
         </div>
       </div>
