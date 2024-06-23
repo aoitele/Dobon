@@ -62,7 +62,7 @@ const TopPageContent:FC = () => {
                   <span className={style.icon}>👨‍👩‍👦‍👦 </span>
                   対人で遊ぶ
                 </div>
-                {isNotLoggedIn(authUser) && <span className={style.hint}>💡登録・ログインすると対人で遊ぶが行えます。</span>}
+                {isNotLoggedIn(authUser) && <span className={style.hint}>💡登録・ログインすると対人戦で遊べます。</span>}
               </>
             }
             {!authUser &&
