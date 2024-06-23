@@ -42,17 +42,17 @@ const TopPageContent:FC = () => {
             ? <>
                 <div className={style.link__active_emphasis}>
                   <span className={style.icon}>🃏 </span>
-                  <Link href="/room">Join game</Link>
+                  <Link href="/room">ルームに参加する</Link>
                 </div>
                 <div className={authUser ? style.link__active_emphasis : style.link__disabled} onClick={() => setValues({ ...values, selectedPvP:true })}>
                   <span className={style.icon}>📝 </span>
-                  <Link href="/room/create">Create game</Link>
+                  <Link href="/room/create">ルームを作る</Link>
                 </div>
               </>
             : <>
                 <div className={`${style.link__active} ${style.show}`}>
                   <span className={style.icon}>🤖 </span>
-                  <button onClick={() => setValues({ ...values, selectedPvE: true })}>Single Mode</button>
+                  <button onClick={() => setValues({ ...values, selectedPvE: true })}>1人で遊ぶ</button>
                 </div>
                 <div
                   className={authUser ? `${style.link__active} ${style.show}` : style.link__disabled}
@@ -60,31 +60,31 @@ const TopPageContent:FC = () => {
                     authUser ? setValues({ ...values, selectedPvP:true }) : undefined
                   }}>
                   <span className={style.icon}>👨‍👩‍👦‍👦 </span>
-                  Versus Mode
+                  対人で遊ぶ
                 </div>
-                {isNotLoggedIn(authUser) && <span className={style.hint}>💡Once you log in, you will have access to the versus mode.</span>}
+                {isNotLoggedIn(authUser) && <span className={style.hint}>💡登録・ログインすると対人戦で遊べます。</span>}
               </>
             }
             {!authUser &&
               <div className={style.loginBtn}>
                 <div className={style.link__active}>
                   <span className={style.icon}>👤 </span>
-                  <Link href="/user/login">Signup/Login</Link>
+                  <Link href="/user/login">登録・ログイン</Link>
                 </div>
               </div>
             }
             {values.selectedPvP
             ? <div className={style.link__active} onClick={() => setValues(initialState)}>
                 <span className={style.icon}>↩︎ </span>
-                Back
+                戻る
               </div>
             : <div className={style.link__active}>
                 <span className={style.icon}>📖 </span>
-                <Link href="/howto">Game rules</Link>
+                <Link href="/howto">ドボンのルール</Link>
               </div>
             }
           </div>
-          {isLoggedIn(authUser) && <span onClick={() => logout()}>Logout</span>}
+          {isLoggedIn(authUser) && <span onClick={() => logout()}>ログアウト</span>}
         </div>
       }
       <div className={`${style.bgAnimatedCard} ${style.card1}`}>
